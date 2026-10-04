@@ -1,73 +1,29 @@
 <%@ Page Title="Dashboard" Language="C#" MasterPageFile="~/Admin/Admin.Master" AutoEventWireup="true" CodeBehind="Dashboard.aspx.cs" Inherits="ForteMove.Web.Admin.Dashboard" %>
-
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    <header class="page-heading">
-        <div>
-            <p class="section-kicker">Operations overview</p>
-            <h1>Good to see you, <asp:Literal ID="litFirstName" runat="server" />.</h1>
-            <p>Monitor the current fleet and route network, then move directly to the work that needs your attention.</p>
-        </div>
-    </header>
-
-    <section aria-labelledby="operations-summary-title">
-        <div class="section-heading-row">
-            <div>
-                <p class="section-kicker">Current position</p>
-                <h2 id="operations-summary-title">Operations summary</h2>
+    <header class="page-heading"><div><p class="section-kicker">Operations overview</p><h1>Good to see you, <asp:Literal ID="litFirstName" runat="server" />.</h1><p>Monitor the current fleet and scheduled network, then move directly to operational work.</p></div></header>
+    <div class="dashboard-overview-grid">
+        <section class="app-panel fleet-status-panel" aria-labelledby="fleet-status-title">
+            <div class="panel-heading"><div><p class="section-kicker">Fleet status</p><h2 id="fleet-status-title">Total fleet: <asp:Literal ID="litTotalFleet" runat="server" /></h2></div></div>
+            <div class="fleet-status-bars">
+                <div class="fleet-status-row"><div class="fleet-status-label"><span>Operational</span><strong><asp:Literal ID="litOperationalFleet" runat="server" /></strong></div><div class="status-track"><div ID="barOperational" runat="server" class="status-fill status-fill-success"></div></div></div>
+                <div class="fleet-status-row"><div class="fleet-status-label"><span>Out of service</span><strong><asp:Literal ID="litOutOfServiceFleet" runat="server" /></strong></div><div class="status-track"><div ID="barOutOfService" runat="server" class="status-fill status-fill-danger"></div></div></div>
+                <div class="fleet-status-row"><div class="fleet-status-label"><span>Under maintenance</span><strong><asp:Literal ID="litUnderMaintenanceFleet" runat="server" /></strong></div><div class="status-track"><div ID="barUnderMaintenance" runat="server" class="status-fill status-fill-warning"></div></div></div>
+                <asp:Panel ID="pnlRetired" runat="server" CssClass="fleet-status-row" Visible="false"><div class="fleet-status-label"><span>Retired</span><strong><asp:Literal ID="litRetiredFleet" runat="server" /></strong></div><div class="status-track"><div ID="barRetired" runat="server" class="status-fill status-fill-neutral"></div></div></asp:Panel>
             </div>
-        </div>
-        <div class="metric-grid">
-            <article class="metric-card app-panel">
-                <span class="metric-label">Total fleet</span>
-                <strong class="metric-value"><asp:Literal ID="litTotalFleet" runat="server" /></strong>
-            </article>
-            <article class="metric-card app-panel metric-card-success">
-                <span class="metric-label">Operational</span>
-                <strong class="metric-value"><asp:Literal ID="litOperationalFleet" runat="server" /></strong>
-            </article>
-            <article class="metric-card app-panel metric-card-danger">
-                <span class="metric-label">Out of service</span>
-                <strong class="metric-value"><asp:Literal ID="litOutOfServiceFleet" runat="server" /></strong>
-            </article>
-            <article class="metric-card app-panel metric-card-warning">
-                <span class="metric-label">Under maintenance</span>
-                <strong class="metric-value"><asp:Literal ID="litUnderMaintenanceFleet" runat="server" /></strong>
-            </article>
-            <article class="metric-card app-panel metric-card-route">
-                <span class="metric-label">Active routes</span>
-                <strong class="metric-value"><asp:Literal ID="litActiveRoutes" runat="server" /></strong>
-            </article>
-        </div>
-    </section>
-
-    <section aria-labelledby="quick-actions-title" class="mt-4">
-        <div class="section-heading-row">
-            <div>
-                <p class="section-kicker">Quick actions</p>
-                <h2 id="quick-actions-title">Manage operations</h2>
-            </div>
-        </div>
-        <div class="action-grid action-grid-four">
-            <a class="action-card" href="<%= ResolveUrl("~/Admin/RegisterBus.aspx") %>">
-                <span class="action-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 16V8.5A2.5 2.5 0 0 1 6.5 6h7A2.5 2.5 0 0 1 16 8.5V16" /><path d="M4 12h12M6.5 16v2M13.5 16v2M4 16h12" /><path d="M19 5v6M16 8h6" /></svg></span>
-                <span class="action-card-copy"><strong>Register a bus</strong><span>Add a vehicle and capture its operational details.</span></span>
-                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6" /></svg>
-            </a>
-            <a class="action-card" href="<%= ResolveUrl("~/Admin/FleetList.aspx") %>">
-                <span class="action-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="3" y="5" width="13" height="12" rx="2" /><path d="M3 11h13M6 17v2M13 17v2M19 7h2M19 11h2M19 15h2" /></svg></span>
-                <span class="action-card-copy"><strong>Open fleet list</strong><span>Review registered buses, compliance and vehicle status.</span></span>
-                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6" /></svg>
-            </a>
-            <a class="action-card" href="<%= ResolveUrl("~/Admin/Routes/CreateRoute.aspx") %>">
-                <span class="action-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="5.5" cy="18" r="2" /><circle cx="15" cy="7" r="2" /><path d="M7 16.6c2.2-1.8 1-4.7 3.4-6.1.8-.5 1.7-.7 2.7-.9M19 14v6M16 17h6" /></svg></span>
-                <span class="action-card-copy"><strong>Create a route</strong><span>Build a permanent service path from an ordered stop list.</span></span>
-                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6" /></svg>
-            </a>
-            <a class="action-card" href="<%= ResolveUrl("~/Admin/Routes/RouteList.aspx") %>">
-                <span class="action-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="6" cy="18" r="2.25" /><circle cx="18" cy="6" r="2.25" /><path d="M7.8 16.6c2.7-1.8 1.2-5.6 4.2-7.2 1.1-.6 2.4-.8 4-.9" /></svg></span>
-                <span class="action-card-copy"><strong>Open route list</strong><span>Find active routes and review their full itineraries.</span></span>
-                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6" /></svg>
-            </a>
-        </div>
-    </section>
+        </section>
+        <section class="app-panel operations-metrics-panel" aria-labelledby="network-status-title"><div class="panel-heading"><div><p class="section-kicker">Network and service</p><h2 id="network-status-title">Current operations</h2></div></div><div class="compact-metric-grid">
+            <article><span>Active Routes</span><strong><asp:Literal ID="litActiveRoutes" runat="server" /></strong></article>
+            <article><span>Active Schedules</span><strong><asp:Literal ID="litActiveSchedules" runat="server" /></strong></article>
+            <article><span>Today's Trips</span><strong><asp:Literal ID="litTodaysTrips" runat="server" /></strong></article>
+            <article><span>Unassigned Trips</span><strong><asp:Literal ID="litUnassignedTrips" runat="server" /></strong></article>
+        </div></section>
+    </div>
+    <section aria-labelledby="quick-actions-title" class="mt-4"><div class="section-heading-row"><div><p class="section-kicker">Quick actions</p><h2 id="quick-actions-title">Manage operations</h2></div></div><div class="action-grid action-grid-three">
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/RegisterBus.aspx") %>"><span class="action-card-copy"><strong>Register a bus</strong><span>Add a vehicle to the fleet register.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/Routes/CreateRoute.aspx") %>"><span class="action-card-copy"><strong>Create a Route</strong><span>Build an ordered service path.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/Scheduling/CreateSchedule.aspx") %>"><span class="action-card-copy"><strong>Create a Schedule</strong><span>Generate recurring future Trips.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/FleetList.aspx") %>"><span class="action-card-copy"><strong>Fleet list</strong><span>Review vehicles and compliance.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/Scheduling/ScheduleList.aspx") %>"><span class="action-card-copy"><strong>Schedule list</strong><span>Review recurring service patterns.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/Scheduling/TripList.aspx") %>"><span class="action-card-copy"><strong>Trips</strong><span>Review generated dated services.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+    </div></section>
 </asp:Content>

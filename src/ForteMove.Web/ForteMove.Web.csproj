@@ -55,6 +55,11 @@
     <Content Include="Admin\Routes\CreateRoute.aspx" />
     <Content Include="Admin\Routes\RouteDetails.aspx" />
     <Content Include="Admin\Routes\RouteList.aspx" />
+    <Content Include="Admin\Scheduling\ChangeSchedule.aspx" />
+    <Content Include="Admin\Scheduling\CreateSchedule.aspx" />
+    <Content Include="Admin\Scheduling\ScheduleDetails.aspx" />
+    <Content Include="Admin\Scheduling\ScheduleList.aspx" />
+    <Content Include="Admin\Scheduling\TripList.aspx" />
     <Content Include="Admin\Web.config" />
     <Content Include="Content\Brand\fortemove-mark.png" />
     <Content Include="Content\Brand\fortemove-wordmark.png" />
@@ -123,6 +128,41 @@
     </Compile>
     <Compile Include="Admin\Routes\RouteList.aspx.designer.cs">
       <DependentUpon>RouteList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ChangeSchedule.aspx.cs">
+      <DependentUpon>ChangeSchedule.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ChangeSchedule.aspx.designer.cs">
+      <DependentUpon>ChangeSchedule.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\CreateSchedule.aspx.cs">
+      <DependentUpon>CreateSchedule.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\CreateSchedule.aspx.designer.cs">
+      <DependentUpon>CreateSchedule.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleDetails.aspx.cs">
+      <DependentUpon>ScheduleDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleDetails.aspx.designer.cs">
+      <DependentUpon>ScheduleDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleList.aspx.cs">
+      <DependentUpon>ScheduleList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleList.aspx.designer.cs">
+      <DependentUpon>ScheduleList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\TripList.aspx.cs">
+      <DependentUpon>TripList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\TripList.aspx.designer.cs">
+      <DependentUpon>TripList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>

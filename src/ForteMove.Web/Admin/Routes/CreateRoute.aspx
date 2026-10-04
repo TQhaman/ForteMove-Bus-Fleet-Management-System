@@ -69,7 +69,7 @@
                         <span class="stop-order" aria-label='Stop <%#: Eval("StopOrder") %>'><%#: Eval("StopOrder") %></span>
                         <span class="route-stop-copy">
                             <strong><%#: Eval("StopName") %></strong>
-                            <span><%#: Eval("StopCode") %> · <%#: Eval("Area") %></span>
+                            <span class="route-stop-meta"><span><%#: Eval("StopCode") %></span><span><%#: Eval("Area") %></span></span>
                             <asp:PlaceHolder runat="server" Visible='<%# Convert.ToBoolean(Eval("IsNew")) %>'><span class="draft-chip">New stop</span></asp:PlaceHolder>
                         </span>
                         <span class="route-stop-actions">

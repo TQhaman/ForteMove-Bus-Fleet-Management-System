@@ -1,13 +1,14 @@
 # ForteMove
 
-ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. This repository currently contains the platform foundation and the first two Sprint 1/2 vertical slices:
+ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. This repository currently contains the platform foundation and the first three Sprint 1/2 vertical slices:
 
 1. secure Transport Administrator authentication and logout;
 2. role-protected administrator workspace and dashboard;
 3. bus registration with business validation and an editable automatic fleet-number suggestion;
 4. a searchable, filterable fleet list;
 5. database-backed fleet and active-route dashboard counts; and
-6. transactional Route creation with reusable ordered Stops, Route List, and Route Details.
+6. transactional Route creation with reusable ordered Stops, Route List, and Route Details; and
+7. recurring Schedule creation, synchronous dated Trip generation, Schedule history, safe future changes, and operational Trip browsing.
 
 No demo identities, buses, routes, stops, schedules, trips, assignments, drivers, passengers, wallets, tickets, tracking records, maintenance work orders, or fuel/energy records are seeded.
 
@@ -52,8 +53,13 @@ Open `ForteMove.sln`, set `ForteMove.Web` as the startup project, and launch its
 6. Open Create Route, add existing Stops or keep new Stops in the in-progress route draft, and arrange them with Move Up and Move Down.
 7. Save the Route. New Stops, the Route, its ordered RouteStops, and audit entries are committed together.
 8. Inspect the saved Route in Route List and Route Details.
-9. Use the POST-backed Logout action when finished.
+9. Open Create Schedule, choose an active Route, operating days, departure times, and an effective period, then review the exact future Trip count.
+10. Create the Schedule and inspect it through Schedule List, Schedule Details, and Trips.
+11. Use Change Schedule to review the impact of a future-dated recurring-pattern change before applying it.
+12. Use the POST-backed Logout action when finished.
 
 An expired licence, roadworthy certificate, or insurance date is accepted for record completeness, but the bus is saved as `OutOfService` with a warning. A compliant bus is initially `Operational`.
 
 Route and Stop codes are assigned automatically. New Stops entered in Create Route are not persisted if the administrator abandons the draft or the aggregate save fails. Origins and destinations are always derived from the first and final ordered RouteStops; they are not stored separately.
+
+Schedule codes such as `FM-S01` remain stable across internal history. Generated Trips use codes such as `TR-000001`, begin as `Unassigned`, and store South African local service time plus an expected-finish snapshot. Audit timestamps remain UTC. A Schedule starting today generates only departures strictly later than the current South African operational time.

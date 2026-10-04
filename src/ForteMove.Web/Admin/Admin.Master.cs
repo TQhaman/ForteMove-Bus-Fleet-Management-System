@@ -72,12 +72,26 @@ namespace ForteMove.Web.Admin
             lnkCreateRoute.CssClass = BuildNavigationClass(
                 appRelativePath,
                 "~/Admin/Routes/CreateRoute.aspx");
+            lnkScheduleList.CssClass = BuildNavigationClass(
+                appRelativePath,
+                "~/Admin/Scheduling/ScheduleList.aspx",
+                "~/Admin/Scheduling/ScheduleDetails.aspx",
+                "~/Admin/Scheduling/ChangeSchedule.aspx");
+            lnkCreateSchedule.CssClass = BuildNavigationClass(
+                appRelativePath,
+                "~/Admin/Scheduling/CreateSchedule.aspx");
+            lnkTripList.CssClass = BuildNavigationClass(
+                appRelativePath,
+                "~/Admin/Scheduling/TripList.aspx");
 
             SetAriaCurrent(lnkDashboard);
             SetAriaCurrent(lnkRegisterBus);
             SetAriaCurrent(lnkFleetList);
             SetAriaCurrent(lnkRouteList);
             SetAriaCurrent(lnkCreateRoute);
+            SetAriaCurrent(lnkScheduleList);
+            SetAriaCurrent(lnkCreateSchedule);
+            SetAriaCurrent(lnkTripList);
         }
 
         private static string BuildNavigationClass(string currentPath, params string[] targetPaths)

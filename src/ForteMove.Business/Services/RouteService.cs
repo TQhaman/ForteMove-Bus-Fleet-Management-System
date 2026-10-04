@@ -58,6 +58,15 @@ namespace ForteMove.Business.Services
             return IdentifierCodePolicy.FormatStopCode(suggestedSequence);
         }
 
+        public ServiceResult<Stop> ValidateStopDraft(CreateStopRequest request)
+        {
+            IList<ValidationError> errors = new List<ValidationError>();
+            Stop stop = ValidateAndNormalizeNewStop(request, 1, errors);
+            return errors.Count == 0
+                ? ServiceResult<Stop>.Success(stop)
+                : ServiceResult<Stop>.Failure(errors);
+        }
+
         public ServiceResult<RouteCreationResult> CreateRoute(
             CreateRouteRequest request,
             long actorUserAccountId)

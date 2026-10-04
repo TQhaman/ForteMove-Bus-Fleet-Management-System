@@ -9,6 +9,9 @@ namespace ForteMove.Web.Admin
         protected global::System.Web.UI.WebControls.HyperLink lnkFleetList;
         protected global::System.Web.UI.WebControls.HyperLink lnkRouteList;
         protected global::System.Web.UI.WebControls.HyperLink lnkCreateRoute;
+        protected global::System.Web.UI.WebControls.HyperLink lnkScheduleList;
+        protected global::System.Web.UI.WebControls.HyperLink lnkCreateSchedule;
+        protected global::System.Web.UI.WebControls.HyperLink lnkTripList;
         protected global::System.Web.UI.WebControls.Literal litInitial;
         protected global::System.Web.UI.WebControls.Label lblDisplayName;
         protected global::System.Web.UI.WebControls.Label lblRole;

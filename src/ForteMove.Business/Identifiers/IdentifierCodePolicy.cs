@@ -20,6 +20,23 @@ namespace ForteMove.Business.Identifiers
             return Format(sequence, "ST-", "D3");
         }
 
+        public static string FormatScheduleCode(int sequence)
+        {
+            return Format(sequence, "FM-S", "D2");
+        }
+
+        public static string FormatTripCode(long sequence)
+        {
+            if (sequence <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "sequence",
+                    "The identifier sequence must be greater than zero.");
+            }
+
+            return "TR-" + sequence.ToString("D6", CultureInfo.InvariantCulture);
+        }
+
         private static string Format(int sequence, string prefix, string format)
         {
             if (sequence <= 0)

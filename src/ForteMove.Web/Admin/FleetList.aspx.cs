@@ -58,7 +58,7 @@ namespace ForteMove.Web.Admin
 
             return string.Format(
                 CultureInfo.CurrentCulture,
-                "Licence {0:d} · Roadworthy {1:d} · Insurance {2:d}",
+                "Licence {0:d} | Roadworthy {1:d} | Insurance {2:d}",
                 bus.LicenceExpiryDate,
                 bus.RoadworthyExpiryDate,
                 bus.InsuranceExpiryDate);

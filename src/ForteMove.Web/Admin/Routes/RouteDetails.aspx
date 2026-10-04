@@ -5,7 +5,7 @@
         <header class="page-heading page-heading-with-action">
             <div>
                 <p class="section-kicker">Route network</p>
-                <h1><asp:Literal ID="litRouteCode" runat="server" /> · <asp:Literal ID="litRouteName" runat="server" /></h1>
+                <h1><asp:Literal ID="litRouteCode" runat="server" /> - <asp:Literal ID="litRouteName" runat="server" /></h1>
                 <p>Review the service path and its ordered stop itinerary.</p>
             </div>
             <a class="btn btn-outline-secondary" href="<%= ResolveUrl("~/Admin/Routes/RouteList.aspx") %>">Back to route list</a>
@@ -45,7 +45,7 @@
                             <span class="itinerary-order" aria-hidden="true"><%#: Eval("StopOrder") %></span>
                             <span class="itinerary-copy">
                                 <strong><%#: Eval("StopName") %></strong>
-                                <span><%#: Eval("StopCode") %> · <%#: Eval("Area") %></span>
+                                <span class="route-stop-meta"><span><%#: Eval("StopCode") %></span><span><%#: Eval("Area") %></span></span>
                             </span>
                             <asp:PlaceHolder runat="server" Visible='<%# Eval("EstimatedMinutesFromOrigin") != null %>'>
                                 <span class="itinerary-time"><%#: FormatMinutesFromOrigin(Eval("EstimatedMinutesFromOrigin")) %></span>
