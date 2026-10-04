@@ -22,6 +22,10 @@ namespace ForteMove.Models.Fleet
 
         public int PassengerCapacity { get; set; }
 
+        public int? GrossVehicleMassKg { get; set; }
+
+        public string RequiredLicenceCode { get; set; }
+
         public string PropulsionName { get; set; }
 
         public decimal OdometerKilometres { get; set; }

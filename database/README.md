@@ -44,12 +44,22 @@ Use this switch for the second idempotency run after the administrator has been 
 - `0001_IdentityAndAccess.sql` creates roles, accounts, staff profiles, and audit entries.
 - `0002_FleetFoundation.sql` creates the fleet catalogues and bus register.
 - `0003_RoutesAndStops.sql` standardizes the internal bus VIN column name and creates Routes, Stops, and ordered RouteStops.
+- `0004_SchedulingAndTrips.sql` creates stable recurring Schedules, versioned operating patterns, generated Trips, and the constraints required for safe regeneration.
+- `0005_DriversAndAssignments.sql` adds bus gross vehicle mass, Driver assignment credentials, and append-only Trip assignment history.
 
 Migration `0003` preserves existing bus rows while renaming `Buses.VinChassisNumber` to `Buses.Vin` and its unique constraint/index to `UQ_Buses_Vin`. It refuses to run against an unexpected or partially changed VIN schema.
 
 Routes derive their origin and destination from their ordered RouteStops. Stops are reusable across routes, while unique constraints prevent duplicate stop order values and prevent the same Stop from appearing twice on one Route. Optional stop coordinates are stored as `DECIMAL(9,6)` values and must be supplied as a valid latitude/longitude pair.
 
 The migration does not seed routes, stops, coordinates, distances, durations, or fares. The approved KuGompo City / East London prototype network remains manual acceptance-test data until its operational values are entered through the application. The approved list contains 14 unique stop names because Terminus Station is shared by two proposed routes.
+
+Migration `0004` does not seed Schedules or Trips. Operating days and departure times are normalized child rows. Each generated Trip is unique for its Route, service date, and departure time; stores its Route-duration and expected-finish snapshots; and begins with controlled status `Unassigned`. Schedule changes create a new internal version, preserve historical Trips, regenerate only safe untouched future Trips, and retain future Trips with operational dependencies for review.
+
+Service dates and times are interpreted as South African local operational time. Audit timestamps and operational-touch timestamps use UTC. Schedule creation is limited to 366 inclusive calendar days and 10,000 synchronously generated Trips per version.
+
+Migration `0005` does not seed Drivers, assignments, or vehicle mass values. Existing buses retain a nullable gross vehicle mass until an administrator records an approved value. New bus registration requires a positive GVM. `DriverProfiles` holds availability, date of birth, licence and passenger PrDP information; `TripAssignments` preserves every assignment decision and permits only one current assignment per Trip.
+
+Assignment recommendations are advisory. The selected Driver, bus, Trip state, credentials, compliance, capacity, conflicts, rowversions, and 15-minute turnaround are revalidated in a serializable transaction before any assignment is committed. A selected batch either saves completely or rolls back completely.
 
 ## Migration policy
 

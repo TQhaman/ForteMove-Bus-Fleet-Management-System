@@ -17,9 +17,21 @@ namespace ForteMove.Web
                 return;
             }
 
+            if (principal.Context.MustChangePassword)
+            {
+                Response.Redirect(ResolveUrl("~/Account/ChangePassword.aspx"), true);
+                return;
+            }
+
             if (principal.Context.Role == RoleCode.TransportAdministrator)
             {
                 Response.Redirect(ResolveUrl("~/Admin/Dashboard.aspx"), true);
+                return;
+            }
+
+            if (principal.Context.Role == RoleCode.Driver)
+            {
+                Response.Redirect(ResolveUrl("~/Driver/Account.aspx"), true);
                 return;
             }
 

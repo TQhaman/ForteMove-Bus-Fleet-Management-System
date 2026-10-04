@@ -7,8 +7,10 @@
     --fm-blue-500: #1495ff;
     --fm-blue-100: #ddecff;
     --fm-surface: #ffffff;
+    --fm-surface-soft: #f7f9fc;
     --fm-workspace: #f3f6fa;
     --fm-border: #dce4ed;
+    --fm-border-strong: #bdc9d7;
     --fm-text: #172235;
     --fm-muted: #637083;
     --fm-success: #16734a;
@@ -285,7 +287,9 @@ a:focus-visible {
 .app-navigation {
     display: flex;
     flex-direction: column;
+    flex: 1;
     gap: .42rem;
+    overflow-y: auto;
 }
 
 .nav-section-label {
@@ -914,6 +918,58 @@ a:focus-visible {
     color: #536178;
 }
 
+.status-info {
+    background: var(--fm-blue-100);
+    color: var(--fm-blue-700);
+}
+
+.route-stop-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: .35rem .8rem;
+}
+
+.dashboard-overview-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
+}
+
+.fleet-status-panel,
+.operations-metrics-panel { padding: 1.35rem; }
+
+.fleet-status-bars { display: grid; gap: 1.05rem; }
+.fleet-status-label { align-items: center; display: flex; justify-content: space-between; margin-bottom: .38rem; }
+.fleet-status-label span { color: var(--fm-muted); font-size: .84rem; font-weight: 700; }
+.fleet-status-label strong { color: var(--fm-navy-900); font-size: .95rem; }
+.status-track { background: #e9eef4; border-radius: 999px; height: 10px; overflow: hidden; }
+.status-fill { border-radius: inherit; height: 100%; min-width: 0; }
+.status-fill-success { background: #1f9d67; }
+.status-fill-danger { background: #d1495b; }
+.status-fill-warning { background: #d49a28; }
+.status-fill-neutral { background: #7a8798; }
+
+.compact-metric-grid { display: grid; gap: .75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.compact-metric-grid article { background: var(--fm-surface-soft); border: 1px solid var(--fm-border); border-radius: 10px; display: flex; flex-direction: column; min-height: 94px; padding: 1rem; }
+.compact-metric-grid span { color: var(--fm-muted); font-size: .76rem; font-weight: 750; }
+.compact-metric-grid strong { color: var(--fm-navy-900); font-size: 1.75rem; margin-top: auto; }
+.action-grid-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.schedule-builder-layout { max-width: 1050px; }
+.day-selector { display: flex; flex-wrap: wrap; gap: .55rem; }
+.day-selector input { margin-right: .32rem; }
+.day-selector label { background: var(--fm-surface-soft); border: 1px solid var(--fm-border); border-radius: 8px; cursor: pointer; padding: .55rem .72rem; }
+.compact-empty { background: var(--fm-surface-soft); border: 1px dashed var(--fm-border-strong); border-radius: 9px; color: var(--fm-muted); padding: .85rem 1rem; }
+.departure-chip-list { display: flex; flex-wrap: wrap; gap: .55rem; margin-bottom: .8rem; }
+.departure-chip { align-items: center; background: var(--fm-blue-100); border-radius: 999px; color: var(--fm-navy-900); display: inline-flex; gap: .3rem; padding: .25rem .35rem .25rem .8rem; }
+.inline-input-row { align-items: center; display: flex; gap: .65rem; max-width: 410px; }
+.preview-panel { border-left: 4px solid var(--fm-blue-500); padding: 1.3rem; }
+.preview-panel h2 { margin-bottom: .35rem; }
+.impact-list { color: var(--fm-muted); display: grid; gap: .55rem; margin: .8rem 0 0; }
+.history-list { display: grid; gap: .75rem; }
+.history-item { border-bottom: 1px solid var(--fm-border); display: flex; flex-direction: column; gap: .22rem; padding-bottom: .75rem; }
+.history-item span { color: var(--fm-muted); font-size: .82rem; }
+
 .empty-state {
     padding: clamp(2.5rem, 7vw, 5.5rem) 1.5rem;
     text-align: center;
@@ -1300,9 +1356,11 @@ a:focus-visible {
     }
 
     .app-navigation {
+        flex: none;
         flex-direction: row;
         gap: .35rem;
         overflow-x: auto;
+        overflow-y: visible;
         padding-top: .55rem;
     }
 
@@ -1331,6 +1389,10 @@ a:focus-visible {
     .metric-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+
+    .dashboard-overview-grid { grid-template-columns: 1fr; }
+
+    .action-grid-three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 767.98px) {
@@ -1382,6 +1444,14 @@ a:focus-visible {
 
     .action-grid {
         grid-template-columns: 1fr;
+    }
+
+    .action-grid-three { grid-template-columns: 1fr; }
+
+    .inline-input-row {
+        align-items: stretch;
+        flex-direction: column;
+        max-width: none;
     }
 
     .metric-grid {

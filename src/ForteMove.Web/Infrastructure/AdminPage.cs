@@ -47,6 +47,12 @@ namespace ForteMove.Web.Infrastructure
                 return;
             }
 
+            if (principal.Context.MustChangePassword)
+            {
+                Response.Redirect(ResolveUrl("~/Account/ChangePassword.aspx"), true);
+                return;
+            }
+
             ViewStateUserKey = principal.Context.UserAccountId.ToString(CultureInfo.InvariantCulture);
             base.OnInit(e);
         }

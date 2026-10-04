@@ -58,10 +58,17 @@ namespace ForteMove.Web.Admin
 
             return string.Format(
                 CultureInfo.CurrentCulture,
-                "Licence {0:d} · Roadworthy {1:d} · Insurance {2:d}",
+                "Licence {0:d} | Roadworthy {1:d} | Insurance {2:d}",
                 bus.LicenceExpiryDate,
                 bus.RoadworthyExpiryDate,
                 bus.InsuranceExpiryDate);
+        }
+
+        protected string FormatGvm(object dataItem)
+        {
+            BusListItem bus = dataItem as BusListItem;
+            if (bus == null || !bus.GrossVehicleMassKg.HasValue) return "GVM required";
+            return string.Format(CultureInfo.CurrentCulture, "GVM {0:N0} kg | Licence {1}", bus.GrossVehicleMassKg.Value, bus.RequiredLicenceCode);
         }
 
         protected string FormatState(object value)

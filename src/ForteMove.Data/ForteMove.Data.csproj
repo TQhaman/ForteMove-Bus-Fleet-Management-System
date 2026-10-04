@@ -39,9 +39,12 @@
     <Compile Include="Internal\SqlAuditWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\SqlAuthenticationRepository.cs" />
+    <Compile Include="Repositories\SqlAssignmentRepository.cs" />
     <Compile Include="Repositories\SqlBusRepository.cs" />
     <Compile Include="Repositories\SqlDashboardRepository.cs" />
+    <Compile Include="Repositories\SqlDriverRepository.cs" />
     <Compile Include="Repositories\SqlRouteRepository.cs" />
+    <Compile Include="Repositories\SqlSchedulingRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ForteMove.Business\ForteMove.Business.csproj">

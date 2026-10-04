@@ -75,6 +75,7 @@
                                     <span><%#: Eval("CategoryName") %></span>
                                     <span class="cell-secondary"><%#: Eval("PassengerCapacity") %> passengers</span>
                                     <span class="cell-tertiary"><%#: Eval("PropulsionName") %></span>
+                                    <span class="cell-tertiary"><%#: FormatGvm(Container.DataItem) %></span>
                                 </td>
                                 <td><%#: FormatOdometer(Eval("OdometerKilometres")) %></td>
                                 <td>
@@ -83,6 +84,7 @@
                                 </td>
                                 <td>
                                     <span class='<%# GetStateCss(Eval("BaseOperationalState")) %>'><%#: FormatState(Eval("BaseOperationalState")) %></span>
+                                    <span class="cell-tertiary"><a href='<%# ResolveUrl("~/Admin/FleetDetails.aspx?id=" + Eval("BusId")) %>'>View details</a></span>
                                 </td>
                             </tr>
                         </ItemTemplate>

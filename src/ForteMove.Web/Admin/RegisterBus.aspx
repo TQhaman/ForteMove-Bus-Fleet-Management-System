@@ -80,6 +80,11 @@
                     <asp:TextBox ID="txtPassengerCapacity" runat="server" CssClass="form-control" TextMode="Number" min="1" max="200" step="1" required="required" inputmode="numeric" />
                 </div>
                 <div class="col-md-4">
+                    <asp:Label ID="lblGrossVehicleMass" runat="server" AssociatedControlID="txtGrossVehicleMass" CssClass="form-label required-label" Text="Gross vehicle mass (kg)" />
+                    <asp:TextBox ID="txtGrossVehicleMass" runat="server" CssClass="form-control" TextMode="Number" min="1" step="1" required="required" inputmode="numeric" />
+                    <div class="form-text">Use the approved mass shown on the vehicle documentation.</div>
+                </div>
+                <div class="col-md-4">
                     <asp:Label ID="lblPropulsion" runat="server" AssociatedControlID="ddlPropulsion" CssClass="form-label required-label" Text="Propulsion type" />
                     <asp:DropDownList ID="ddlPropulsion" runat="server" CssClass="form-select" required="required" />
                 </div>
@@ -121,6 +126,15 @@
                 <div class="col-md-4">
                     <asp:Label ID="lblInsuranceExpiry" runat="server" AssociatedControlID="txtInsuranceExpiry" CssClass="form-label required-label" Text="Insurance expiry" />
                     <asp:TextBox ID="txtInsuranceExpiry" runat="server" CssClass="form-control" TextMode="Date" required="required" />
+                </div>
+                <div class="col-md-4">
+                    <asp:Label ID="lblVehicleStatus" runat="server" AssociatedControlID="ddlVehicleStatus" CssClass="form-label required-label" Text="Vehicle status" />
+                    <asp:DropDownList ID="ddlVehicleStatus" runat="server" CssClass="form-select" required="required">
+                        <asp:ListItem Text="Operational" Value="Operational" Selected="True" />
+                        <asp:ListItem Text="Out of service" Value="OutOfService" />
+                        <asp:ListItem Text="Under maintenance" Value="UnderMaintenance" />
+                        <asp:ListItem Text="Retired" Value="Retired" />
+                    </asp:DropDownList>
                 </div>
             </div>
         </section>

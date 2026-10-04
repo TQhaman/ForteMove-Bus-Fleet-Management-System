@@ -82,26 +82,8 @@ namespace ForteMove.Web.Admin.Routes
         {
             ClearStopDraftErrors();
             IList<ValidationError> errors = new List<ValidationError>();
-            string stopName = (txtStopName.Text ?? string.Empty).Trim();
-            string area = (txtArea.Text ?? string.Empty).Trim();
-            if (stopName.Length == 0)
-            {
-                errors.Add(new ValidationError("StopName", "Stop name is required."));
-            }
-
-            if (area.Length == 0)
-            {
-                errors.Add(new ValidationError("Area", "Area is required."));
-            }
-
             decimal? latitude = ParseDecimal(txtLatitude, "Latitude", "Latitude", errors);
             decimal? longitude = ParseDecimal(txtLongitude, "Longitude", "Longitude", errors);
-            if (latitude.HasValue != longitude.HasValue)
-            {
-                errors.Add(new ValidationError(
-                    latitude.HasValue ? "Longitude" : "Latitude",
-                    "Enter both latitude and longitude, or leave both empty."));
-            }
 
             if (errors.Count > 0)
             {
@@ -110,15 +92,32 @@ namespace ForteMove.Web.Admin.Routes
                 return;
             }
 
+            ServiceResult<Stop> validation = ServiceFactory.CreateRouteService().ValidateStopDraft(
+                new CreateStopRequest
+                {
+                    StopName = txtStopName.Text,
+                    Area = txtArea.Text,
+                    Latitude = latitude,
+                    Longitude = longitude
+                });
+            if (!validation.Succeeded)
+            {
+                ShowStopDraftErrors(validation.Errors);
+                pnlNewStop.Visible = true;
+                return;
+            }
+
+            Stop normalizedStop = validation.Value;
+
             RouteBuilderState state = BuilderState;
             state.Stops.Add(new RouteDraftStop
             {
                 DraftKey = "new-" + Guid.NewGuid().ToString("N"),
                 StopCode = litStopCode.Text,
-                StopName = stopName,
-                Area = area,
-                Latitude = latitude,
-                Longitude = longitude
+                StopName = normalizedStop.StopName,
+                Area = normalizedStop.Area,
+                Latitude = normalizedStop.Latitude,
+                Longitude = normalizedStop.Longitude
             });
             BuilderState = state;
             ClearNewStopInputs();

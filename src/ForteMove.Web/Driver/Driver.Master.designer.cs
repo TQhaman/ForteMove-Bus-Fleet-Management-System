@@ -1,0 +1,1 @@
+namespace ForteMove.Web.Driver{public partial class DriverMaster{protected global::System.Web.UI.WebControls.Label lblName;protected global::System.Web.UI.WebControls.LinkButton btnLogout;protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;}}

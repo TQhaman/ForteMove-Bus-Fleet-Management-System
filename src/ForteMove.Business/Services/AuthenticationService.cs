@@ -3,6 +3,8 @@ using ForteMove.Business.Contracts;
 using ForteMove.Business.Security;
 using ForteMove.Business.Time;
 using ForteMove.Models.Security;
+using ForteMove.Models.Common;
+using System.Collections.Generic;
 
 namespace ForteMove.Business.Services
 {
@@ -137,6 +139,48 @@ namespace ForteMove.Business.Services
             }
 
             repository.RecordLogout(userAccountId, clock.UtcNow, NormalizeClientIp(clientIpAddress));
+        }
+
+        public ServiceResult<bool> ChangePassword(ChangePasswordRequest request)
+        {
+            IList<ValidationError> errors = new List<ValidationError>();
+            if (request == null || request.UserAccountId <= 0)
+            {
+                return ServiceResult<bool>.Failure(string.Empty, "A valid authenticated account is required.");
+            }
+
+            if (string.IsNullOrEmpty(request.CurrentPassword))
+            {
+                errors.Add(new ValidationError("CurrentPassword", "Current temporary password is required."));
+            }
+
+            PasswordPolicy.Validate(request.NewPassword, "NewPassword", errors);
+            if (!string.Equals(request.NewPassword, request.ConfirmPassword, StringComparison.Ordinal))
+            {
+                errors.Add(new ValidationError("ConfirmPassword", "The new password confirmation does not match."));
+            }
+
+            UserCredentialRecord credential = repository.GetCredential(request.UserAccountId);
+            if (credential == null || !passwordHasher.VerifyPassword(request.CurrentPassword, credential))
+            {
+                errors.Add(new ValidationError("CurrentPassword", "The current password is incorrect."));
+            }
+            else if (passwordHasher.VerifyPassword(request.NewPassword, credential))
+            {
+                errors.Add(new ValidationError("NewPassword", "Choose a new password that differs from the temporary password."));
+            }
+
+            if (errors.Count > 0)
+            {
+                return ServiceResult<bool>.Failure(errors);
+            }
+
+            repository.ChangePassword(
+                request.UserAccountId,
+                passwordHasher.HashPassword(request.NewPassword),
+                clock.UtcNow,
+                NormalizeClientIp(request.ClientIpAddress));
+            return ServiceResult<bool>.Success(true);
         }
 
         public static bool IsCurrentPrincipalValid(PrincipalContext principal)

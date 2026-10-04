@@ -19,5 +19,13 @@ namespace ForteMove.Business.Contracts
         void RecordSuccessfulLogin(long userAccountId, DateTime loggedInAtUtc, string clientIpAddress);
 
         void RecordLogout(long userAccountId, DateTime loggedOutAtUtc, string clientIpAddress);
+
+        UserCredentialRecord GetCredential(long userAccountId);
+
+        void ChangePassword(
+            long userAccountId,
+            PasswordHash passwordHash,
+            DateTime changedAtUtc,
+            string clientIpAddress);
     }
 }

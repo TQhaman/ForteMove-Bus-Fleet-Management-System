@@ -33,6 +33,22 @@ namespace ForteMove.Web.Infrastructure
                 new SqlDashboardRepository(GetConnectionString()));
         }
 
+        public static SchedulingService CreateSchedulingService()
+        {
+            return new SchedulingService(
+                new SqlSchedulingRepository(GetConnectionString()));
+        }
+
+        public static DriverService CreateDriverService()
+        {
+            return new DriverService(new SqlDriverRepository(GetConnectionString()));
+        }
+
+        public static AssignmentService CreateAssignmentService()
+        {
+            return new AssignmentService(new SqlAssignmentRepository(GetConnectionString()));
+        }
+
         private static string GetConnectionString()
         {
             ConnectionStringSettings settings =

@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using ForteMove.Business.Contracts;
 using ForteMove.Business.Exceptions;
+using ForteMove.Business.Services;
 using ForteMove.Data.Internal;
 using ForteMove.Models.Fleet;
 
@@ -52,6 +53,7 @@ INSERT dbo.Buses
     Model,
     ManufactureYear,
     PassengerCapacity,
+    GrossVehicleMassKg,
     FuelTankCapacityLitres,
     BatteryCapacityKwh,
     OdometerKilometres,
@@ -74,6 +76,7 @@ VALUES
     @Model,
     @ManufactureYear,
     @PassengerCapacity,
+    @GrossVehicleMassKg,
     @FuelTankCapacityLitres,
     @BatteryCapacityKwh,
     @OdometerKilometres,
@@ -96,6 +99,7 @@ SELECT
     b.ManufactureYear,
     bc.DisplayName AS CategoryName,
     b.PassengerCapacity,
+    b.GrossVehicleMassKg,
     pt.DisplayName AS PropulsionName,
     b.OdometerKilometres,
     b.LicenceExpiryDate,
@@ -288,18 +292,50 @@ ORDER BY b.FleetNumber, b.BusId;";
                             ManufactureYear = reader.GetInt16(6),
                             CategoryName = reader.GetString(7),
                             PassengerCapacity = reader.GetInt16(8),
-                            PropulsionName = reader.GetString(9),
-                            OdometerKilometres = reader.GetDecimal(10),
-                            LicenceExpiryDate = reader.GetDateTime(11),
-                            RoadworthyExpiryDate = reader.GetDateTime(12),
-                            InsuranceExpiryDate = reader.GetDateTime(13),
-                            BaseOperationalState = ParseOperationalState(reader.GetString(14))
+                            GrossVehicleMassKg = reader.IsDBNull(9) ? (int?)null : reader.GetInt32(9),
+                            RequiredLicenceCode = BusService.GetRequiredLicenceCode(reader.IsDBNull(9) ? (int?)null : reader.GetInt32(9)),
+                            PropulsionName = reader.GetString(10),
+                            OdometerKilometres = reader.GetDecimal(11),
+                            LicenceExpiryDate = reader.GetDateTime(12),
+                            RoadworthyExpiryDate = reader.GetDateTime(13),
+                            InsuranceExpiryDate = reader.GetDateTime(14),
+                            BaseOperationalState = ParseOperationalState(reader.GetString(15))
                         });
                     }
                 }
             }
 
             return fleet;
+        }
+
+        public BusDetails GetBusDetails(long busId)
+        {
+            const string sql = @"
+SELECT b.BusId,b.BusCategoryId,bc.DisplayName,b.FleetNumber,b.RegistrationNumber,b.Vin,b.Make,b.Model,b.ManufactureYear,
+b.PassengerCapacity,b.GrossVehicleMassKg,b.OdometerKilometres,b.LicenceExpiryDate,b.RoadworthyExpiryDate,b.InsuranceExpiryDate,b.BaseOperationalState,b.RowVersion
+FROM dbo.Buses b INNER JOIN dbo.BusCategories bc ON bc.BusCategoryId=b.BusCategoryId WHERE b.BusId=@BusId;";
+            using(SqlConnection connection=new SqlConnection(connectionString))
+            using(SqlCommand command=new SqlCommand(sql,connection))
+            {
+                command.Parameters.Add("@BusId",SqlDbType.BigInt).Value=busId; connection.Open();
+                using(SqlDataReader reader=command.ExecuteReader(CommandBehavior.SingleRow))
+                {
+                    if(!reader.Read()) return null;
+                    return new BusDetails{BusId=reader.GetInt64(0),BusCategoryId=reader.GetInt32(1),CategoryName=reader.GetString(2),FleetNumber=reader.GetString(3),RegistrationNumber=reader.GetString(4),Vin=reader.GetString(5),Make=reader.GetString(6),Model=reader.GetString(7),ManufactureYear=reader.GetInt16(8),PassengerCapacity=reader.GetInt16(9),GrossVehicleMassKg=reader.IsDBNull(10)?(int?)null:reader.GetInt32(10),OdometerKilometres=reader.GetDecimal(11),LicenceExpiryDate=reader.GetDateTime(12),RoadworthyExpiryDate=reader.GetDateTime(13),InsuranceExpiryDate=reader.GetDateTime(14),BaseOperationalState=ParseOperationalState(reader.GetString(15)),RowVersion=(byte[])reader.GetValue(16)};
+                }
+            }
+        }
+
+        public void UpdateBusEligibility(BusDetails bus,long actorUserAccountId)
+        {
+            const string sql=@"UPDATE dbo.Buses SET BusCategoryId=@CategoryId,PassengerCapacity=@Capacity,GrossVehicleMassKg=@Gvm,
+LicenceExpiryDate=@Licence,RoadworthyExpiryDate=@Roadworthy,InsuranceExpiryDate=@Insurance,BaseOperationalState=@State,
+UpdatedByUserAccountId=@Actor,UpdatedUtc=SYSUTCDATETIME()
+WHERE BusId=@BusId AND RowVersion=@RowVersion;";
+            using(SqlConnection connection=new SqlConnection(connectionString)){connection.Open();using(SqlTransaction transaction=connection.BeginTransaction(IsolationLevel.Serializable))
+            {int? previousGvm;using(SqlCommand read=new SqlCommand("SELECT GrossVehicleMassKg FROM dbo.Buses WITH(UPDLOCK,HOLDLOCK) WHERE BusId=@BusId AND RowVersion=@RowVersion;",connection,transaction)){read.Parameters.Add("@BusId",SqlDbType.BigInt).Value=bus.BusId;read.Parameters.Add("@RowVersion",SqlDbType.Timestamp,8).Value=bus.RowVersion;object value=read.ExecuteScalar();if(value==null)throw new InvalidOperationException("This bus was changed by another user. Refresh and try again.");previousGvm=value==DBNull.Value?(int?)null:Convert.ToInt32(value,CultureInfo.InvariantCulture);}
+            using(SqlCommand command=new SqlCommand(sql,connection,transaction)){command.Parameters.Add("@CategoryId",SqlDbType.Int).Value=bus.BusCategoryId;command.Parameters.Add("@Capacity",SqlDbType.SmallInt).Value=bus.PassengerCapacity;command.Parameters.Add("@Gvm",SqlDbType.Int).Value=(object)bus.GrossVehicleMassKg??DBNull.Value;AddDateParameter(command,"@Licence",bus.LicenceExpiryDate);AddDateParameter(command,"@Roadworthy",bus.RoadworthyExpiryDate);AddDateParameter(command,"@Insurance",bus.InsuranceExpiryDate);AddRequiredStringParameter(command,"@State",30,ToDatabaseOperationalState(bus.BaseOperationalState));command.Parameters.Add("@Actor",SqlDbType.BigInt).Value=actorUserAccountId;command.Parameters.Add("@BusId",SqlDbType.BigInt).Value=bus.BusId;command.Parameters.Add("@RowVersion",SqlDbType.Timestamp,8).Value=bus.RowVersion;if(command.ExecuteNonQuery()!=1)throw new InvalidOperationException("This bus was changed by another user. Refresh and try again.");}
+            SqlAuditWriter.Write(connection,transaction,actorUserAccountId,"BusUpdated","Bus",bus.BusId.ToString(CultureInfo.InvariantCulture),"Fields=Category,Capacity,Compliance,Status",null,DateTime.UtcNow);if(previousGvm!=bus.GrossVehicleMassKg)SqlAuditWriter.Write(connection,transaction,actorUserAccountId,"BusGvmUpdated","Bus",bus.BusId.ToString(CultureInfo.InvariantCulture),"Field=GrossVehicleMassKg",null,DateTime.UtcNow);transaction.Commit();}}
         }
 
         private IList<LookupOption> GetLookupOptions(string commandText)
@@ -379,6 +415,11 @@ ORDER BY b.FleetNumber, b.BusId;";
                     "@PassengerCapacity",
                     SqlDbType.SmallInt);
                 capacityParameter.Value = bus.PassengerCapacity;
+
+                SqlParameter gvmParameter = command.Parameters.Add(
+                    "@GrossVehicleMassKg",
+                    SqlDbType.Int);
+                gvmParameter.Value = (object)bus.GrossVehicleMassKg ?? DBNull.Value;
 
                 AddDecimalParameter(
                     command,

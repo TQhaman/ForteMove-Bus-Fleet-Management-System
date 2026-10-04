@@ -10,6 +10,18 @@ namespace ForteMove.Models.Operations
 
         public long UnderMaintenanceFleet { get; set; }
 
+        public long RetiredFleet { get; set; }
+
         public long ActiveRoutes { get; set; }
+
+        public long ActiveSchedules { get; set; }
+
+        public long TodaysTrips { get; set; }
+
+        public long UnassignedTrips { get; set; }
+
+        public long AvailableDrivers { get; set; }
+
+        public long ScheduledTrips { get; set; }
     }
 }

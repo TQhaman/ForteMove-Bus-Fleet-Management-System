@@ -48,19 +48,36 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Account\Login.aspx" />
+    <Content Include="Account\ChangePassword.aspx" />
     <Content Include="Admin\Admin.Master" />
     <Content Include="Admin\Dashboard.aspx" />
     <Content Include="Admin\FleetList.aspx" />
+    <Content Include="Admin\FleetDetails.aspx" />
+    <Content Include="Admin\EditBus.aspx" />
     <Content Include="Admin\RegisterBus.aspx" />
     <Content Include="Admin\Routes\CreateRoute.aspx" />
     <Content Include="Admin\Routes\RouteDetails.aspx" />
     <Content Include="Admin\Routes\RouteList.aspx" />
+    <Content Include="Admin\Scheduling\ChangeSchedule.aspx" />
+    <Content Include="Admin\Scheduling\CreateSchedule.aspx" />
+    <Content Include="Admin\Scheduling\ScheduleDetails.aspx" />
+    <Content Include="Admin\Scheduling\ScheduleList.aspx" />
+    <Content Include="Admin\Scheduling\TripList.aspx" />
+    <Content Include="Admin\Drivers\DriverList.aspx" />
+    <Content Include="Admin\Drivers\CreateDriver.aspx" />
+    <Content Include="Admin\Drivers\DriverDetails.aspx" />
+    <Content Include="Admin\Drivers\EditDriver.aspx" />
+    <Content Include="Admin\Assignments\AssignmentQueue.aspx" />
+    <Content Include="Admin\Assignments\AssignmentDetails.aspx" />
     <Content Include="Admin\Web.config" />
     <Content Include="Content\Brand\fortemove-mark.png" />
     <Content Include="Content\Brand\fortemove-wordmark.png" />
     <Content Include="Content\fortemove.css" />
     <Content Include="Content\vendor\bootstrap.min.css" />
     <Content Include="Default.aspx" />
+    <Content Include="Driver\Driver.Master" />
+    <Content Include="Driver\Account.aspx" />
+    <Content Include="Driver\Web.config" />
     <Content Include="Errors\AccessDenied.aspx" />
     <Content Include="Errors\Unexpected.aspx" />
     <Content Include="Global.asax" />
@@ -68,6 +85,8 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Account\ChangePassword.aspx.cs"><DependentUpon>ChangePassword.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Account\ChangePassword.aspx.designer.cs"><DependentUpon>ChangePassword.aspx</DependentUpon></Compile>
     <Compile Include="Account\Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -96,6 +115,10 @@
     <Compile Include="Admin\FleetList.aspx.designer.cs">
       <DependentUpon>FleetList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Admin\FleetDetails.aspx.cs"><DependentUpon>FleetDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\FleetDetails.aspx.designer.cs"><DependentUpon>FleetDetails.aspx</DependentUpon></Compile>
+    <Compile Include="Admin\EditBus.aspx.cs"><DependentUpon>EditBus.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\EditBus.aspx.designer.cs"><DependentUpon>EditBus.aspx</DependentUpon></Compile>
     <Compile Include="Admin\RegisterBus.aspx.cs">
       <DependentUpon>RegisterBus.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -124,6 +147,53 @@
     <Compile Include="Admin\Routes\RouteList.aspx.designer.cs">
       <DependentUpon>RouteList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Admin\Scheduling\ChangeSchedule.aspx.cs">
+      <DependentUpon>ChangeSchedule.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ChangeSchedule.aspx.designer.cs">
+      <DependentUpon>ChangeSchedule.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\CreateSchedule.aspx.cs">
+      <DependentUpon>CreateSchedule.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\CreateSchedule.aspx.designer.cs">
+      <DependentUpon>CreateSchedule.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleDetails.aspx.cs">
+      <DependentUpon>ScheduleDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleDetails.aspx.designer.cs">
+      <DependentUpon>ScheduleDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleList.aspx.cs">
+      <DependentUpon>ScheduleList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\ScheduleList.aspx.designer.cs">
+      <DependentUpon>ScheduleList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Scheduling\TripList.aspx.cs">
+      <DependentUpon>TripList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Scheduling\TripList.aspx.designer.cs">
+      <DependentUpon>TripList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Drivers\DriverList.aspx.cs"><DependentUpon>DriverList.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\Drivers\DriverList.aspx.designer.cs"><DependentUpon>DriverList.aspx</DependentUpon></Compile>
+    <Compile Include="Admin\Drivers\CreateDriver.aspx.cs"><DependentUpon>CreateDriver.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\Drivers\CreateDriver.aspx.designer.cs"><DependentUpon>CreateDriver.aspx</DependentUpon></Compile>
+    <Compile Include="Admin\Drivers\DriverDetails.aspx.cs"><DependentUpon>DriverDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\Drivers\DriverDetails.aspx.designer.cs"><DependentUpon>DriverDetails.aspx</DependentUpon></Compile>
+    <Compile Include="Admin\Drivers\EditDriver.aspx.cs"><DependentUpon>EditDriver.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\Drivers\EditDriver.aspx.designer.cs"><DependentUpon>EditDriver.aspx</DependentUpon></Compile>
+    <Compile Include="Admin\Assignments\AssignmentQueue.aspx.cs"><DependentUpon>AssignmentQueue.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\Assignments\AssignmentQueue.aspx.designer.cs"><DependentUpon>AssignmentQueue.aspx</DependentUpon></Compile>
+    <Compile Include="Admin\Assignments\AssignmentDetails.aspx.cs"><DependentUpon>AssignmentDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Admin\Assignments\AssignmentDetails.aspx.designer.cs"><DependentUpon>AssignmentDetails.aspx</DependentUpon></Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -131,6 +201,10 @@
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Driver\Driver.Master.cs"><DependentUpon>Driver.Master</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Driver\Driver.Master.designer.cs"><DependentUpon>Driver.Master</DependentUpon></Compile>
+    <Compile Include="Driver\Account.aspx.cs"><DependentUpon>Account.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Driver\Account.aspx.designer.cs"><DependentUpon>Account.aspx</DependentUpon></Compile>
     <Compile Include="Errors\AccessDenied.aspx.cs">
       <DependentUpon>AccessDenied.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -152,6 +226,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Infrastructure\ClientIpAddress.cs" />
+    <Compile Include="Infrastructure\DriverPage.cs" />
     <Compile Include="Infrastructure\FlashMessageStore.cs" />
     <Compile Include="Infrastructure\ForteMovePrincipal.cs" />
     <Compile Include="Infrastructure\RouteBuilderState.cs" />
