@@ -1,0 +1,35 @@
+# Visual Studio workspace and user state
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+*.pdb
+
+# Restored packages
+packages/
+*.nupkg
+
+# ASP.NET local/runtime files
+App_Data/*.mdf
+App_Data/*.ldf
+App_Data/*.db
+*.publishsettings
+*.pubxml.user
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+~$*
+
+# Operating-system files
+.DS_Store
+Thumbs.db

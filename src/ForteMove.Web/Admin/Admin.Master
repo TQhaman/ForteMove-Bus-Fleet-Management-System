@@ -1,0 +1,105 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Admin.Master.cs" Inherits="ForteMove.Web.Admin.AdminMaster" %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="ForteMove transport administration workspace." />
+    <title><%: Page.Title %> | ForteMove</title>
+    <link rel="icon" type="image/png" href="<%= ResolveUrl("~/Content/Brand/fortemove-mark.png") %>" />
+    <link runat="server" href="~/Content/vendor/bootstrap.min.css" rel="stylesheet" />
+    <link runat="server" href="~/Content/fortemove.css" rel="stylesheet" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+</head>
+<body class="admin-page">
+    <form id="form1" runat="server">
+        <div class="app-frame">
+            <aside class="app-sidebar" aria-label="Primary navigation">
+                <a class="sidebar-brand" href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>" aria-label="ForteMove administration home">
+                    <img src="<%= ResolveUrl("~/Content/Brand/fortemove-wordmark.png") %>" alt="ForteMove" />
+                </a>
+
+                <div class="workspace-label">
+                    <span>Workspace</span>
+                    <strong>Transport administration</strong>
+                </div>
+
+                <nav class="app-navigation">
+                    <asp:HyperLink ID="lnkDashboard" runat="server" NavigateUrl="~/Admin/Dashboard.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path d="M3 10.75 12 3l9 7.75" />
+                            <path d="M5.5 9.5V21h13V9.5" />
+                            <path d="M9.5 21v-6h5v6" />
+                        </svg>
+                        <span>Dashboard</span>
+                    </asp:HyperLink>
+
+                    <span class="nav-section-label">Fleet</span>
+                    <asp:HyperLink ID="lnkRegisterBus" runat="server" NavigateUrl="~/Admin/RegisterBus.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path d="M4 16V8.5A2.5 2.5 0 0 1 6.5 6h7A2.5 2.5 0 0 1 16 8.5V16" />
+                            <path d="M4 12h12M6.5 16v2M13.5 16v2M4 16h12" />
+                            <path d="M19 5v6M16 8h6" />
+                        </svg>
+                        <span>Register bus</span>
+                    </asp:HyperLink>
+                    <asp:HyperLink ID="lnkFleetList" runat="server" NavigateUrl="~/Admin/FleetList.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <rect x="3" y="5" width="13" height="12" rx="2" />
+                            <path d="M3 11h13M6 17v2M13 17v2M19 7h2M19 11h2M19 15h2" />
+                        </svg>
+                        <span>Fleet list</span>
+                    </asp:HyperLink>
+
+                    <span class="nav-section-label">Routes</span>
+                    <asp:HyperLink ID="lnkRouteList" runat="server" NavigateUrl="~/Admin/Routes/RouteList.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <circle cx="6" cy="18" r="2.25" />
+                            <circle cx="18" cy="6" r="2.25" />
+                            <path d="M7.8 16.6c2.7-1.8 1.2-5.6 4.2-7.2 1.1-.6 2.4-.8 4-.9" />
+                        </svg>
+                        <span>Route list</span>
+                    </asp:HyperLink>
+                    <asp:HyperLink ID="lnkCreateRoute" runat="server" NavigateUrl="~/Admin/Routes/CreateRoute.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <circle cx="5.5" cy="18" r="2" />
+                            <circle cx="15" cy="7" r="2" />
+                            <path d="M7 16.6c2.2-1.8 1-4.7 3.4-6.1.8-.5 1.7-.7 2.7-.9" />
+                            <path d="M19 14v6M16 17h6" />
+                        </svg>
+                        <span>Create route</span>
+                    </asp:HyperLink>
+                </nav>
+
+                <div class="sidebar-footnote" aria-label="Authenticated session status: Active">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>Active</span>
+                </div>
+            </aside>
+
+            <div class="app-workspace">
+                <header class="app-topbar">
+                    <div>
+                        <span class="topbar-product">ForteMove</span>
+                        <span class="topbar-context">Transport operations</span>
+                    </div>
+                    <div class="account-menu">
+                        <span class="account-avatar" aria-hidden="true"><asp:Literal ID="litInitial" runat="server" /></span>
+                        <span class="account-copy">
+                            <asp:Label ID="lblDisplayName" runat="server" CssClass="account-name" />
+                            <asp:Label ID="lblRole" runat="server" CssClass="account-role" />
+                        </span>
+                        <asp:LinkButton ID="btnLogout" runat="server" CssClass="btn btn-outline-secondary btn-sm logout-button" Text="Sign out" CausesValidation="false" OnClick="btnLogout_Click" />
+                    </div>
+                </header>
+
+                <main class="app-main" id="main-content">
+                    <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+                </main>
+            </div>
+        </div>
+    </form>
+    <script src="<%= ResolveUrl("~/Scripts/vendor/bootstrap.bundle.min.js") %>"></script>
+</body>
+</html>
