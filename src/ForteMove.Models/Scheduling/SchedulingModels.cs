@@ -193,6 +193,7 @@ namespace ForteMove.Models.Scheduling
         public DateTime? ServiceDate { get; set; }
         public long? RouteId { get; set; }
         public TripStatus? Status { get; set; }
+        public DateTime OperationalNow { get; set; }
     }
 
     public sealed class TripListItem
@@ -211,6 +212,11 @@ namespace ForteMove.Models.Scheduling
         public string AssignedDriverName { get; set; }
         public string AssignedEmployeeNumber { get; set; }
         public string AssignedFleetNumber { get; set; }
+        public DateTime? ActualStartUtc { get; set; }
+        public DateTime? ActualCompletionUtc { get; set; }
+        public bool HasOpenCannotProceed { get; set; }
+        public bool HasUnresolvedCriticalDefect { get; set; }
+        public bool IsOverdueNotStarted { get; set; }
     }
 
     public sealed class ExistingScheduleTrip
@@ -225,6 +231,8 @@ namespace ForteMove.Models.Scheduling
 
         public bool HasAssignmentHistory { get; set; }
 
+        public bool HasOperationalHistory { get; set; }
+
         public bool IsUntouched
         {
             get
@@ -232,7 +240,8 @@ namespace ForteMove.Models.Scheduling
                 return Status == TripStatus.Unassigned &&
                     !RequiresReview &&
                     !OperationallyTouchedUtc.HasValue &&
-                    !HasAssignmentHistory;
+                    !HasAssignmentHistory &&
+                    !HasOperationalHistory;
             }
         }
     }

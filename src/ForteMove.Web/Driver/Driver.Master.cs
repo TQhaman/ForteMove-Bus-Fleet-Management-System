@@ -12,6 +12,18 @@ namespace ForteMove.Web.Driver
         {
             ForteMovePrincipal principal = Context.User as ForteMovePrincipal;
             if (principal != null) lblName.Text = Server.HtmlEncode(principal.Context.DisplayName);
+            string path = Request.AppRelativeCurrentExecutionFilePath;
+            Mark(lnkToday, path == "~/Driver/Today.aspx" || path == "~/Driver/TripDetails.aspx" || path == "~/Driver/PreTripCheck.aspx" || path == "~/Driver/ReportDelay.aspx" || path == "~/Driver/CannotProceed.aspx" || path == "~/Driver/ReportDefect.aspx" || path == "~/Driver/CompleteTrip.aspx");
+            Mark(lnkUpcoming, path == "~/Driver/Upcoming.aspx");
+            Mark(lnkHistory, path == "~/Driver/History.aspx");
+            Mark(lnkAccount, path == "~/Driver/Account.aspx");
+        }
+
+        private static void Mark(System.Web.UI.WebControls.HyperLink link, bool active)
+        {
+            link.CssClass = active ? "active" : string.Empty;
+            if (active) link.Attributes["aria-current"] = "page";
+            else link.Attributes.Remove("aria-current");
         }
 
         protected void btnLogout_Click(object sender, EventArgs e)

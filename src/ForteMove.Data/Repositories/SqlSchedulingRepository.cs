@@ -351,7 +351,10 @@ SELECT t.TripId, t.TripCode, t.ServiceDate, t.ScheduledDepartureTime,
        t.ExpectedFinishLocal, r.RouteCode, r.RouteName,
        origin_stop.StopName, destination_stop.StopName,
        t.TripStatus, t.RequiresReview,
-       current_assignment.EmployeeNumber, current_assignment.DriverName, current_assignment.FleetNumber
+       current_assignment.EmployeeNumber, current_assignment.DriverName, current_assignment.FleetNumber,
+       execution.ActualStartUtc, execution.ActualCompletionUtc,
+       CONVERT(bit,CASE WHEN open_exception.TripCannotProceedReportId IS NULL THEN 0 ELSE 1 END),
+       CONVERT(bit,CASE WHEN critical_defect.BusDefectReportId IS NULL THEN 0 ELSE 1 END)
 FROM dbo.Trips AS t
 INNER JOIN dbo.Routes AS r ON r.RouteId=t.RouteId
 OUTER APPLY (SELECT TOP (1) s.StopName FROM dbo.RouteStops AS x INNER JOIN dbo.Stops AS s ON s.StopId=x.StopId WHERE x.RouteId=r.RouteId ORDER BY x.StopOrder) AS origin_stop
@@ -360,13 +363,16 @@ OUTER APPLY
 (
     SELECT TOP (1) sp.EmployeeNumber,
            sp.FirstName + N' ' + sp.LastName AS DriverName,
-           b.FleetNumber
+            b.FleetNumber, b.BusId
     FROM dbo.TripAssignments AS ta
     INNER JOIN dbo.DriverProfiles AS dp ON dp.DriverProfileId=ta.DriverProfileId
     INNER JOIN dbo.StaffProfiles AS sp ON sp.StaffProfileId=dp.StaffProfileId
     INNER JOIN dbo.Buses AS b ON b.BusId=ta.BusId
     WHERE ta.TripId=t.TripId AND ta.IsCurrent=1
 ) AS current_assignment
+LEFT JOIN dbo.TripExecutions AS execution ON execution.TripId=t.TripId
+OUTER APPLY (SELECT TOP(1) x.TripCannotProceedReportId FROM dbo.TripCannotProceedReports AS x WHERE x.TripId=t.TripId AND x.ResolvedUtc IS NULL) AS open_exception
+OUTER APPLY (SELECT TOP(1) d.BusDefectReportId FROM dbo.BusDefectReports AS d WHERE d.BusId=current_assignment.BusId AND d.Severity=N'Critical' AND d.DefectStatus<>N'Resolved') AS critical_defect
 WHERE (@ServiceDate IS NULL OR t.ServiceDate=@ServiceDate)
   AND (@RouteId IS NULL OR t.RouteId=@RouteId)
   AND (@Status IS NULL OR t.TripStatus=@Status)
@@ -395,7 +401,12 @@ ORDER BY t.ServiceDate, t.ScheduledDepartureTime, r.RouteCode;";
                             RequiresReview = reader.GetBoolean(10),
                             AssignedEmployeeNumber = reader.IsDBNull(11) ? null : reader.GetString(11),
                             AssignedDriverName = reader.IsDBNull(12) ? null : reader.GetString(12),
-                            AssignedFleetNumber = reader.IsDBNull(13) ? null : reader.GetString(13)
+                            AssignedFleetNumber = reader.IsDBNull(13) ? null : reader.GetString(13),
+                            ActualStartUtc = reader.IsDBNull(14) ? (DateTime?)null : reader.GetDateTime(14),
+                            ActualCompletionUtc = reader.IsDBNull(15) ? (DateTime?)null : reader.GetDateTime(15),
+                            HasOpenCannotProceed = reader.GetBoolean(16),
+                            HasUnresolvedCriticalDefect = reader.GetBoolean(17),
+                            IsOverdueNotStarted = reader.IsDBNull(14) && query.OperationalNow != DateTime.MinValue && reader.GetDateTime(2).Date.Add(reader.GetTimeSpan(3)) < query.OperationalNow && reader.GetString(9) != "Completed" && reader.GetString(9) != "Cancelled"
                         });
                     }
                 }
@@ -724,7 +735,15 @@ SELECT t.TripId, t.RouteScheduleVersionId, t.ServiceDate, t.ScheduledDepartureTi
        (
            SELECT 1 FROM dbo.TripAssignments AS assignment_history
            WHERE assignment_history.TripId=t.TripId
-       ) THEN 1 ELSE 0 END) AS HasAssignmentHistory
+       ) THEN 1 ELSE 0 END) AS HasAssignmentHistory,
+       CONVERT(bit, CASE WHEN
+           EXISTS (SELECT 1 FROM dbo.PreTripInspections p WHERE p.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripExecutions e WHERE e.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripDelayEvents d WHERE d.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripCannotProceedReports x WHERE x.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId)
+       THEN 1 ELSE 0 END) AS HasOperationalHistory
 FROM dbo.Trips AS t" + hint + @"
 INNER JOIN dbo.RouteScheduleVersions AS rsv
     ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
@@ -746,7 +765,8 @@ ORDER BY t.ServiceDate, t.ScheduledDepartureTime;"))
                             Status = (TripStatus)Enum.Parse(typeof(TripStatus), reader.GetString(4), false),
                             RequiresReview = reader.GetBoolean(5),
                             OperationallyTouchedUtc = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
-                            HasAssignmentHistory = reader.GetBoolean(7)
+                            HasAssignmentHistory = reader.GetBoolean(7),
+                            HasOperationalHistory = reader.GetBoolean(8)
                         });
                     }
                 }
@@ -769,6 +789,12 @@ WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
       AND t.RequiresReview=0
       AND t.OperationallyTouchedUtc IS NULL
       AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.PreTripInspections p WHERE p.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripExecutions e WHERE e.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripDelayEvents d WHERE d.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripCannotProceedReports x WHERE x.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId)
   );"))
             {
                 AddBigInt(command, "@ActorId", actorId);
@@ -787,7 +813,13 @@ FROM dbo.Trips AS t
 INNER JOIN dbo.RouteScheduleVersions AS rsv ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
 WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
   AND t.TripStatus=N'Unassigned' AND t.RequiresReview=0 AND t.OperationallyTouchedUtc IS NULL
-  AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId);"))
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.PreTripInspections p WHERE p.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripExecutions e WHERE e.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripDelayEvents d WHERE d.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripCannotProceedReports x WHERE x.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId);"))
             {
                 AddBigInt(command, "@ScheduleId", scheduleId);
                 AddDate(command, "@FromDate", fromDate);

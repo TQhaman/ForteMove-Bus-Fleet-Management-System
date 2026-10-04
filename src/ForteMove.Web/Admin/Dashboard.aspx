@@ -20,6 +20,16 @@
             <article><span>Upcoming Scheduled Trips</span><strong><asp:Literal ID="litScheduledTrips" runat="server" /></strong></article>
         </div></section>
     </div>
+    <section class="app-panel mt-4" aria-labelledby="live-operations-title">
+        <div class="panel-heading"><div><p class="section-kicker">Live operations</p><h2 id="live-operations-title">Trip attention</h2></div><a class="btn btn-outline-primary btn-sm" href="<%= ResolveUrl("~/Admin/Operations/Exceptions.aspx") %>">View exceptions</a></div>
+        <div class="compact-metric-grid">
+            <article><span>Ready</span><strong><asp:Literal ID="litReadyTrips" runat="server" /></strong></article>
+            <article><span>In progress</span><strong><asp:Literal ID="litInProgressTrips" runat="server" /></strong></article>
+            <article><span>Delayed</span><strong><asp:Literal ID="litDelayedTrips" runat="server" /></strong></article>
+            <article><span>Cannot proceed</span><strong><asp:Literal ID="litOpenCannotProceed" runat="server" /></strong></article>
+            <article><span>Critical defects</span><strong><asp:Literal ID="litCriticalDefects" runat="server" /></strong></article>
+        </div>
+    </section>
     <section aria-labelledby="quick-actions-title" class="mt-4"><div class="section-heading-row"><div><p class="section-kicker">Quick actions</p><h2 id="quick-actions-title">Manage operations</h2></div></div><div class="action-grid action-grid-three">
         <a class="action-card" href="<%= ResolveUrl("~/Admin/RegisterBus.aspx") %>"><span class="action-card-copy"><strong>Register a bus</strong><span>Add a vehicle to the fleet register.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Routes/CreateRoute.aspx") %>"><span class="action-card-copy"><strong>Create a Route</strong><span>Build an ordered service path.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
@@ -29,5 +39,6 @@
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Scheduling/TripList.aspx") %>"><span class="action-card-copy"><strong>Trips</strong><span>Review generated dated services.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Drivers/DriverList.aspx") %>"><span class="action-card-copy"><strong>Drivers</strong><span>Review availability and credentials.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Assignments/AssignmentQueue.aspx") %>"><span class="action-card-copy"><strong>Assignment queue</strong><span>Review Driver and bus recommendations.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/Operations/Defects.aspx") %>"><span class="action-card-copy"><strong>Defect reports</strong><span>Review vehicle safety reports.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
     </div></section>
 </asp:Content>

@@ -45,6 +45,7 @@
     <Compile Include="Repositories\SqlDriverRepository.cs" />
     <Compile Include="Repositories\SqlRouteRepository.cs" />
     <Compile Include="Repositories\SqlSchedulingRepository.cs" />
+    <Compile Include="Repositories\SqlTripOperationsRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ForteMove.Business\ForteMove.Business.csproj">

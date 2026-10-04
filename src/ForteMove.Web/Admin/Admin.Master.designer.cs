@@ -15,6 +15,8 @@ namespace ForteMove.Web.Admin
         protected global::System.Web.UI.WebControls.HyperLink lnkDriverList;
         protected global::System.Web.UI.WebControls.HyperLink lnkCreateDriver;
         protected global::System.Web.UI.WebControls.HyperLink lnkAssignmentQueue;
+        protected global::System.Web.UI.WebControls.HyperLink lnkExceptions;
+        protected global::System.Web.UI.WebControls.HyperLink lnkDefects;
         protected global::System.Web.UI.WebControls.Literal litInitial;
         protected global::System.Web.UI.WebControls.Label lblDisplayName;
         protected global::System.Web.UI.WebControls.Label lblRole;

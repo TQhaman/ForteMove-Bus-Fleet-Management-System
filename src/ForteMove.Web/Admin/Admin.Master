@@ -103,6 +103,14 @@
                     <asp:HyperLink ID="lnkAssignmentQueue" runat="server" NavigateUrl="~/Admin/Assignments/AssignmentQueue.aspx" CssClass="app-nav-link">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6M7 17h4"/></svg><span>Assignment queue</span>
                     </asp:HyperLink>
+
+                    <span class="nav-section-label">Operations</span>
+                    <asp:HyperLink ID="lnkExceptions" runat="server" NavigateUrl="~/Admin/Operations/Exceptions.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"/><path d="M12 9v4M12 16.5v.5"/></svg><span>Exceptions</span>
+                    </asp:HyperLink>
+                    <asp:HyperLink ID="lnkDefects" runat="server" NavigateUrl="~/Admin/Operations/Defects.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0-5.7 5.7L3 18l3 3 5.8-5.8a4 4 0 0 0 5.7-5.7l-2.8 2.8-3-3 2.8-2.8Z"/></svg><span>Defect reports</span>
+                    </asp:HyperLink>
                 </nav>
 
                 <div class="sidebar-footnote" aria-label="Authenticated session status: Signed in">

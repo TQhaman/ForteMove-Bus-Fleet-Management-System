@@ -26,5 +26,11 @@ namespace ForteMove.Business.Time
                     SouthAfricaTimeZone);
             }
         }
+
+        public DateTime ToOperationalTime(DateTime utc)
+        {
+            DateTime normalized = utc.Kind == DateTimeKind.Utc ? utc : DateTime.SpecifyKind(utc, DateTimeKind.Utc);
+            return TimeZoneInfo.ConvertTimeFromUtc(normalized, SouthAfricaTimeZone);
+        }
     }
 }

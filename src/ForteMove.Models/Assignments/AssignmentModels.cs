@@ -15,7 +15,8 @@ namespace ForteMove.Models.Assignments
     public enum AssignmentEndType
     {
         Changed,
-        Removed
+        Removed,
+        Cancelled
     }
 
     public sealed class AssignmentQueueQuery
@@ -65,6 +66,8 @@ namespace ForteMove.Models.Assignments
         public DateTime RoadworthyExpiryDate { get; set; }
         public DateTime InsuranceExpiryDate { get; set; }
         public byte[] RowVersion { get; set; }
+        public bool HasUnresolvedCriticalDefect { get; set; }
+        public bool HasActiveExecution { get; set; }
         public IList<AssignmentResourceWindow> Windows { get; set; }
     }
 
@@ -86,6 +89,7 @@ namespace ForteMove.Models.Assignments
         public byte[] UserRowVersion { get; set; }
         public byte[] StaffRowVersion { get; set; }
         public byte[] DriverRowVersion { get; set; }
+        public bool HasActiveExecution { get; set; }
         public IList<AssignmentResourceWindow> Windows { get; set; }
     }
 
@@ -185,5 +189,9 @@ namespace ForteMove.Models.Assignments
         public AssignmentTripCandidate Trip { get; set; }
         public AssignmentHistoryItem CurrentAssignment { get; set; }
         public IList<AssignmentHistoryItem> History { get; set; }
+        public bool HasStarted { get; set; }
+        public bool HasCurrentReadiness { get; set; }
+        public bool HasOpenCannotProceed { get; set; }
+        public bool HasOpenPreStartDelay { get; set; }
     }
 }

@@ -157,7 +157,9 @@ namespace ForteMove.Business.Services
 
         public IList<TripListItem> GetTripList(TripQuery query)
         {
-            return repository.GetTripList(query ?? new TripQuery()) ?? new List<TripListItem>();
+            TripQuery effective = query ?? new TripQuery();
+            effective.OperationalNow = clock.OperationalNow;
+            return repository.GetTripList(effective) ?? new List<TripListItem>();
         }
 
         public ScheduleChangeOptions GetChangeOptions(long routeScheduleId)

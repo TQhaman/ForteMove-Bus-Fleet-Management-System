@@ -88,7 +88,7 @@ namespace ForteMove.Web.Account
 
             if (principal.Role == RoleCode.Driver)
             {
-                Response.Redirect(ResolveUrl("~/Driver/Account.aspx"), true);
+                Response.Redirect(ResolveUrl("~/Driver/Today.aspx"), true);
                 return;
             }
 
