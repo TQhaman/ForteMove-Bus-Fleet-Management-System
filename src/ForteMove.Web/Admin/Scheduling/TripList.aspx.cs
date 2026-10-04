@@ -25,6 +25,12 @@ namespace ForteMove.Web.Admin.Scheduling
             if(Convert.ToBoolean(review))return "status-badge status-warning";
             string value=Convert.ToString(status); return value=="Completed"?"status-badge status-success":value=="Cancelled"?"status-badge status-neutral":"status-badge status-info";
         }
+        protected string FormatAssignment(object dataItem)
+        {
+            TripListItem trip = dataItem as TripListItem;
+            if (trip == null || string.IsNullOrWhiteSpace(trip.AssignedFleetNumber)) return "Unassigned";
+            return trip.AssignedFleetNumber + " · " + trip.AssignedEmployeeNumber + " · " + trip.AssignedDriverName;
+        }
         private void BindOptions()
         {
             SchedulingCreationOptions options=ServiceFactory.CreateSchedulingService().GetCreationOptions();

@@ -16,6 +16,8 @@
             <article><span>Active Schedules</span><strong><asp:Literal ID="litActiveSchedules" runat="server" /></strong></article>
             <article><span>Today's Trips</span><strong><asp:Literal ID="litTodaysTrips" runat="server" /></strong></article>
             <article><span>Unassigned Trips</span><strong><asp:Literal ID="litUnassignedTrips" runat="server" /></strong></article>
+            <article><span>Available Drivers</span><strong><asp:Literal ID="litAvailableDrivers" runat="server" /></strong></article>
+            <article><span>Upcoming Scheduled Trips</span><strong><asp:Literal ID="litScheduledTrips" runat="server" /></strong></article>
         </div></section>
     </div>
     <section aria-labelledby="quick-actions-title" class="mt-4"><div class="section-heading-row"><div><p class="section-kicker">Quick actions</p><h2 id="quick-actions-title">Manage operations</h2></div></div><div class="action-grid action-grid-three">
@@ -25,5 +27,7 @@
         <a class="action-card" href="<%= ResolveUrl("~/Admin/FleetList.aspx") %>"><span class="action-card-copy"><strong>Fleet list</strong><span>Review vehicles and compliance.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Scheduling/ScheduleList.aspx") %>"><span class="action-card-copy"><strong>Schedule list</strong><span>Review recurring service patterns.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Scheduling/TripList.aspx") %>"><span class="action-card-copy"><strong>Trips</strong><span>Review generated dated services.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/Drivers/DriverList.aspx") %>"><span class="action-card-copy"><strong>Drivers</strong><span>Review availability and credentials.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
+        <a class="action-card" href="<%= ResolveUrl("~/Admin/Assignments/AssignmentQueue.aspx") %>"><span class="action-card-copy"><strong>Assignment queue</strong><span>Review Driver and bus recommendations.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
     </div></section>
 </asp:Content>

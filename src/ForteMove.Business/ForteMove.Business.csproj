@@ -31,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IAssignmentRepository.cs" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Security" />
@@ -39,9 +40,12 @@
     <Compile Include="Contracts\IAuthenticationRepository.cs" />
     <Compile Include="Contracts\IBusRepository.cs" />
     <Compile Include="Contracts\IDashboardRepository.cs" />
+    <Compile Include="Contracts\IDriverRepository.cs" />
     <Compile Include="Contracts\IRouteRepository.cs" />
     <Compile Include="Contracts\ISchedulingRepository.cs" />
     <Compile Include="Exceptions\DuplicateBusException.cs" />
+    <Compile Include="Exceptions\AssignmentPersistenceException.cs" />
+    <Compile Include="Exceptions\DriverPersistenceException.cs" />
     <Compile Include="Exceptions\DuplicateRouteException.cs" />
     <Compile Include="Exceptions\DuplicateStopException.cs" />
     <Compile Include="Exceptions\UnavailableRouteStopException.cs" />
@@ -49,9 +53,12 @@
     <Compile Include="Identifiers\IdentifierCodePolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\PasswordHasher.cs" />
+    <Compile Include="Security\PasswordPolicy.cs" />
+    <Compile Include="Services\AssignmentService.cs" />
     <Compile Include="Services\AuthenticationService.cs" />
     <Compile Include="Services\BusService.cs" />
     <Compile Include="Services\DashboardService.cs" />
+    <Compile Include="Services\DriverService.cs" />
     <Compile Include="Services\RouteService.cs" />
     <Compile Include="Services\SchedulingService.cs" />
     <Compile Include="Time\IClock.cs" />

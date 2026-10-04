@@ -14,5 +14,9 @@ namespace ForteMove.Business.Contracts
         long RegisterBus(Bus bus, long actorUserAccountId);
 
         IList<BusListItem> GetFleetList(FleetQuery query);
+
+        BusDetails GetBusDetails(long busId);
+
+        void UpdateBusEligibility(BusDetails bus, long actorUserAccountId);
     }
 }

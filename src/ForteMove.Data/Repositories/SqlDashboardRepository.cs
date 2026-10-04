@@ -31,7 +31,19 @@ SELECT
         (
             ServiceDate > @OperationalDate
             OR (ServiceDate = @OperationalDate AND ScheduledDepartureTime > @OperationalTime)
-        )) AS UnassignedTrips
+        )) AS UnassignedTrips,
+    (SELECT COUNT_BIG(*)
+       FROM dbo.DriverProfiles AS dp
+       INNER JOIN dbo.StaffProfiles AS sp ON sp.StaffProfileId=dp.StaffProfileId
+       INNER JOIN dbo.UserAccounts AS ua ON ua.UserAccountId=sp.UserAccountId
+       INNER JOIN dbo.Roles AS role ON role.RoleId=ua.RoleId
+      WHERE role.RoleCode=N'Driver' AND role.IsActive=1 AND ua.IsActive=1
+        AND sp.EmploymentStatus=N'Active' AND dp.AvailabilityStatus=N'Available'
+        AND DATEADD(year,21,dp.DateOfBirth)<=@OperationalDate
+        AND dp.LicenceExpiryDate>=@OperationalDate AND dp.PrdpExpiryDate>=@OperationalDate) AS AvailableDrivers,
+    (SELECT COUNT_BIG(*) FROM dbo.Trips
+      WHERE TripStatus=N'Scheduled'
+        AND (ServiceDate>@OperationalDate OR (ServiceDate=@OperationalDate AND ScheduledDepartureTime>@OperationalTime))) AS ScheduledTrips
 FROM dbo.Buses;";
 
         private readonly string connectionString;
@@ -77,7 +89,9 @@ FROM dbo.Buses;";
                         ActiveRoutes = reader.GetInt64(5),
                         ActiveSchedules = reader.GetInt64(6),
                         TodaysTrips = reader.GetInt64(7),
-                        UnassignedTrips = reader.GetInt64(8)
+                        UnassignedTrips = reader.GetInt64(8),
+                        AvailableDrivers = reader.GetInt64(9),
+                        ScheduledTrips = reader.GetInt64(10)
                     };
                 }
             }

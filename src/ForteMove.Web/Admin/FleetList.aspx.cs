@@ -64,6 +64,13 @@ namespace ForteMove.Web.Admin
                 bus.InsuranceExpiryDate);
         }
 
+        protected string FormatGvm(object dataItem)
+        {
+            BusListItem bus = dataItem as BusListItem;
+            if (bus == null || !bus.GrossVehicleMassKg.HasValue) return "GVM required";
+            return string.Format(CultureInfo.CurrentCulture, "GVM {0:N0} kg | Licence {1}", bus.GrossVehicleMassKg.Value, bus.RequiredLicenceCode);
+        }
+
         protected string FormatState(object value)
         {
             switch ((BusOperationalState)value)

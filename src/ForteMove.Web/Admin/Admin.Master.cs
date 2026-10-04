@@ -83,6 +83,11 @@ namespace ForteMove.Web.Admin
             lnkTripList.CssClass = BuildNavigationClass(
                 appRelativePath,
                 "~/Admin/Scheduling/TripList.aspx");
+            lnkDriverList.CssClass = BuildNavigationClass(appRelativePath,
+                "~/Admin/Drivers/DriverList.aspx", "~/Admin/Drivers/DriverDetails.aspx", "~/Admin/Drivers/EditDriver.aspx");
+            lnkCreateDriver.CssClass = BuildNavigationClass(appRelativePath, "~/Admin/Drivers/CreateDriver.aspx");
+            lnkAssignmentQueue.CssClass = BuildNavigationClass(appRelativePath,
+                "~/Admin/Assignments/AssignmentQueue.aspx", "~/Admin/Assignments/AssignmentDetails.aspx");
 
             SetAriaCurrent(lnkDashboard);
             SetAriaCurrent(lnkRegisterBus);
@@ -92,6 +97,9 @@ namespace ForteMove.Web.Admin
             SetAriaCurrent(lnkScheduleList);
             SetAriaCurrent(lnkCreateSchedule);
             SetAriaCurrent(lnkTripList);
+            SetAriaCurrent(lnkDriverList);
+            SetAriaCurrent(lnkCreateDriver);
+            SetAriaCurrent(lnkAssignmentQueue);
         }
 
         private static string BuildNavigationClass(string currentPath, params string[] targetPaths)

@@ -17,5 +17,7 @@ namespace ForteMove.Web.Admin
         protected global::System.Web.UI.WebControls.Literal litActiveSchedules;
         protected global::System.Web.UI.WebControls.Literal litTodaysTrips;
         protected global::System.Web.UI.WebControls.Literal litUnassignedTrips;
+        protected global::System.Web.UI.WebControls.Literal litAvailableDrivers;
+        protected global::System.Web.UI.WebControls.Literal litScheduledTrips;
     }
 }

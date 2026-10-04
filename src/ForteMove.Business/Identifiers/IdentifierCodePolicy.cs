@@ -25,6 +25,11 @@ namespace ForteMove.Business.Identifiers
             return Format(sequence, "FM-S", "D2");
         }
 
+        public static string FormatDriverEmployeeNumber(int sequence)
+        {
+            return Format(sequence, "DRV-", "D3");
+        }
+
         public static string FormatTripCode(long sequence)
         {
             if (sequence <= 0)

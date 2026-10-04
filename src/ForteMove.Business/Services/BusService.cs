@@ -100,6 +100,13 @@ namespace ForteMove.Business.Services
                     "Passenger capacity must be between 1 and 200."));
             }
 
+            if (!request.GrossVehicleMassKg.HasValue || request.GrossVehicleMassKg.Value <= 0)
+            {
+                errors.Add(new ValidationError(
+                    "GrossVehicleMassKg",
+                    "Gross vehicle mass must be greater than zero."));
+            }
+
             if (!request.OdometerKilometres.HasValue || request.OdometerKilometres.Value < 0)
             {
                 errors.Add(new ValidationError(
@@ -137,6 +144,19 @@ namespace ForteMove.Business.Services
 
             ValidateEnergyCapacities(errors, request, selectedPropulsion);
 
+            BusOperationalState baseState = request.BaseOperationalState ?? BusOperationalState.Operational;
+            if (!Enum.IsDefined(typeof(BusOperationalState), baseState))
+            {
+                errors.Add(new ValidationError("BaseOperationalState", "Select a valid vehicle status."));
+            }
+
+            if (request.LicenceExpiryDate.HasValue && request.RoadworthyExpiryDate.HasValue && request.InsuranceExpiryDate.HasValue &&
+                baseState == BusOperationalState.Operational)
+            {
+                AddOperationalComplianceErrors(errors, request.LicenceExpiryDate.Value,
+                    request.RoadworthyExpiryDate.Value, request.InsuranceExpiryDate.Value, clock.Today);
+            }
+
             if (actorUserAccountId <= 0)
             {
                 errors.Add(new ValidationError(string.Empty, "A valid administrator is required to register a bus."));
@@ -146,11 +166,6 @@ namespace ForteMove.Business.Services
             {
                 return ServiceResult<BusRegistrationResult>.Failure(errors);
             }
-
-            IList<string> expiredDocuments = GetExpiredDocuments(request, clock.Today);
-            BusOperationalState baseState = expiredDocuments.Count == 0
-                ? BusOperationalState.Operational
-                : BusOperationalState.OutOfService;
 
             string propulsionCode = selectedPropulsion.Code == null
                 ? string.Empty
@@ -167,6 +182,7 @@ namespace ForteMove.Business.Services
                 Model = model,
                 ManufactureYear = request.ManufactureYear.Value,
                 PassengerCapacity = request.PassengerCapacity.Value,
+                GrossVehicleMassKg = request.GrossVehicleMassKg.Value,
                 FuelTankCapacityLitres = UsesFuel(propulsionCode) ? request.FuelTankCapacityLitres : null,
                 BatteryCapacityKwh = UsesBattery(propulsionCode) ? request.BatteryCapacityKwh : null,
                 OdometerKilometres = request.OdometerKilometres.Value,
@@ -186,16 +202,7 @@ namespace ForteMove.Business.Services
                     BaseOperationalState = baseState
                 };
 
-                if (expiredDocuments.Count == 0)
-                {
-                    return ServiceResult<BusRegistrationResult>.Success(result);
-                }
-
-                string warning = string.Format(
-                    CultureInfo.CurrentCulture,
-                    "The bus was registered Out of Service because the following compliance document(s) have expired: {0}.",
-                    string.Join(", ", expiredDocuments));
-                return ServiceResult<BusRegistrationResult>.Success(result, new[] { warning });
+                return ServiceResult<BusRegistrationResult>.Success(result);
             }
             catch (DuplicateBusException duplicateException)
             {
@@ -232,6 +239,62 @@ namespace ForteMove.Business.Services
             }
 
             return fleet;
+        }
+
+        public BusDetails GetBusDetails(long busId)
+        {
+            BusDetails bus = busId <= 0 ? null : repository.GetBusDetails(busId);
+            if (bus != null)
+            {
+                bus.RequiredLicenceCode = GetRequiredLicenceCode(bus.GrossVehicleMassKg);
+            }
+            return bus;
+        }
+
+        public ServiceResult<bool> UpdateBusEligibility(UpdateBusEligibilityRequest request, long actorUserAccountId)
+        {
+            IList<ValidationError> errors = new List<ValidationError>();
+            if (request == null || request.BusId <= 0)
+                return ServiceResult<bool>.Failure(string.Empty, "A valid bus is required.");
+            BusRegistrationOptions options = GetRegistrationOptions();
+            if (FindOption(options.Categories, request.BusCategoryId) == null)
+                errors.Add(new ValidationError("BusCategoryId", "Select an active bus category."));
+            if (!request.PassengerCapacity.HasValue || request.PassengerCapacity.Value < 1 || request.PassengerCapacity.Value > 200)
+                errors.Add(new ValidationError("PassengerCapacity", "Passenger capacity must be between 1 and 200."));
+            if (!request.GrossVehicleMassKg.HasValue || request.GrossVehicleMassKg.Value <= 0)
+                errors.Add(new ValidationError("GrossVehicleMassKg", "Gross vehicle mass must be greater than zero."));
+            ValidateRequiredDate(errors,"LicenceExpiryDate","Licence expiry date",request.LicenceExpiryDate);
+            ValidateRequiredDate(errors,"RoadworthyExpiryDate","Roadworthy expiry date",request.RoadworthyExpiryDate);
+            ValidateRequiredDate(errors,"InsuranceExpiryDate","Insurance expiry date",request.InsuranceExpiryDate);
+            if (!request.BaseOperationalState.HasValue || !Enum.IsDefined(typeof(BusOperationalState),request.BaseOperationalState.Value))
+                errors.Add(new ValidationError("BaseOperationalState","Select a valid vehicle status."));
+            if (request.RowVersion == null || request.RowVersion.Length == 0)
+                errors.Add(new ValidationError(string.Empty,"The bus record must be refreshed before saving."));
+            if (request.BaseOperationalState == BusOperationalState.Operational && request.LicenceExpiryDate.HasValue && request.RoadworthyExpiryDate.HasValue && request.InsuranceExpiryDate.HasValue)
+                AddOperationalComplianceErrors(errors,request.LicenceExpiryDate.Value,request.RoadworthyExpiryDate.Value,request.InsuranceExpiryDate.Value,clock.Today);
+            if (errors.Count > 0) return ServiceResult<bool>.Failure(errors);
+            BusDetails existing=repository.GetBusDetails(request.BusId);
+            if(existing==null)return ServiceResult<bool>.Failure(string.Empty,"The bus no longer exists.");
+            existing.BusCategoryId=request.BusCategoryId.Value;existing.PassengerCapacity=request.PassengerCapacity.Value;
+            existing.GrossVehicleMassKg=request.GrossVehicleMassKg;existing.LicenceExpiryDate=request.LicenceExpiryDate.Value.Date;
+            existing.RoadworthyExpiryDate=request.RoadworthyExpiryDate.Value.Date;existing.InsuranceExpiryDate=request.InsuranceExpiryDate.Value.Date;
+            existing.BaseOperationalState=request.BaseOperationalState.Value;existing.RowVersion=request.RowVersion;
+            try{repository.UpdateBusEligibility(existing,actorUserAccountId);return ServiceResult<bool>.Success(true);}
+            catch(InvalidOperationException ex){return ServiceResult<bool>.Failure(string.Empty,ex.Message);}
+        }
+
+        public static string GetRequiredLicenceCode(int? grossVehicleMassKg)
+        {
+            if (!grossVehicleMassKg.HasValue) return null;
+            if (grossVehicleMassKg.Value <= 3500) return "B";
+            return grossVehicleMassKg.Value <= 16000 ? "C1" : "C";
+        }
+
+        private static void AddOperationalComplianceErrors(IList<ValidationError> errors, DateTime licence, DateTime roadworthy, DateTime insurance, DateTime today)
+        {
+            if (licence.Date < today.Date) errors.Add(new ValidationError("LicenceExpiryDate", "An expired vehicle licence prevents Operational status."));
+            if (roadworthy.Date < today.Date) errors.Add(new ValidationError("RoadworthyExpiryDate", "An expired roadworthy certificate prevents Operational status."));
+            if (insurance.Date < today.Date) errors.Add(new ValidationError("InsuranceExpiryDate", "Expired insurance prevents Operational status."));
         }
 
         private static void ValidateRequiredText(

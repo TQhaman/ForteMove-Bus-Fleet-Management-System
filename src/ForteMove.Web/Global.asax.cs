@@ -50,6 +50,13 @@ namespace ForteMove.Web
             ForteMovePrincipal principal = new ForteMovePrincipal(principalContext);
             Context.User = principal;
             Thread.CurrentPrincipal = principal;
+
+            if (principal.Context.MustChangePassword && IsProtectedPageRequest(Request.AppRelativeCurrentExecutionFilePath))
+            {
+                Response.Redirect(VirtualPathUtility.ToAbsolute("~/Account/ChangePassword.aspx"), false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
         }
 
         protected void Application_Error(object sender, EventArgs e)
@@ -72,6 +79,18 @@ namespace ForteMove.Web
             FormsAuthentication.SignOut();
             Context.User = null;
             Thread.CurrentPrincipal = null;
+        }
+
+        private static bool IsProtectedPageRequest(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !path.EndsWith(".aspx", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return !path.Equals("~/Account/ChangePassword.aspx", StringComparison.OrdinalIgnoreCase)
+                && !path.Equals("~/Account/Login.aspx", StringComparison.OrdinalIgnoreCase)
+                && !path.StartsWith("~/Errors/", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

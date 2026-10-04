@@ -350,11 +350,23 @@ ORDER BY rsv.VersionNumber DESC;";
 SELECT t.TripId, t.TripCode, t.ServiceDate, t.ScheduledDepartureTime,
        t.ExpectedFinishLocal, r.RouteCode, r.RouteName,
        origin_stop.StopName, destination_stop.StopName,
-       t.TripStatus, t.RequiresReview
+       t.TripStatus, t.RequiresReview,
+       current_assignment.EmployeeNumber, current_assignment.DriverName, current_assignment.FleetNumber
 FROM dbo.Trips AS t
 INNER JOIN dbo.Routes AS r ON r.RouteId=t.RouteId
 OUTER APPLY (SELECT TOP (1) s.StopName FROM dbo.RouteStops AS x INNER JOIN dbo.Stops AS s ON s.StopId=x.StopId WHERE x.RouteId=r.RouteId ORDER BY x.StopOrder) AS origin_stop
 OUTER APPLY (SELECT TOP (1) s.StopName FROM dbo.RouteStops AS x INNER JOIN dbo.Stops AS s ON s.StopId=x.StopId WHERE x.RouteId=r.RouteId ORDER BY x.StopOrder DESC) AS destination_stop
+OUTER APPLY
+(
+    SELECT TOP (1) sp.EmployeeNumber,
+           sp.FirstName + N' ' + sp.LastName AS DriverName,
+           b.FleetNumber
+    FROM dbo.TripAssignments AS ta
+    INNER JOIN dbo.DriverProfiles AS dp ON dp.DriverProfileId=ta.DriverProfileId
+    INNER JOIN dbo.StaffProfiles AS sp ON sp.StaffProfileId=dp.StaffProfileId
+    INNER JOIN dbo.Buses AS b ON b.BusId=ta.BusId
+    WHERE ta.TripId=t.TripId AND ta.IsCurrent=1
+) AS current_assignment
 WHERE (@ServiceDate IS NULL OR t.ServiceDate=@ServiceDate)
   AND (@RouteId IS NULL OR t.RouteId=@RouteId)
   AND (@Status IS NULL OR t.TripStatus=@Status)
@@ -380,7 +392,10 @@ ORDER BY t.ServiceDate, t.ScheduledDepartureTime, r.RouteCode;";
                             OriginName = reader.IsDBNull(7) ? string.Empty : reader.GetString(7),
                             DestinationName = reader.IsDBNull(8) ? string.Empty : reader.GetString(8),
                             Status = (TripStatus)Enum.Parse(typeof(TripStatus), reader.GetString(9), false),
-                            RequiresReview = reader.GetBoolean(10)
+                            RequiresReview = reader.GetBoolean(10),
+                            AssignedEmployeeNumber = reader.IsDBNull(11) ? null : reader.GetString(11),
+                            AssignedDriverName = reader.IsDBNull(12) ? null : reader.GetString(12),
+                            AssignedFleetNumber = reader.IsDBNull(13) ? null : reader.GetString(13)
                         });
                     }
                 }
@@ -704,7 +719,12 @@ WHERE rs.RouteScheduleId=@ScheduleId AND rs.RouteId=@RouteId AND rs.IsActive=1
             string hint = lockRows ? " WITH (UPDLOCK, HOLDLOCK)" : string.Empty;
             using (SqlCommand command = CreateCommand(connection, transaction, @"
 SELECT t.TripId, t.RouteScheduleVersionId, t.ServiceDate, t.ScheduledDepartureTime,
-       t.TripStatus, t.RequiresReview, t.OperationallyTouchedUtc
+       t.TripStatus, t.RequiresReview, t.OperationallyTouchedUtc,
+       CONVERT(bit, CASE WHEN EXISTS
+       (
+           SELECT 1 FROM dbo.TripAssignments AS assignment_history
+           WHERE assignment_history.TripId=t.TripId
+       ) THEN 1 ELSE 0 END) AS HasAssignmentHistory
 FROM dbo.Trips AS t" + hint + @"
 INNER JOIN dbo.RouteScheduleVersions AS rsv
     ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
@@ -725,7 +745,8 @@ ORDER BY t.ServiceDate, t.ScheduledDepartureTime;"))
                             ScheduledDepartureTime = reader.GetTimeSpan(3),
                             Status = (TripStatus)Enum.Parse(typeof(TripStatus), reader.GetString(4), false),
                             RequiresReview = reader.GetBoolean(5),
-                            OperationallyTouchedUtc = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6)
+                            OperationallyTouchedUtc = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
+                            HasAssignmentHistory = reader.GetBoolean(7)
                         });
                     }
                 }
@@ -742,7 +763,13 @@ SET RequiresReview=1, UpdatedUtc=SYSUTCDATETIME(), UpdatedByUserAccountId=@Actor
 FROM dbo.Trips AS t
 INNER JOIN dbo.RouteScheduleVersions AS rsv ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
 WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
-  AND NOT (t.TripStatus=N'Unassigned' AND t.RequiresReview=0 AND t.OperationallyTouchedUtc IS NULL);"))
+  AND NOT
+  (
+      t.TripStatus=N'Unassigned'
+      AND t.RequiresReview=0
+      AND t.OperationallyTouchedUtc IS NULL
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId)
+  );"))
             {
                 AddBigInt(command, "@ActorId", actorId);
                 AddBigInt(command, "@ScheduleId", scheduleId);
@@ -759,7 +786,8 @@ DELETE t
 FROM dbo.Trips AS t
 INNER JOIN dbo.RouteScheduleVersions AS rsv ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
 WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
-  AND t.TripStatus=N'Unassigned' AND t.RequiresReview=0 AND t.OperationallyTouchedUtc IS NULL;"))
+  AND t.TripStatus=N'Unassigned' AND t.RequiresReview=0 AND t.OperationallyTouchedUtc IS NULL
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId);"))
             {
                 AddBigInt(command, "@ScheduleId", scheduleId);
                 AddDate(command, "@FromDate", fromDate);

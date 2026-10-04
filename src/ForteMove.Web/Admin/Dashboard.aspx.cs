@@ -27,6 +27,8 @@ namespace ForteMove.Web.Admin
             litActiveSchedules.Text = summary.ActiveSchedules.ToString("N0", CultureInfo.CurrentCulture);
             litTodaysTrips.Text = summary.TodaysTrips.ToString("N0", CultureInfo.CurrentCulture);
             litUnassignedTrips.Text = summary.UnassignedTrips.ToString("N0", CultureInfo.CurrentCulture);
+            litAvailableDrivers.Text = summary.AvailableDrivers.ToString("N0", CultureInfo.CurrentCulture);
+            litScheduledTrips.Text = summary.ScheduledTrips.ToString("N0", CultureInfo.CurrentCulture);
             pnlRetired.Visible = summary.RetiredFleet > 0;
             SetBar(barOperational, summary.OperationalFleet, summary.TotalFleet, "Operational");
             SetBar(barOutOfService, summary.OutOfServiceFleet, summary.TotalFleet, "Out of service");

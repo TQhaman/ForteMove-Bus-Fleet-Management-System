@@ -20,6 +20,8 @@ namespace ForteMove.Models.Fleet
 
         public int? PassengerCapacity { get; set; }
 
+        public int? GrossVehicleMassKg { get; set; }
+
         public int? PropulsionTypeId { get; set; }
 
         public decimal? FuelTankCapacityLitres { get; set; }
@@ -33,5 +35,7 @@ namespace ForteMove.Models.Fleet
         public DateTime? RoadworthyExpiryDate { get; set; }
 
         public DateTime? InsuranceExpiryDate { get; set; }
+
+        public BusOperationalState? BaseOperationalState { get; set; }
     }
 }

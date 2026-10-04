@@ -19,5 +19,9 @@ namespace ForteMove.Models.Operations
         public long TodaysTrips { get; set; }
 
         public long UnassignedTrips { get; set; }
+
+        public long AvailableDrivers { get; set; }
+
+        public long ScheduledTrips { get; set; }
     }
 }

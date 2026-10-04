@@ -208,6 +208,9 @@ namespace ForteMove.Models.Scheduling
         public string DestinationName { get; set; }
         public TripStatus Status { get; set; }
         public bool RequiresReview { get; set; }
+        public string AssignedDriverName { get; set; }
+        public string AssignedEmployeeNumber { get; set; }
+        public string AssignedFleetNumber { get; set; }
     }
 
     public sealed class ExistingScheduleTrip
@@ -220,13 +223,16 @@ namespace ForteMove.Models.Scheduling
         public bool RequiresReview { get; set; }
         public DateTime? OperationallyTouchedUtc { get; set; }
 
+        public bool HasAssignmentHistory { get; set; }
+
         public bool IsUntouched
         {
             get
             {
                 return Status == TripStatus.Unassigned &&
                     !RequiresReview &&
-                    !OperationallyTouchedUtc.HasValue;
+                    !OperationallyTouchedUtc.HasValue &&
+                    !HasAssignmentHistory;
             }
         }
     }

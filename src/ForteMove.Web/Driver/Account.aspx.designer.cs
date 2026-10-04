@@ -1,0 +1,1 @@
+namespace ForteMove.Web.Driver{public partial class Account{protected global::System.Web.UI.WebControls.Literal litName;protected global::System.Web.UI.WebControls.Literal litEmployeeNumber;protected global::System.Web.UI.WebControls.Literal litAvailability;protected global::System.Web.UI.WebControls.Literal litCredentialStatus;}}

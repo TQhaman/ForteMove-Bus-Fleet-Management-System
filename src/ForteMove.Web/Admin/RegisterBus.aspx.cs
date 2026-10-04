@@ -82,13 +82,15 @@ namespace ForteMove.Web.Admin
                 ManufactureYear = ParseInteger(txtManufactureYear, "ManufactureYear", "Manufacture year", errors),
                 BusCategoryId = ParseInteger(ddlCategory, "BusCategoryId", "Bus category", errors),
                 PassengerCapacity = ParseInteger(txtPassengerCapacity, "PassengerCapacity", "Passenger capacity", errors),
+                GrossVehicleMassKg = ParseInteger(txtGrossVehicleMass, "GrossVehicleMassKg", "Gross vehicle mass", errors),
                 PropulsionTypeId = ParseInteger(ddlPropulsion, "PropulsionTypeId", "Propulsion type", errors),
                 FuelTankCapacityLitres = ParseDecimal(txtFuelCapacity, "FuelTankCapacityLitres", "Fuel-tank capacity", errors),
                 BatteryCapacityKwh = ParseDecimal(txtBatteryCapacity, "BatteryCapacityKwh", "Battery capacity", errors),
                 OdometerKilometres = ParseDecimal(txtOdometer, "OdometerKilometres", "Odometer", errors),
                 LicenceExpiryDate = ParseDate(txtLicenceExpiry, "LicenceExpiryDate", "Licence expiry date", errors),
                 RoadworthyExpiryDate = ParseDate(txtRoadworthyExpiry, "RoadworthyExpiryDate", "Roadworthy expiry date", errors),
-                InsuranceExpiryDate = ParseDate(txtInsuranceExpiry, "InsuranceExpiryDate", "Insurance expiry date", errors)
+                InsuranceExpiryDate = ParseDate(txtInsuranceExpiry, "InsuranceExpiryDate", "Insurance expiry date", errors),
+                BaseOperationalState = ParseState(ddlVehicleStatus, errors)
             };
         }
 
@@ -141,6 +143,7 @@ namespace ForteMove.Web.Admin
                 case "ManufactureYear": return txtManufactureYear;
                 case "BusCategoryId": return ddlCategory;
                 case "PassengerCapacity": return txtPassengerCapacity;
+                case "GrossVehicleMassKg": return txtGrossVehicleMass;
                 case "PropulsionTypeId": return ddlPropulsion;
                 case "FuelTankCapacityLitres": return txtFuelCapacity;
                 case "BatteryCapacityKwh": return txtBatteryCapacity;
@@ -148,6 +151,7 @@ namespace ForteMove.Web.Admin
                 case "LicenceExpiryDate": return txtLicenceExpiry;
                 case "RoadworthyExpiryDate": return txtRoadworthyExpiry;
                 case "InsuranceExpiryDate": return txtInsuranceExpiry;
+                case "BaseOperationalState": return ddlVehicleStatus;
                 default: return null;
             }
         }
@@ -157,9 +161,9 @@ namespace ForteMove.Web.Admin
             return new WebControl[]
             {
                 txtFleetNumber, txtRegistrationNumber, txtVin, txtMake, txtModel,
-                txtManufactureYear, ddlCategory, txtPassengerCapacity, ddlPropulsion,
+                txtManufactureYear, ddlCategory, txtPassengerCapacity, txtGrossVehicleMass, ddlPropulsion,
                 txtFuelCapacity, txtBatteryCapacity, txtOdometer, txtLicenceExpiry,
-                txtRoadworthyExpiry, txtInsuranceExpiry
+                txtRoadworthyExpiry, txtInsuranceExpiry, ddlVehicleStatus
             };
         }
 
@@ -235,6 +239,14 @@ namespace ForteMove.Web.Admin
             }
 
             errors.Add(new ValidationError(field, label + " must be a valid number."));
+            return null;
+        }
+
+        private static BusOperationalState? ParseState(DropDownList input, IList<ValidationError> errors)
+        {
+            BusOperationalState value;
+            if (Enum.TryParse(input.SelectedValue, false, out value)) return value;
+            errors.Add(new ValidationError("BaseOperationalState", "Select a valid vehicle status."));
             return null;
         }
 

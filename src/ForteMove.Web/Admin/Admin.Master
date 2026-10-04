@@ -90,6 +90,19 @@
                         </svg>
                         <span>Trips</span>
                     </asp:HyperLink>
+
+                    <span class="nav-section-label">Drivers</span>
+                    <asp:HyperLink ID="lnkDriverList" runat="server" NavigateUrl="~/Admin/Drivers/DriverList.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="3"/><path d="M3.5 20v-2.5A4.5 4.5 0 0 1 8 13h2a4.5 4.5 0 0 1 4.5 4.5V20M17 8h4M19 6v4"/></svg><span>Driver list</span>
+                    </asp:HyperLink>
+                    <asp:HyperLink ID="lnkCreateDriver" runat="server" NavigateUrl="~/Admin/Drivers/CreateDriver.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="7" r="3"/><path d="M2.5 20v-2.5A4.5 4.5 0 0 1 7 13h2M17 13v7M13.5 16.5h7"/></svg><span>Create Driver</span>
+                    </asp:HyperLink>
+
+                    <span class="nav-section-label">Assignments</span>
+                    <asp:HyperLink ID="lnkAssignmentQueue" runat="server" NavigateUrl="~/Admin/Assignments/AssignmentQueue.aspx" CssClass="app-nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6M7 17h4"/></svg><span>Assignment queue</span>
+                    </asp:HyperLink>
                 </nav>
 
                 <div class="sidebar-footnote" aria-label="Authenticated session status: Signed in">

@@ -30,7 +30,7 @@ namespace ForteMove.Web.Account
             ForteMovePrincipal principal = Context.User as ForteMovePrincipal;
             if (principal != null && principal.Identity.IsAuthenticated)
             {
-                RedirectAuthenticatedUser(principal.Context.Role);
+                RedirectAuthenticatedUser(principal.Context);
             }
         }
 
@@ -53,7 +53,7 @@ namespace ForteMove.Web.Account
             }
 
             IssueAuthenticationCookie(result.Principal.UserAccountId);
-            RedirectAuthenticatedUser(result.Principal.Role);
+            RedirectAuthenticatedUser(result.Principal);
         }
 
         private void IssueAuthenticationCookie(long userAccountId)
@@ -78,9 +78,21 @@ namespace ForteMove.Web.Account
             Response.Cookies.Add(cookie);
         }
 
-        private void RedirectAuthenticatedUser(RoleCode role)
+        private void RedirectAuthenticatedUser(PrincipalContext principal)
         {
-            if (role != RoleCode.TransportAdministrator)
+            if (principal.MustChangePassword)
+            {
+                Response.Redirect(ResolveUrl("~/Account/ChangePassword.aspx"), true);
+                return;
+            }
+
+            if (principal.Role == RoleCode.Driver)
+            {
+                Response.Redirect(ResolveUrl("~/Driver/Account.aspx"), true);
+                return;
+            }
+
+            if (principal.Role != RoleCode.TransportAdministrator)
             {
                 Response.Redirect(ResolveUrl("~/Errors/AccessDenied.aspx"), true);
                 return;

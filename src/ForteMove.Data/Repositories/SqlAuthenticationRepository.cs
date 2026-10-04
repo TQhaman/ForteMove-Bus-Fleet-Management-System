@@ -148,6 +148,77 @@ WHERE UserAccountId = @UserAccountId;";
             }
         }
 
+        public UserCredentialRecord GetCredential(long userAccountId)
+        {
+            EnsureValidUserAccountId(userAccountId);
+            const string sql = @"
+SELECT ua.UserAccountId, ua.NormalizedEmail, ua.PasswordAlgorithm, ua.PasswordHash,
+       ua.PasswordSalt, ua.PasswordIterations, ua.IsActive, r.IsActive, r.RoleCode,
+       ua.FailedLoginCount, ua.LockoutEndUtc
+FROM dbo.UserAccounts AS ua
+INNER JOIN dbo.Roles AS r ON r.RoleId=ua.RoleId
+WHERE ua.UserAccountId=@UserAccountId;";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = sql;
+                command.Parameters.Add("@UserAccountId", SqlDbType.BigInt).Value = userAccountId;
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow))
+                {
+                    if (!reader.Read()) return null;
+                    return new UserCredentialRecord
+                    {
+                        UserAccountId = reader.GetInt64(0),
+                        NormalizedEmail = reader.GetString(1),
+                        PasswordAlgorithm = reader.GetString(2),
+                        PasswordHash = (byte[])reader.GetValue(3),
+                        PasswordSalt = (byte[])reader.GetValue(4),
+                        PasswordIterations = reader.GetInt32(5),
+                        IsActive = reader.GetBoolean(6),
+                        IsRoleActive = reader.GetBoolean(7),
+                        Role = ParseRoleCode(reader.GetString(8)),
+                        FailedLoginCount = reader.GetInt32(9),
+                        LockoutEndUtc = reader.IsDBNull(10) ? (DateTime?)null : reader.GetDateTime(10)
+                    };
+                }
+            }
+        }
+
+        public void ChangePassword(long userAccountId, PasswordHash passwordHash, DateTime changedAtUtc, string clientIpAddress)
+        {
+            EnsureValidUserAccountId(userAccountId);
+            if (passwordHash == null) throw new ArgumentNullException("passwordHash");
+            EnsureValidClientIpAddress(clientIpAddress);
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                using (SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.Serializable))
+                {
+                    using (SqlCommand command = connection.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+                        command.CommandText = @"
+UPDATE dbo.UserAccounts WITH (UPDLOCK, ROWLOCK)
+SET PasswordAlgorithm=@Algorithm, PasswordHash=@Hash, PasswordSalt=@Salt,
+    PasswordIterations=@Iterations, MustChangePassword=0, FailedLoginCount=0,
+    LockoutEndUtc=NULL, UpdatedUtc=@ChangedUtc
+WHERE UserAccountId=@UserAccountId AND IsActive=1;";
+                        command.Parameters.Add("@Algorithm", SqlDbType.NVarChar, 50).Value = passwordHash.Algorithm;
+                        command.Parameters.Add("@Hash", SqlDbType.VarBinary, 64).Value = passwordHash.Hash;
+                        command.Parameters.Add("@Salt", SqlDbType.VarBinary, 64).Value = passwordHash.Salt;
+                        command.Parameters.Add("@Iterations", SqlDbType.Int).Value = passwordHash.Iterations;
+                        SqlParameter changed = command.Parameters.Add("@ChangedUtc", SqlDbType.DateTime2); changed.Scale = 0; changed.Value = changedAtUtc;
+                        command.Parameters.Add("@UserAccountId", SqlDbType.BigInt).Value = userAccountId;
+                        if (command.ExecuteNonQuery() != 1) throw new InvalidOperationException("The account is no longer available.");
+                    }
+                    SqlAuditWriter.Write(connection, transaction, userAccountId, "PasswordChanged", "UserAccount",
+                        userAccountId.ToString(CultureInfo.InvariantCulture), null, clientIpAddress, changedAtUtc);
+                    transaction.Commit();
+                }
+            }
+        }
+
         public PrincipalContext GetPrincipalContext(long userAccountId)
         {
             if (userAccountId <= 0)

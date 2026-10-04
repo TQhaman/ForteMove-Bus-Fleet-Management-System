@@ -18,18 +18,49 @@ packages/
 *.nupkg
 
 # ASP.NET local/runtime files
-App_Data/*.mdf
-App_Data/*.ldf
+*.mdf
+*.ldf
+*.ndf
+*.bacpac
+*.sqlite
+*.sqlite3
 App_Data/*.db
 *.publishsettings
+*.pubxml
 *.pubxml.user
+database/local/
+database/exports/
+database/backups/
+
+# Local environment and secret files; sanitized examples may be shared
+.env
+.env.*
+!.env.example
+!.env.sample
+*.local.config
+*.secrets.config
+secrets.local.*
+
+# Private key material (public certificates are not blanket-ignored)
+*.pfx
+*.p12
+*.key
+id_rsa
+id_ed25519
 
 # Logs and temporary files
 *.log
 *.tmp
 *.bak
+*.orig
+*.dmp
+*.etl
 ~$*
 
 # Operating-system files
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# Developer-local editor workspaces; shared editor configuration stays eligible
+*.code-workspace

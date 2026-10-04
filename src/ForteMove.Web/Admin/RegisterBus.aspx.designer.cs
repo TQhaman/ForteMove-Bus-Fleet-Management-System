@@ -20,6 +20,8 @@ namespace ForteMove.Web.Admin
         protected global::System.Web.UI.WebControls.DropDownList ddlCategory;
         protected global::System.Web.UI.WebControls.Label lblPassengerCapacity;
         protected global::System.Web.UI.WebControls.TextBox txtPassengerCapacity;
+        protected global::System.Web.UI.WebControls.Label lblGrossVehicleMass;
+        protected global::System.Web.UI.WebControls.TextBox txtGrossVehicleMass;
         protected global::System.Web.UI.WebControls.Label lblPropulsion;
         protected global::System.Web.UI.WebControls.DropDownList ddlPropulsion;
         protected global::System.Web.UI.WebControls.Label lblFuelCapacity;
@@ -34,6 +36,8 @@ namespace ForteMove.Web.Admin
         protected global::System.Web.UI.WebControls.TextBox txtRoadworthyExpiry;
         protected global::System.Web.UI.WebControls.Label lblInsuranceExpiry;
         protected global::System.Web.UI.WebControls.TextBox txtInsuranceExpiry;
+        protected global::System.Web.UI.WebControls.Label lblVehicleStatus;
+        protected global::System.Web.UI.WebControls.DropDownList ddlVehicleStatus;
         protected global::System.Web.UI.WebControls.Button btnRegisterBus;
     }
 }
