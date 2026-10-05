@@ -7,6 +7,16 @@ namespace ForteMove.Web.Infrastructure
     {
         public static string GetAdminReturnUrl(string candidate)
         {
+            return GetRoleReturnUrl(candidate, "~/Admin/");
+        }
+
+        public static string GetPassengerReturnUrl(string candidate)
+        {
+            return GetRoleReturnUrl(candidate, "~/Passenger/");
+        }
+
+        private static string GetRoleReturnUrl(string candidate, string roleRoot)
+        {
             if (string.IsNullOrWhiteSpace(candidate))
             {
                 return null;
@@ -40,8 +50,8 @@ namespace ForteMove.Web.Infrastructure
 
             int suffixIndex = value.IndexOfAny(new[] { '?', '#' });
             string path = suffixIndex < 0 ? value : value.Substring(0, suffixIndex);
-            string adminRoot = VirtualPathUtility.ToAbsolute("~/Admin/");
-            return path.StartsWith(adminRoot, StringComparison.OrdinalIgnoreCase)
+            string allowedRoot = VirtualPathUtility.ToAbsolute(roleRoot);
+            return path.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase)
                 ? value
                 : null;
         }

@@ -1,0 +1,1 @@
+namespace ForteMove.Web.Admin.Operations{public partial class Exceptions{protected global::System.Web.UI.WebControls.CheckBox chkOpenOnly;protected global::System.Web.UI.WebControls.Panel pnlResults;protected global::System.Web.UI.WebControls.Repeater rptItems;protected global::System.Web.UI.WebControls.Panel pnlEmpty;}}

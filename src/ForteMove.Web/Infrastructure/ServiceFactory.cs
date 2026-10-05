@@ -49,6 +49,30 @@ namespace ForteMove.Web.Infrastructure
             return new AssignmentService(new SqlAssignmentRepository(GetConnectionString()));
         }
 
+        public static DriverOperationsService CreateDriverOperationsService()
+        {
+            return new DriverOperationsService(
+                new SqlTripOperationsRepository(GetConnectionString()));
+        }
+
+        public static OperationsAdminService CreateOperationsAdminService()
+        {
+            return new OperationsAdminService(
+                new SqlTripOperationsRepository(GetConnectionString()));
+        }
+
+        public static PassengerRegistrationService CreatePassengerRegistrationService()
+        {
+            return new PassengerRegistrationService(
+                new SqlPassengerRepository(GetConnectionString()));
+        }
+
+        public static PassengerService CreatePassengerService()
+        {
+            return new PassengerService(
+                new SqlPassengerRepository(GetConnectionString()));
+        }
+
         private static string GetConnectionString()
         {
             ConnectionStringSettings settings =

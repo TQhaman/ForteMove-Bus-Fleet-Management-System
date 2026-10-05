@@ -32,8 +32,8 @@ WHERE ua.NormalizedEmail = @NormalizedEmail;";
 SELECT
     ua.UserAccountId,
     ua.Email,
-    sp.FirstName,
-    sp.LastName,
+    COALESCE(sp.FirstName, pp.FirstName) AS FirstName,
+    COALESCE(sp.LastName, pp.LastName) AS LastName,
     r.RoleCode,
     r.DisplayName AS RoleDisplayName,
     ua.IsActive,
@@ -44,6 +44,8 @@ INNER JOIN dbo.Roles AS r
     ON r.RoleId = ua.RoleId
 LEFT JOIN dbo.StaffProfiles AS sp
     ON sp.UserAccountId = ua.UserAccountId
+LEFT JOIN dbo.PassengerProfiles AS pp
+    ON pp.UserAccountId = ua.UserAccountId
 WHERE ua.UserAccountId = @UserAccountId;";
 
         private const string RecordFailedLoginSql = @"

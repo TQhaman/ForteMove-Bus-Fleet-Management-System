@@ -351,7 +351,10 @@ SELECT t.TripId, t.TripCode, t.ServiceDate, t.ScheduledDepartureTime,
        t.ExpectedFinishLocal, r.RouteCode, r.RouteName,
        origin_stop.StopName, destination_stop.StopName,
        t.TripStatus, t.RequiresReview,
-       current_assignment.EmployeeNumber, current_assignment.DriverName, current_assignment.FleetNumber
+       current_assignment.EmployeeNumber, current_assignment.DriverName, current_assignment.FleetNumber,
+       execution.ActualStartUtc, execution.ActualCompletionUtc,
+       CONVERT(bit,CASE WHEN open_exception.TripCannotProceedReportId IS NULL THEN 0 ELSE 1 END),
+       CONVERT(bit,CASE WHEN critical_defect.BusDefectReportId IS NULL THEN 0 ELSE 1 END)
 FROM dbo.Trips AS t
 INNER JOIN dbo.Routes AS r ON r.RouteId=t.RouteId
 OUTER APPLY (SELECT TOP (1) s.StopName FROM dbo.RouteStops AS x INNER JOIN dbo.Stops AS s ON s.StopId=x.StopId WHERE x.RouteId=r.RouteId ORDER BY x.StopOrder) AS origin_stop
@@ -360,13 +363,16 @@ OUTER APPLY
 (
     SELECT TOP (1) sp.EmployeeNumber,
            sp.FirstName + N' ' + sp.LastName AS DriverName,
-           b.FleetNumber
+            b.FleetNumber, b.BusId
     FROM dbo.TripAssignments AS ta
     INNER JOIN dbo.DriverProfiles AS dp ON dp.DriverProfileId=ta.DriverProfileId
     INNER JOIN dbo.StaffProfiles AS sp ON sp.StaffProfileId=dp.StaffProfileId
     INNER JOIN dbo.Buses AS b ON b.BusId=ta.BusId
     WHERE ta.TripId=t.TripId AND ta.IsCurrent=1
 ) AS current_assignment
+LEFT JOIN dbo.TripExecutions AS execution ON execution.TripId=t.TripId
+OUTER APPLY (SELECT TOP(1) x.TripCannotProceedReportId FROM dbo.TripCannotProceedReports AS x WHERE x.TripId=t.TripId AND x.ResolvedUtc IS NULL) AS open_exception
+OUTER APPLY (SELECT TOP(1) d.BusDefectReportId FROM dbo.BusDefectReports AS d WHERE d.BusId=current_assignment.BusId AND d.Severity=N'Critical' AND d.DefectStatus<>N'Resolved') AS critical_defect
 WHERE (@ServiceDate IS NULL OR t.ServiceDate=@ServiceDate)
   AND (@RouteId IS NULL OR t.RouteId=@RouteId)
   AND (@Status IS NULL OR t.TripStatus=@Status)
@@ -395,7 +401,12 @@ ORDER BY t.ServiceDate, t.ScheduledDepartureTime, r.RouteCode;";
                             RequiresReview = reader.GetBoolean(10),
                             AssignedEmployeeNumber = reader.IsDBNull(11) ? null : reader.GetString(11),
                             AssignedDriverName = reader.IsDBNull(12) ? null : reader.GetString(12),
-                            AssignedFleetNumber = reader.IsDBNull(13) ? null : reader.GetString(13)
+                            AssignedFleetNumber = reader.IsDBNull(13) ? null : reader.GetString(13),
+                            ActualStartUtc = reader.IsDBNull(14) ? (DateTime?)null : reader.GetDateTime(14),
+                            ActualCompletionUtc = reader.IsDBNull(15) ? (DateTime?)null : reader.GetDateTime(15),
+                            HasOpenCannotProceed = reader.GetBoolean(16),
+                            HasUnresolvedCriticalDefect = reader.GetBoolean(17),
+                            IsOverdueNotStarted = reader.IsDBNull(14) && query.OperationalNow != DateTime.MinValue && reader.GetDateTime(2).Date.Add(reader.GetTimeSpan(3)) < query.OperationalNow && reader.GetString(9) != "Completed" && reader.GetString(9) != "Cancelled"
                         });
                     }
                 }
@@ -469,6 +480,8 @@ WHERE rs.RouteScheduleId=@RouteScheduleId AND rs.IsActive=1;";
                     using (SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.Serializable))
                     {
                         AcquireReferenceCodeLock(connection, transaction);
+                        AcquireAssignmentLock(connection, transaction);
+                        SqlPassengerCommerce.AcquireLock(connection, transaction);
                         ValidateCurrentVersion(connection, transaction, aggregate);
                         ValidateCategory(connection, transaction, aggregate.PreferredBusCategoryId);
 
@@ -477,8 +490,12 @@ WHERE rs.RouteScheduleId=@RouteScheduleId AND rs.IsActive=1;";
                             aggregate.ChangeEffectiveDate, true);
                         int safeCount = existing.Count(item => item.IsUntouched);
                         int protectedCount = existing.Count - safeCount;
+                        int ticketProtectedCount = existing.Count(item => item.HasTicketHistory);
+                        int purchasedTicketCount = existing.Sum(item => item.PurchasedTicketCount);
                         if (safeCount != aggregate.ExpectedFutureTripsToReplace ||
-                            protectedCount != aggregate.ExpectedProtectedTrips)
+                            protectedCount != aggregate.ExpectedProtectedTrips ||
+                            ticketProtectedCount != aggregate.ExpectedTicketProtectedTrips ||
+                            purchasedTicketCount != aggregate.ExpectedPurchasedTickets)
                         {
                             throw new SchedulingConcurrencyException(
                                 "Trip activity changed after the preview. Review the schedule change again.");
@@ -554,6 +571,9 @@ WHERE rs.RouteScheduleId=@RouteScheduleId AND rs.IsActive=1;";
                 if (exception.Number == 2601 || exception.Number == 2627)
                     throw new SchedulingConflictException(
                         "Another Schedule already provides this Route at one or more revised departure times.");
+                if (exception.Number == 51052)
+                    throw new SchedulingConcurrencyException(
+                        "Passenger booking activity changed while applying the Schedule. Review the change and try again.");
                 throw;
             }
         }
@@ -724,7 +744,22 @@ SELECT t.TripId, t.RouteScheduleVersionId, t.ServiceDate, t.ScheduledDepartureTi
        (
            SELECT 1 FROM dbo.TripAssignments AS assignment_history
            WHERE assignment_history.TripId=t.TripId
-       ) THEN 1 ELSE 0 END) AS HasAssignmentHistory
+       ) THEN 1 ELSE 0 END) AS HasAssignmentHistory,
+       CONVERT(bit, CASE WHEN
+           EXISTS (SELECT 1 FROM dbo.PreTripInspections p WHERE p.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripExecutions e WHERE e.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripDelayEvents d WHERE d.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripCannotProceedReports x WHERE x.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
+           OR EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId)
+       THEN 1 ELSE 0 END) AS HasOperationalHistory,
+       CONVERT(bit, CASE WHEN EXISTS
+       (
+           SELECT 1 FROM dbo.Tickets ticket_history
+           WHERE ticket_history.TripId=t.TripId
+       ) THEN 1 ELSE 0 END) AS HasTicketHistory,
+       (SELECT COUNT(*) FROM dbo.Tickets purchased_ticket
+        WHERE purchased_ticket.TripId=t.TripId AND purchased_ticket.TicketStatus=N'Purchased') AS PurchasedTicketCount
 FROM dbo.Trips AS t" + hint + @"
 INNER JOIN dbo.RouteScheduleVersions AS rsv
     ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
@@ -746,7 +781,10 @@ ORDER BY t.ServiceDate, t.ScheduledDepartureTime;"))
                             Status = (TripStatus)Enum.Parse(typeof(TripStatus), reader.GetString(4), false),
                             RequiresReview = reader.GetBoolean(5),
                             OperationallyTouchedUtc = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
-                            HasAssignmentHistory = reader.GetBoolean(7)
+                            HasAssignmentHistory = reader.GetBoolean(7),
+                            HasOperationalHistory = reader.GetBoolean(8),
+                            HasTicketHistory = reader.GetBoolean(9),
+                            PurchasedTicketCount = reader.GetInt32(10)
                         });
                     }
                 }
@@ -769,6 +807,13 @@ WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
       AND t.RequiresReview=0
       AND t.OperationallyTouchedUtc IS NULL
       AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.PreTripInspections p WHERE p.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripExecutions e WHERE e.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripDelayEvents d WHERE d.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripCannotProceedReports x WHERE x.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.Tickets ticket_history WHERE ticket_history.TripId=t.TripId)
   );"))
             {
                 AddBigInt(command, "@ActorId", actorId);
@@ -787,7 +832,14 @@ FROM dbo.Trips AS t
 INNER JOIN dbo.RouteScheduleVersions AS rsv ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
 WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
   AND t.TripStatus=N'Unassigned' AND t.RequiresReview=0 AND t.OperationallyTouchedUtc IS NULL
-  AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId);"))
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripAssignments AS assignment_history WHERE assignment_history.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.PreTripInspections p WHERE p.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripExecutions e WHERE e.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripDelayEvents d WHERE d.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripCannotProceedReports x WHERE x.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.Tickets ticket_history WHERE ticket_history.TripId=t.TripId);"))
             {
                 AddBigInt(command, "@ScheduleId", scheduleId);
                 AddDate(command, "@FromDate", fromDate);
@@ -928,6 +980,24 @@ SELECT @Result;"))
                 AddNVarChar(command, "@Resource", 255, ReferenceCodeLockResource);
                 int result = Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture);
                 if (result < 0) throw new DataException("The scheduling reference-code lock could not be acquired.");
+            }
+        }
+
+        private static void AcquireAssignmentLock(SqlConnection connection, SqlTransaction transaction)
+        {
+            using (SqlCommand command = CreateCommand(connection, transaction, @"
+DECLARE @Result int;
+EXEC @Result=sys.sp_getapplock
+    @Resource=N'ForteMove.Assignments',
+    @LockMode=N'Exclusive',
+    @LockOwner=N'Transaction',
+    @LockTimeout=10000;
+SELECT @Result;"))
+            {
+                int result = Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture);
+                if (result < 0)
+                    throw new SchedulingConcurrencyException(
+                        "Trip assignment activity changed while applying the Schedule. Review the change and try again.");
             }
         }
 

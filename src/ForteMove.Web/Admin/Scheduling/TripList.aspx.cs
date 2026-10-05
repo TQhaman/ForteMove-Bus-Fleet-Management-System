@@ -31,6 +31,22 @@ namespace ForteMove.Web.Admin.Scheduling
             if (trip == null || string.IsNullOrWhiteSpace(trip.AssignedFleetNumber)) return "Unassigned";
             return trip.AssignedFleetNumber + " · " + trip.AssignedEmployeeNumber + " · " + trip.AssignedDriverName;
         }
+        protected string FormatAttention(object dataItem)
+        {
+            TripListItem trip=dataItem as TripListItem;if(trip==null)return string.Empty;
+            if(trip.HasOpenCannotProceed)return "Cannot Proceed report open";
+            if(trip.HasUnresolvedCriticalDefect)return "Critical bus defect";
+            if(trip.IsOverdueNotStarted)return "Departure passed - not started";
+            return string.Empty;
+        }
+        protected string FormatActual(object dataItem)
+        {
+            TripListItem trip=dataItem as TripListItem;if(trip==null||!trip.ActualStartUtc.HasValue)return string.Empty;
+            DateTime start=ServiceFactory.CreateDriverOperationsService().ToOperationalTime(trip.ActualStartUtc.Value);
+            if(!trip.ActualCompletionUtc.HasValue)return "Started "+start.ToString("dd MMM HH:mm",CultureInfo.CurrentCulture);
+            DateTime end=ServiceFactory.CreateDriverOperationsService().ToOperationalTime(trip.ActualCompletionUtc.Value);
+            return "Actual "+start.ToString("dd MMM HH:mm",CultureInfo.CurrentCulture)+" to "+end.ToString("dd MMM HH:mm",CultureInfo.CurrentCulture);
+        }
         private void BindOptions()
         {
             SchedulingCreationOptions options=ServiceFactory.CreateSchedulingService().GetCreationOptions();

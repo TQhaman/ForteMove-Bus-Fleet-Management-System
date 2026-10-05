@@ -31,7 +31,14 @@ namespace ForteMove.Web
 
             if (principal.Context.Role == RoleCode.Driver)
             {
-                Response.Redirect(ResolveUrl("~/Driver/Account.aspx"), true);
+                Response.Redirect(ResolveUrl("~/Driver/Today.aspx"), true);
+                return;
+            }
+
+
+            if (principal.Context.Role == RoleCode.Passenger)
+            {
+                Response.Redirect(ResolveUrl("~/Passenger/Home.aspx"), true);
                 return;
             }
 

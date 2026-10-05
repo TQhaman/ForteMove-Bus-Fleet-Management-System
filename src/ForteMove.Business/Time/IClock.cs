@@ -9,5 +9,7 @@ namespace ForteMove.Business.Time
         DateTime Today { get; }
 
         DateTime OperationalNow { get; }
+
+        DateTime ToOperationalTime(DateTime utc);
     }
 }

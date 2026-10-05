@@ -1,0 +1,1 @@
+namespace ForteMove.Web.Driver{public partial class Today{protected global::System.Web.UI.WebControls.Panel pnlAlert;protected global::System.Web.UI.WebControls.Literal litAlert;protected global::System.Web.UI.WebControls.Repeater rptTrips;protected global::System.Web.UI.WebControls.Panel pnlEmpty;}}

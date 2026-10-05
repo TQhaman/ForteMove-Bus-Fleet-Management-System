@@ -76,7 +76,8 @@ namespace ForteMove.Business.Services
             if(string.IsNullOrWhiteSpace(request.Reason))return ServiceResult<bool>.Failure("Reason","Explain why this assignment is being changed.");
             AssignmentDetails details=repository.GetDetails(request.TripId);
             if(details==null||details.Trip==null||details.CurrentAssignment==null)return ServiceResult<bool>.Failure(string.Empty,"The current assignment is no longer available.");
-            if(details.Trip.Status!=TripStatus.Scheduled)return ServiceResult<bool>.Failure(string.Empty,"Only a Scheduled Trip can be reassigned in this release.");
+            if(details.HasStarted || (details.Trip.Status!=TripStatus.Scheduled && details.Trip.Status!=TripStatus.Ready && details.Trip.Status!=TripStatus.Delayed))
+                return ServiceResult<bool>.Failure(string.Empty,"Only a Trip that has not started can be reassigned.");
             AssignmentData data=repository.GetAssignmentData(details.Trip.ServiceDate);
             AssignmentBusCandidate bus=data.Buses.FirstOrDefault(b=>b.BusId==request.BusId.Value);
             AssignmentDriverCandidate driver=data.Drivers.FirstOrDefault(d=>d.DriverProfileId==request.DriverProfileId.Value);
@@ -128,7 +129,7 @@ namespace ForteMove.Business.Services
         {
             return (buses??Enumerable.Empty<AssignmentBusCandidate>()).Where(b=>IsBusEligible(trip,b))
                 .OrderByDescending(b=>trip.PreferredBusCategoryId.HasValue&&b.BusCategoryId==trip.PreferredBusCategoryId.Value)
-                .ThenBy(b=>trip.ExpectedCapacity.HasValue?b.PassengerCapacity-trip.ExpectedCapacity.Value:0)
+                .ThenBy(b=>b.PassengerCapacity-RequiredCapacity(trip))
                 .ThenBy(b=>b.Windows.Count(w=>w.StartLocal.Date==trip.ServiceDate.Date)).ThenBy(b=>b.FleetNumber,StringComparer.Ordinal);
         }
 
@@ -144,15 +145,16 @@ namespace ForteMove.Business.Services
 
         private static bool IsBusEligible(AssignmentTripCandidate trip,AssignmentBusCandidate bus)
         {
-            return bus!=null&&string.Equals(bus.OperationalState,"Operational",StringComparison.Ordinal)&&bus.GrossVehicleMassKg.HasValue&&bus.GrossVehicleMassKg.Value>0
+            return bus!=null&&!bus.HasUnresolvedCriticalDefect&&!bus.HasActiveExecution&&string.Equals(bus.OperationalState,"Operational",StringComparison.Ordinal)&&bus.GrossVehicleMassKg.HasValue&&bus.GrossVehicleMassKg.Value>0
                 &&(!trip.ExpectedCapacity.HasValue||bus.PassengerCapacity>=trip.ExpectedCapacity.Value)
+                &&bus.PassengerCapacity>=trip.PurchasedTicketCount
                 &&bus.LicenceExpiryDate.Date>=trip.ExpectedFinishLocal.Date&&bus.RoadworthyExpiryDate.Date>=trip.ExpectedFinishLocal.Date&&bus.InsuranceExpiryDate.Date>=trip.ExpectedFinishLocal.Date
                 &&!bus.Windows.Any(w=>w.TripId!=trip.TripId&&Conflicts(trip,w));
         }
 
         private static bool IsDriverEligible(AssignmentTripCandidate trip,AssignmentBusCandidate bus,AssignmentDriverCandidate driver)
         {
-            return driver!=null&&driver.AccountIsActive&&driver.RoleIsActive&&string.Equals(driver.EmploymentStatus,"Active",StringComparison.Ordinal)
+            return driver!=null&&!driver.HasActiveExecution&&driver.AccountIsActive&&driver.RoleIsActive&&string.Equals(driver.EmploymentStatus,"Active",StringComparison.Ordinal)
                 &&driver.AvailabilityStatus==DriverAvailabilityStatus.Available&&driver.DateOfBirth.Date.AddYears(21)<=trip.ServiceDate.Date
                 &&driver.LicenceExpiryDate.Date>=trip.ExpectedFinishLocal.Date&&driver.PrdpExpiryDate.Date>=trip.ExpectedFinishLocal.Date
                 &&LicenceCompatible(bus.GrossVehicleMassKg.Value,driver.LicenceCode)&&!driver.Windows.Any(w=>w.TripId!=trip.TripId&&Conflicts(trip,w));
@@ -167,7 +169,8 @@ namespace ForteMove.Business.Services
         private static bool Conflicts(AssignmentTripCandidate trip,AssignmentResourceWindow w){return w.StartLocal<trip.ExpectedFinishLocal.Add(Turnaround)&&w.FinishLocal.Add(Turnaround)>trip.ScheduledDepartureLocal;}
         private static AssignmentRecommendation CreateRecommendation(AssignmentTripCandidate trip,AssignmentBusCandidate bus,AssignmentDriverCandidate driver){return new AssignmentRecommendation{Trip=trip,Bus=bus,Driver=driver,Explanation="Recommended for capacity, compliance, licence compatibility and current workload.",Fingerprint=BuildFingerprint(trip,bus,driver)};}
         private static string BuildFingerprint(AssignmentTripCandidate t,AssignmentBusCandidate b,AssignmentDriverCandidate d){string raw=t.TripId+":"+Convert.ToBase64String(t.RowVersion??new byte[0])+":"+b.BusId+":"+Convert.ToBase64String(b.RowVersion??new byte[0])+":"+d.DriverProfileId+":"+Convert.ToBase64String(d.DriverRowVersion??new byte[0]);using(SHA256 s=SHA256.Create())return Convert.ToBase64String(s.ComputeHash(Encoding.UTF8.GetBytes(raw)));}
-        private static string GetBusExclusion(AssignmentTripCandidate trip,IEnumerable<AssignmentBusCandidate> buses){if(!(buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>b.GrossVehicleMassKg.HasValue))return "No bus with an approved gross vehicle mass is available.";if(!(buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>string.Equals(b.OperationalState,"Operational",StringComparison.Ordinal)))return "No Operational bus is available.";if(trip.ExpectedCapacity.HasValue&&!(buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>b.PassengerCapacity>=trip.ExpectedCapacity.Value))return "No bus has sufficient passenger capacity.";return "No bus meets compliance and turnaround requirements.";}
+        private static int RequiredCapacity(AssignmentTripCandidate trip){return Math.Max(trip.ExpectedCapacity??0,trip.PurchasedTicketCount);}
+        private static string GetBusExclusion(AssignmentTripCandidate trip,IEnumerable<AssignmentBusCandidate> buses){if((buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>b.HasUnresolvedCriticalDefect))return "Available buses are blocked by unresolved Critical defects.";if((buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>b.HasActiveExecution))return "Available buses are still operating another Trip.";if(!(buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>b.GrossVehicleMassKg.HasValue))return "No bus with an approved gross vehicle mass is available.";if(!(buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>string.Equals(b.OperationalState,"Operational",StringComparison.Ordinal)))return "No Operational bus is available.";if(trip.PurchasedTicketCount>0&&!(buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>b.PassengerCapacity>=trip.PurchasedTicketCount))return "No bus has capacity for the passengers who already hold tickets.";if(trip.ExpectedCapacity.HasValue&&!(buses??Enumerable.Empty<AssignmentBusCandidate>()).Any(b=>b.PassengerCapacity>=trip.ExpectedCapacity.Value))return "No bus has sufficient passenger capacity.";return "No bus meets compliance and turnaround requirements.";}
         private static IList<ValidationError> ValidateConfirmation(ConfirmAssignmentsRequest request,long actor){IList<ValidationError> e=new List<ValidationError>();if(request==null||request.Items==null||request.Items.Count==0)e.Add(new ValidationError(string.Empty,"Select at least one recommendation."));else{if(request.Items.GroupBy(i=>i.TripId).Any(g=>g.Count()>1))e.Add(new ValidationError(string.Empty,"A Trip can only be selected once."));foreach(ConfirmAssignmentItem i in request.Items)if(i.DecisionType!=AssignmentDecisionType.RecommendationAccepted&&string.IsNullOrWhiteSpace(i.Reason))e.Add(new ValidationError("Reason","A reason is required for an alternative assignment."));}if(actor<=0)e.Add(new ValidationError(string.Empty,"A valid administrator is required."));return e;}
     }
 }

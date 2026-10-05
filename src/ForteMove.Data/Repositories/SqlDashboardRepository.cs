@@ -43,7 +43,12 @@ SELECT
         AND dp.LicenceExpiryDate>=@OperationalDate AND dp.PrdpExpiryDate>=@OperationalDate) AS AvailableDrivers,
     (SELECT COUNT_BIG(*) FROM dbo.Trips
       WHERE TripStatus=N'Scheduled'
-        AND (ServiceDate>@OperationalDate OR (ServiceDate=@OperationalDate AND ScheduledDepartureTime>@OperationalTime))) AS ScheduledTrips
+        AND (ServiceDate>@OperationalDate OR (ServiceDate=@OperationalDate AND ScheduledDepartureTime>@OperationalTime))) AS ScheduledTrips,
+    (SELECT COUNT_BIG(*) FROM dbo.Trips WHERE TripStatus=N'Ready') AS ReadyTrips,
+    (SELECT COUNT_BIG(*) FROM dbo.Trips WHERE TripStatus=N'InProgress') AS InProgressTrips,
+    (SELECT COUNT_BIG(*) FROM dbo.Trips WHERE TripStatus=N'Delayed') AS DelayedTrips,
+    (SELECT COUNT_BIG(*) FROM dbo.TripCannotProceedReports WHERE ResolvedUtc IS NULL) AS OpenCannotProceed,
+    (SELECT COUNT_BIG(*) FROM dbo.BusDefectReports WHERE Severity=N'Critical' AND DefectStatus<>N'Resolved') AS UnresolvedCriticalDefects
 FROM dbo.Buses;";
 
         private readonly string connectionString;
@@ -91,7 +96,12 @@ FROM dbo.Buses;";
                         TodaysTrips = reader.GetInt64(7),
                         UnassignedTrips = reader.GetInt64(8),
                         AvailableDrivers = reader.GetInt64(9),
-                        ScheduledTrips = reader.GetInt64(10)
+                        ScheduledTrips = reader.GetInt64(10),
+                        ReadyTrips = reader.GetInt64(11),
+                        InProgressTrips = reader.GetInt64(12),
+                        DelayedTrips = reader.GetInt64(13),
+                        OpenCannotProceed = reader.GetInt64(14),
+                        UnresolvedCriticalDefects = reader.GetInt64(15)
                     };
                 }
             }

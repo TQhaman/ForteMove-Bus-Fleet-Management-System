@@ -23,5 +23,15 @@ namespace ForteMove.Models.Operations
         public long AvailableDrivers { get; set; }
 
         public long ScheduledTrips { get; set; }
+
+        public long ReadyTrips { get; set; }
+
+        public long InProgressTrips { get; set; }
+
+        public long DelayedTrips { get; set; }
+
+        public long OpenCannotProceed { get; set; }
+
+        public long UnresolvedCriticalDefects { get; set; }
     }
 }

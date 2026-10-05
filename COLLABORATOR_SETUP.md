@@ -1,6 +1,6 @@
-# ForteMove collaborator setup (accepted through Slice 4)
+# ForteMove collaborator setup (accepted through Slice 6)
 
-Start development on a feature branch based on the owner's published, accepted `main`. The Slice 4 checkpoint and its merge were prepared locally on 4 October 2026; until the owner explicitly publishes them, GitHub may still contain an older `main`. Confirm publication before starting. Read [the branch workflow](BRANCH_WORKFLOW.md), [the developer handoff](DEVELOPER_HANDOFF.md), and [the preliminary Slice 5 plan](SLICE_5_PLAN.md).
+`main` is the stable accepted baseline through Slice 6. `Slice-6` is its frozen checkpoint; `Slice-7` starts from accepted `main` and has no Slice 7 implementation yet. The existing `Slice-4` branch is preserved as historical work; its name does not accurately describe all its contents. Read [the current checkpoint and implementation map](SLICE_6_CHECKPOINT.md). Earlier Slice 4 handoff documents and the Slice 5 plan are historical references.
 
 ## Prerequisites
 
@@ -24,13 +24,13 @@ Start development on a feature branch based on the owner's published, accepted `
    git pull --ff-only origin main
    ```
 
-2. Create the agreed collaborator branch from updated `main`:
+2. Check out the published development branch:
 
    ```powershell
-   git switch -c Slice-5-driver-operations
+   git switch --track origin/Slice-7
    ```
 
-   If the owner has already published that branch, use `git switch --track origin/Slice-5-driver-operations` instead. Do not create a competing branch with the same name. Do not develop directly on `main` or the frozen `Slice-4` checkpoint.
+   If you already have it locally, use `git switch Slice-7` and `git pull --ff-only`. For separate individual work, agree a unique feature-branch name and create it with `git switch -c your-feature-name main`. Do not develop directly on `main`, `Slice-6`, or the historical `Slice-4`. Submit feature work for review before merging into `main`.
 
 3. Open **ForteMove.sln** in Visual Studio 2022.
 4. Use Restore NuGet Packages if Visual Studio offers it, then **Build Solution**. There are currently no `PackageReference`, `packages.config`, npm, or external package-restore dependencies. The four projects use .NET Framework assemblies, relative project references, and checked-in Bootstrap 5.2.3 assets. Missing `Microsoft.WebApplication.targets` means the web tools/workload are missing; missing Framework reference assemblies means the targeting pack is missing. From a VS Developer PowerShell prompt, `MSBuild.exe ForteMove.sln /t:Build /p:Configuration=Debug` is also valid.
@@ -41,7 +41,7 @@ Start development on a feature branch based on the owner's published, accepted `
    .\tools\Initialize-ForteMoveDatabase.ps1 -ServerInstance '.\SQLEXPRESS' -DatabaseName 'ForteMove'
    ```
 
-   If PowerShell blocks a downloaded script, review it first and follow your machine's script policy; do not disable execution policy globally. Use a different fresh name such as `ForteMove_Dev` if `ForteMove` already exists. The initializer refuses to adopt an unrelated database, never drops a database, and checks applied migration checksums.
+   If PowerShell blocks a downloaded script, review it first and follow your machine's script policy; do not disable execution policy globally. Use a different fresh name such as `ForteMove_Dev` if `ForteMove` already exists. The initializer applies migrations `0000`–`0007`, refuses to adopt an unrelated database, never drops a database, and checks applied migration checksums. Never edit an applied migration; add a new numbered migration for later schema work.
 7. Interactively create **your own first Transport Administrator**: email, employee number, names, and a private 15–128 character password. There are no default login credentials. Password entry is masked; only its salted hash is stored in your local SQL database. Do not save credentials in Git, screenshots, logs, tickets, or this document. An optional second run with `-SkipAdministratorSeed` verifies migration idempotency without creating another account.
 8. Set **ForteMove.Web** as the Startup Project. In `src/ForteMove.Web/Web.config`, confirm the `ForteMove` connection string targets the same instance/database used in step 6. It uses `Integrated Security=True`. If your local names differ, change only those non-secret settings locally and review `git diff` before every commit; the existing configuration does not automatically load `.env` or `*.local.config` files.
 9. Start **HTTPS IIS Express**. The project defaults to `https://localhost:44300/`; if occupied, choose another IIS Express HTTPS port in Visual Studio's web settings. Let Visual Studio configure/trust its local IIS Express development certificate. Do not copy the owner's certificate or export its private key. Secure authentication cookies require HTTPS. `dotnet dev-certs` is not this classic Web Forms project's certificate setup workflow.
@@ -52,7 +52,11 @@ Start development on a feature branch based on the owner's published, accepted `
     - Slice 2: create reusable Stops and an ordered Route; inspect Route List/Details and derived endpoints.
     - Slice 3: preview/create a recurring Schedule with future departures, inspect generated Trips, preview a future schedule change, and confirm protected/history Trips are retained for review.
     - Slice 4: create/edit a Driver with licence, passenger PrDP, availability and a private temporary password; sign in as that Driver and complete the mandatory password change; confirm the Driver Account page works and Admin pages are denied. Return as administrator, inspect/confirm assignment recommendations and change/remove a Scheduled assignment with a reason; inspect retained history and stale-update rejection.
+    - Slice 5: as the assigned Driver, use Today/Upcoming/History and Trip Details; complete the service-date readiness checklist and start odometer, start within the permitted departure window, report delay or Cannot Proceed, report a defect, and complete a started Trip with a valid ending odometer. As administrator, inspect and resolve operational exceptions and defects. Late Trips retain their actual state and surface warnings rather than auto-starting or auto-cancelling.
+    - Slice 6: self-register a fictional Passenger through the login page and sign in separately. Inspect the profile and initially empty wallet; make a simulated top-up and inspect the transaction ledger. Discover an eligible assigned future journey, purchase a Ticket, and inspect Ticket history. As administrator, cancel an appropriate test Trip and verify the Passenger's retained Ticket and exact wallet refund. Confirm Passenger requests cannot access Driver/Admin pages. Wallet top-ups do not process real money; boarding/redemption is not implemented.
 
-The original developer's local SQL database **is not part of Git**. A fresh initialization creates schema, reference roles/categories/propulsion types, the migration ledger, and your interactive administrator. It does **not** reproduce manually entered demonstration buses, Stops, Routes, Schedules, generated Trips, Drivers, or Assignments. No demo seed was added. A future demo seed requires separate approval.
+The original developer's local SQL database **is not part of Git**. A fresh initialization creates schema, reference roles/categories/propulsion types, the migration ledger, and your interactive administrator. It does **not** reproduce manually entered demonstration buses, Stops, Routes, Schedules, generated Trips, Drivers, Assignments, operational reports, Passenger accounts, funded wallets, or Tickets. There are no default passwords. No demo seed was added. A future demo seed requires separate approval.
+
+The optional sources in `tools/Verification` are acceptance harnesses, not database setup or demo seeds. Some assume particular local records and dates; see [their notes](tools/Verification/README.md) before using a disposable test database. They are not required to clone, build, initialize, or run the application.
 
 For consistent existing screen defaults, use South African local time on the development PC. Core operational calculations use `South Africa Standard Time` explicitly; the Assignment Queue's initial date still uses the host's `DateTime.Today` (see the audit).
