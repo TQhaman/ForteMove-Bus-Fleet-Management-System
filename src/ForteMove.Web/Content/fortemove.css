@@ -1566,3 +1566,46 @@ a:focus-visible {
 .timeline-list li { margin-bottom: 1rem; position: relative; }
 .timeline-list li::before { background: #1670e8; border: 3px solid #edf4ff; border-radius: 50%; content: ""; height: .85rem; left: -1.65rem; position: absolute; top: .25rem; width: .85rem; }
 @media (max-width: 520px) { .driver-action-grid { grid-template-columns: 1fr; } .driver-topbar .account-name { display:none; } }
+
+/* Passenger portal */
+.passenger-page { background: #f4f6f9; color: #17233d; }
+.passenger-shell { min-height: 100vh; }
+.passenger-topbar { align-items: center; background: #071d3b; color: #fff; display: flex; justify-content: space-between; min-height: 68px; padding: .75rem clamp(1rem,4vw,2rem); }
+.passenger-topbar img { height: 32px; width: auto; }
+.passenger-topbar .account-name { color: #fff; max-width: 13rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.passenger-navigation { background: #fff; border-bottom: 1px solid #dbe2ea; display: flex; gap: .25rem; overflow-x: auto; padding: .5rem clamp(1rem,4vw,2rem); }
+.passenger-navigation a { border-radius: .5rem; color: #41516a; font-weight: 700; padding: .65rem .85rem; text-decoration: none; white-space: nowrap; }
+.passenger-navigation a.active { background: #eaf2ff; color: #075bd8; }
+.passenger-main { margin: 0 auto; max-width: 920px; padding: 1.25rem clamp(1rem,4vw,2rem) 3rem; }
+.passenger-heading { margin-bottom: 1.25rem; }
+.passenger-heading h1 { font-size: clamp(1.65rem,5vw,2.2rem); margin-bottom: .35rem; }
+.passenger-balance-card { align-items: center; background: linear-gradient(135deg,#075bd8,#1685ef); border-radius: 1rem; color: #fff; display: flex; justify-content: space-between; padding: 1.15rem 1.25rem; }
+.passenger-balance-card span,.passenger-balance-card strong { display: block; }
+.passenger-balance-card span { color: rgba(255,255,255,.82); font-size: .86rem; }
+.passenger-balance-card strong { font-size: clamp(1.6rem,6vw,2.35rem); }
+.passenger-action-grid { display: grid; gap: .85rem; grid-template-columns: repeat(2,minmax(0,1fr)); margin-top: 1rem; }
+.passenger-action-card { background: #fff; border: 1px solid #dbe2ea; border-radius: .85rem; color: inherit; display: block; padding: 1rem; text-decoration: none; }
+.passenger-action-card:hover { border-color: #8fb8f4; color: inherit; }
+.passenger-action-card strong,.passenger-action-card span { display: block; }
+.passenger-action-card span { color: #607089; font-size: .9rem; margin-top: .25rem; }
+.passenger-journey-card,.passenger-ticket-card { background: #fff; border: 1px solid #dbe2ea; border-radius: .85rem; box-shadow: 0 8px 24px rgba(21,42,77,.05); color: inherit; display: block; margin-bottom: .85rem; padding: 1rem; text-decoration: none; }
+.passenger-journey-card:hover,.passenger-ticket-card:hover { border-color: #8fb8f4; color: inherit; }
+.passenger-journey-card > strong,.passenger-journey-card > span,.passenger-ticket-card > strong,.passenger-ticket-card > span { display: block; }
+.passenger-journey-time { color: #075bd8; font-size: 1.25rem; font-weight: 800; }
+.passenger-card-footer { align-items: center; border-top: 1px solid #edf0f4; display: flex; justify-content: space-between; margin-top: .75rem; padding-top: .75rem; }
+.passenger-ticket-history { background: #fafbfc; box-shadow: none; }
+.passenger-review-card,.passenger-ticket-detail { background: #fff; border: 1px solid #dbe2ea; border-radius: 1rem; box-shadow: 0 12px 32px rgba(21,42,77,.06); padding: clamp(1rem,4vw,1.5rem); }
+.ticket-brand { align-items: center; border-bottom: 1px solid #edf0f4; display: flex; justify-content: space-between; margin-bottom: 1.25rem; padding-bottom: 1rem; }
+.ticket-brand img { height: 30px; width: auto; }
+.ticket-brand span { background: #eaf2ff; border-radius: 99px; color: #075bd8; font-size: .82rem; font-weight: 800; padding: .35rem .65rem; }
+.ticket-route { color: #607089; font-size: 1.05rem; }
+.ticket-note { border-top: 1px solid #edf0f4; color: #607089; font-size: .86rem; margin: 1.25rem 0 0; padding-top: 1rem; }
+.wallet-review { display: grid; gap: .75rem; grid-template-columns: repeat(3,minmax(0,1fr)); }
+.wallet-review > div { background: #f7f9fc; border-radius: .65rem; padding: .85rem; }
+.wallet-review span,.wallet-review strong { display: block; }
+.wallet-review span { color: #607089; font-size: .82rem; }
+.wallet-entry { align-items: center; border-top: 1px solid #edf0f4; display: flex; gap: 1rem; justify-content: space-between; padding: .9rem 0; }
+.wallet-entry:first-child { border-top: 0; }
+.wallet-entry span { color: #607089; display: block; font-size: .82rem; }
+.passenger-registration-card { max-width: 620px; }
+@media (max-width: 520px) { .passenger-action-grid,.wallet-review { grid-template-columns: 1fr; } .passenger-topbar .account-name { display:none; } .passenger-navigation a { font-size:.85rem; padding:.6rem .7rem; } }

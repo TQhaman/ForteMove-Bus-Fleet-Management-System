@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Include="Contracts\IAssignmentRepository.cs" />
     <Compile Include="Contracts\ITripOperationsRepository.cs" />
+    <Compile Include="Contracts\IPassengerRepository.cs" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Security" />
@@ -48,6 +49,7 @@
     <Compile Include="Exceptions\AssignmentPersistenceException.cs" />
     <Compile Include="Exceptions\DriverPersistenceException.cs" />
     <Compile Include="Exceptions\TripOperationsPersistenceException.cs" />
+    <Compile Include="Exceptions\PassengerPersistenceException.cs" />
     <Compile Include="Exceptions\DuplicateRouteException.cs" />
     <Compile Include="Exceptions\DuplicateStopException.cs" />
     <Compile Include="Exceptions\UnavailableRouteStopException.cs" />
@@ -63,6 +65,8 @@
     <Compile Include="Services\DriverService.cs" />
     <Compile Include="Services\DriverOperationsService.cs" />
     <Compile Include="Services\OperationsAdminService.cs" />
+    <Compile Include="Services\PassengerRegistrationService.cs" />
+    <Compile Include="Services\PassengerService.cs" />
     <Compile Include="Services\RouteService.cs" />
     <Compile Include="Services\SchedulingService.cs" />
     <Compile Include="Time\IClock.cs" />

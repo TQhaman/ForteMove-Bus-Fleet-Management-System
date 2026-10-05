@@ -48,6 +48,18 @@ namespace ForteMove.Business.Identifiers
             return "DF-" + sequence.ToString("D6", CultureInfo.InvariantCulture);
         }
 
+        public static string FormatTicketCode(long sequence)
+        {
+            if (sequence <= 0) throw new ArgumentOutOfRangeException("sequence", "The identifier sequence must be greater than zero.");
+            return "TKT-" + sequence.ToString("D6", CultureInfo.InvariantCulture);
+        }
+
+        public static string FormatWalletTransactionCode(long sequence)
+        {
+            if (sequence <= 0) throw new ArgumentOutOfRangeException("sequence", "The identifier sequence must be greater than zero.");
+            return "WTX-" + sequence.ToString("D6", CultureInfo.InvariantCulture);
+        }
+
         private static string Format(int sequence, string prefix, string format)
         {
             if (sequence <= 0)

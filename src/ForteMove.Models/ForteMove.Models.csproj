@@ -52,6 +52,7 @@
     <Compile Include="Fleet\RegisterBusRequest.cs" />
     <Compile Include="Operations\DashboardSummary.cs" />
     <Compile Include="Operations\DriverOperationsModels.cs" />
+    <Compile Include="Passengers\PassengerModels.cs" />
     <Compile Include="Drivers\DriverModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Routing\CreateRouteRequest.cs" />

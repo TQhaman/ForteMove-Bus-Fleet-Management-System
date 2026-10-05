@@ -4,6 +4,8 @@ namespace ForteMove.Web.Account
     {
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
         protected global::System.Web.UI.WebControls.Panel pnlError;
+        protected global::System.Web.UI.WebControls.Panel pnlNotice;
+        protected global::System.Web.UI.WebControls.Literal litNotice;
         protected global::System.Web.UI.WebControls.Label lblError;
         protected global::System.Web.UI.WebControls.Label lblEmail;
         protected global::System.Web.UI.WebControls.TextBox txtEmail;

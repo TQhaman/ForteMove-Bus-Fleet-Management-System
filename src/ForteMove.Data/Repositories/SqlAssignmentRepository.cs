@@ -22,7 +22,8 @@ namespace ForteMove.Data.Repositories
             AssignmentData data=new AssignmentData();
             using(SqlConnection c=new SqlConnection(connectionString)){c.Open();
                 using(SqlCommand cmd=new SqlCommand(@"SELECT t.TripId,t.TripCode,t.RouteId,r.RouteCode,r.RouteName,t.ServiceDate,t.ScheduledDepartureTime,t.ExpectedFinishLocal,
-rsv.PreferredBusCategoryId,rsv.ExpectedCapacity,t.RequiresReview,t.TripStatus,t.RowVersion
+rsv.PreferredBusCategoryId,rsv.ExpectedCapacity,t.RequiresReview,t.TripStatus,t.RowVersion,
+(SELECT COUNT(*) FROM dbo.Tickets ticket WHERE ticket.TripId=t.TripId AND ticket.TicketStatus=N'Purchased')
 FROM dbo.Trips t INNER JOIN dbo.Routes r ON r.RouteId=t.RouteId INNER JOIN dbo.RouteScheduleVersions rsv ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
 WHERE t.ServiceDate=@Date ORDER BY t.ScheduledDepartureTime,t.TripCode;",c))
                 {cmd.Parameters.Add("@Date",SqlDbType.Date).Value=serviceDate.Date;using(SqlDataReader r=cmd.ExecuteReader())while(r.Read())data.Trips.Add(ReadTrip(r));}
@@ -54,7 +55,8 @@ WHERE ta.IsCurrent=1 AND t.TripStatus NOT IN(N'Completed',N'Cancelled') AND (t.S
             AssignmentDetails details=new AssignmentDetails();
             using(SqlConnection c=new SqlConnection(connectionString)){c.Open();
                 using(SqlCommand cmd=new SqlCommand(@"SELECT t.TripId,t.TripCode,t.RouteId,r.RouteCode,r.RouteName,t.ServiceDate,t.ScheduledDepartureTime,t.ExpectedFinishLocal,
-rsv.PreferredBusCategoryId,rsv.ExpectedCapacity,t.RequiresReview,t.TripStatus,t.RowVersion
+rsv.PreferredBusCategoryId,rsv.ExpectedCapacity,t.RequiresReview,t.TripStatus,t.RowVersion,
+(SELECT COUNT(*) FROM dbo.Tickets ticket WHERE ticket.TripId=t.TripId AND ticket.TicketStatus=N'Purchased')
 FROM dbo.Trips t INNER JOIN dbo.Routes r ON r.RouteId=t.RouteId INNER JOIN dbo.RouteScheduleVersions rsv ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId WHERE t.TripId=@TripId;",c))
                 {cmd.Parameters.Add("@TripId",SqlDbType.BigInt).Value=tripId;using(SqlDataReader r=cmd.ExecuteReader(CommandBehavior.SingleRow)){if(!r.Read())return null;details.Trip=ReadTrip(r);}}
                 using(SqlCommand cmd=new SqlCommand(@"SELECT ta.TripAssignmentId,ta.DriverProfileId,ta.BusId,sp.FirstName+N' '+sp.LastName,sp.EmployeeNumber,b.FleetNumber,ta.DecisionType,ta.DecisionReason,
@@ -66,16 +68,18 @@ INNER JOIN dbo.Buses b ON b.BusId=ta.BusId WHERE ta.TripId=@TripId ORDER BY ta.A
 CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM dbo.TripExecutions WHERE TripId=@TripId) THEN 1 ELSE 0 END),
 CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM dbo.PreTripInspections WHERE TripId=@TripId AND InvalidatedUtc IS NULL) THEN 1 ELSE 0 END),
 CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM dbo.TripCannotProceedReports WHERE TripId=@TripId AND ResolvedUtc IS NULL) THEN 1 ELSE 0 END),
-CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM dbo.TripDelayEvents WHERE TripId=@TripId AND EndedUtc IS NULL AND DelayPhase=N'PreStart') THEN 1 ELSE 0 END);",c))
-                {cmd.Parameters.Add("@TripId",SqlDbType.BigInt).Value=tripId;using(SqlDataReader r=cmd.ExecuteReader(CommandBehavior.SingleRow))if(r.Read()){details.HasStarted=r.GetBoolean(0);details.HasCurrentReadiness=r.GetBoolean(1);details.HasOpenCannotProceed=r.GetBoolean(2);details.HasOpenPreStartDelay=r.GetBoolean(3);}}
+CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM dbo.TripDelayEvents WHERE TripId=@TripId AND EndedUtc IS NULL AND DelayPhase=N'PreStart') THEN 1 ELSE 0 END),
+(SELECT COUNT(*) FROM dbo.Tickets WHERE TripId=@TripId AND TicketStatus=N'Purchased'),
+(SELECT COALESCE(SUM(FareAmount),0) FROM dbo.Tickets WHERE TripId=@TripId AND TicketStatus=N'Purchased');",c))
+                {cmd.Parameters.Add("@TripId",SqlDbType.BigInt).Value=tripId;using(SqlDataReader r=cmd.ExecuteReader(CommandBehavior.SingleRow))if(r.Read()){details.HasStarted=r.GetBoolean(0);details.HasCurrentReadiness=r.GetBoolean(1);details.HasOpenCannotProceed=r.GetBoolean(2);details.HasOpenPreStartDelay=r.GetBoolean(3);details.PurchasedTicketCount=r.GetInt32(4);details.PurchasedTicketTotal=r.GetDecimal(5);}}
             }return details;
         }
 
         public void ConfirmAssignments(ConfirmAssignmentsRequest request,long actorUserAccountId,DateTime operationalNow,DateTime utcNow)
-        {ExecuteWrite((c,tx)=>{AcquireLock(c,tx);foreach(ConfirmAssignmentItem item in request.Items)ValidateAndInsert(c,tx,item,actorUserAccountId,operationalNow,utcNow,false,null);},"The assignments could not be confirmed because a Trip, Driver, or bus changed. Review the recommendations and try again.");}
+        {ExecuteWrite((c,tx)=>{AcquireLock(c,tx);SqlPassengerCommerce.AcquireLock(c,tx);foreach(ConfirmAssignmentItem item in request.Items)ValidateAndInsert(c,tx,item,actorUserAccountId,operationalNow,utcNow,false,null);},"The assignments could not be confirmed because a Trip, Driver, bus, or passenger booking changed. Review the recommendations and try again.");}
 
         public void ChangeAssignment(ConfirmAssignmentItem replacement,byte[] currentAssignmentRowVersion,long actorUserAccountId,DateTime operationalNow,DateTime utcNow)
-        {ExecuteWrite((c,tx)=>{AcquireLock(c,tx);using(SqlCommand cmd=NewCommand(c,tx,@"DECLARE @OldStatus nvarchar(30);
+        {ExecuteWrite((c,tx)=>{AcquireLock(c,tx);SqlPassengerCommerce.AcquireLock(c,tx);using(SqlCommand cmd=NewCommand(c,tx,@"DECLARE @OldStatus nvarchar(30);
 SELECT @OldStatus=t.TripStatus FROM dbo.Trips t WITH(UPDLOCK,HOLDLOCK) WHERE t.TripId=@TripId AND t.RowVersion=@TripRv AND t.TripStatus IN(N'Scheduled',N'Ready',N'Delayed') AND NOT EXISTS(SELECT 1 FROM dbo.TripExecutions e WHERE e.TripId=t.TripId);
 IF @OldStatus IS NULL THROW 51014,'Only a current pre-start assignment can be changed. Refresh and try again.',1;
 UPDATE dbo.TripAssignments SET IsCurrent=0,EndType=N'Changed',EndReason=@Reason,EndedByUserAccountId=@Actor,EndedUtc=@Utc,UpdatedUtc=@Utc WHERE TripId=@TripId AND IsCurrent=1 AND RowVersion=@AssignmentRv;
@@ -116,6 +120,7 @@ AND b.RowVersion=@BusRv AND b.BaseOperationalState=N'Operational' AND b.GrossVeh
 AND NOT EXISTS(SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.BusId=b.BusId AND defect.Severity=N'Critical' AND defect.DefectStatus<>N'Resolved')
 AND NOT EXISTS(SELECT 1 FROM dbo.TripExecutions active_bus WHERE active_bus.BusId=b.BusId AND active_bus.ActualCompletionUtc IS NULL AND active_bus.TripId<>t.TripId)
 AND (rsv.ExpectedCapacity IS NULL OR b.PassengerCapacity>=rsv.ExpectedCapacity)
+AND b.PassengerCapacity >= (SELECT COUNT(*) FROM dbo.Tickets ticket WITH(UPDLOCK,HOLDLOCK) WHERE ticket.TripId=t.TripId AND ticket.TicketStatus=N'Purchased')
 AND b.LicenceExpiryDate>=CONVERT(date,t.ExpectedFinishLocal) AND b.RoadworthyExpiryDate>=CONVERT(date,t.ExpectedFinishLocal) AND b.InsuranceExpiryDate>=CONVERT(date,t.ExpectedFinishLocal)
 AND dp.RowVersion=@DriverRv AND sp.RowVersion=@StaffRv AND ua.RowVersion=@UserRv AND ua.IsActive=1 AND ro.IsActive=1 AND sp.EmploymentStatus=N'Active' AND dp.AvailabilityStatus=N'Available'
 AND NOT EXISTS(SELECT 1 FROM dbo.TripExecutions active_driver WHERE active_driver.DriverProfileId=dp.DriverProfileId AND active_driver.ActualCompletionUtc IS NULL AND active_driver.TripId<>t.TripId)
@@ -137,7 +142,7 @@ IF @IsChange=0 INSERT dbo.TripStatusHistory(TripId,FromStatus,ToStatus,EventType
 
         private void ExecuteWrite(Action<SqlConnection,SqlTransaction> action,string friendly){try{using(SqlConnection c=new SqlConnection(connectionString)){c.Open();using(SqlTransaction tx=c.BeginTransaction(IsolationLevel.Serializable)){action(c,tx);tx.Commit();}}}catch(AssignmentPersistenceException){throw;}catch(SqlException ex){throw new AssignmentPersistenceException(friendly,ex);}}
         private static void AcquireLock(SqlConnection c,SqlTransaction tx){using(SqlCommand cmd=NewCommand(c,tx,"DECLARE @r int;EXEC @r=sys.sp_getapplock @Resource=N'ForteMove.Assignments',@LockMode=N'Exclusive',@LockOwner=N'Transaction',@LockTimeout=10000;IF @r<0 THROW 51013,'Could not acquire assignment lock.',1;"))cmd.ExecuteNonQuery();}
-        private static AssignmentTripCandidate ReadTrip(SqlDataReader r){return new AssignmentTripCandidate{TripId=r.GetInt64(0),TripCode=r.GetString(1),RouteId=r.GetInt64(2),RouteCode=r.GetString(3),RouteName=r.GetString(4),ServiceDate=r.GetDateTime(5),ScheduledDepartureTime=r.GetTimeSpan(6),ExpectedFinishLocal=r.GetDateTime(7),PreferredBusCategoryId=r.IsDBNull(8)?(int?)null:r.GetInt32(8),ExpectedCapacity=r.IsDBNull(9)?(int?)null:r.GetInt32(9),RequiresReview=r.GetBoolean(10),Status=(TripStatus)Enum.Parse(typeof(TripStatus),r.GetString(11),false),RowVersion=(byte[])r.GetValue(12)};}
+        private static AssignmentTripCandidate ReadTrip(SqlDataReader r){return new AssignmentTripCandidate{TripId=r.GetInt64(0),TripCode=r.GetString(1),RouteId=r.GetInt64(2),RouteCode=r.GetString(3),RouteName=r.GetString(4),ServiceDate=r.GetDateTime(5),ScheduledDepartureTime=r.GetTimeSpan(6),ExpectedFinishLocal=r.GetDateTime(7),PreferredBusCategoryId=r.IsDBNull(8)?(int?)null:r.GetInt32(8),ExpectedCapacity=r.IsDBNull(9)?(int?)null:r.GetInt32(9),RequiresReview=r.GetBoolean(10),Status=(TripStatus)Enum.Parse(typeof(TripStatus),r.GetString(11),false),RowVersion=(byte[])r.GetValue(12),PurchasedTicketCount=r.GetInt32(13)};}
         private static AssignmentDriverCandidate FindDriver(AssignmentData d,long id){foreach(AssignmentDriverCandidate x in d.Drivers)if(x.DriverProfileId==id)return x;return null;}
         private static AssignmentBusCandidate FindBus(AssignmentData d,long id){foreach(AssignmentBusCandidate x in d.Buses)if(x.BusId==id)return x;return null;}
         private static SqlCommand NewCommand(SqlConnection c,SqlTransaction tx,string sql){SqlCommand cmd=c.CreateCommand();cmd.Transaction=tx;cmd.CommandText=sql;return cmd;}

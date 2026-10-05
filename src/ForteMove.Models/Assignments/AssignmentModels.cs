@@ -43,6 +43,7 @@ namespace ForteMove.Models.Assignments
         public DateTime ExpectedFinishLocal { get; set; }
         public int? PreferredBusCategoryId { get; set; }
         public int? ExpectedCapacity { get; set; }
+        public int PurchasedTicketCount { get; set; }
         public bool RequiresReview { get; set; }
         public TripStatus Status { get; set; }
         public byte[] RowVersion { get; set; }
@@ -193,5 +194,7 @@ namespace ForteMove.Models.Assignments
         public bool HasCurrentReadiness { get; set; }
         public bool HasOpenCannotProceed { get; set; }
         public bool HasOpenPreStartDelay { get; set; }
+        public int PurchasedTicketCount { get; set; }
+        public decimal PurchasedTicketTotal { get; set; }
     }
 }

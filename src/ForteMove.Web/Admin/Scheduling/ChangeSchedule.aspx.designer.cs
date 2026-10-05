@@ -21,6 +21,8 @@ namespace ForteMove.Web.Admin.Scheduling
         protected global::System.Web.UI.WebControls.Literal litReplaceCount;
         protected global::System.Web.UI.WebControls.Literal litGenerateCount;
         protected global::System.Web.UI.WebControls.Literal litProtectedCount;
+        protected global::System.Web.UI.WebControls.Literal litTicketProtectedCount;
+        protected global::System.Web.UI.WebControls.Literal litPurchasedTicketCount;
         protected global::System.Web.UI.WebControls.HyperLink lnkCancel;
         protected global::System.Web.UI.WebControls.Button btnReview;
         protected global::System.Web.UI.WebControls.Button btnApply;

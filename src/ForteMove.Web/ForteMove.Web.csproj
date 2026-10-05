@@ -49,6 +49,7 @@
   <ItemGroup>
     <Content Include="Account\Login.aspx" />
     <Content Include="Account\ChangePassword.aspx" />
+    <Content Include="Account\RegisterPassenger.aspx" />
     <Content Include="Admin\Admin.Master" />
     <Content Include="Admin\Dashboard.aspx" />
     <Content Include="Admin\FleetList.aspx" />
@@ -91,6 +92,15 @@
     <Content Include="Driver\ReportDefect.aspx" />
     <Content Include="Driver\CompleteTrip.aspx" />
     <Content Include="Driver\Web.config" />
+    <Content Include="Passenger\Passenger.Master" />
+    <Content Include="Passenger\Home.aspx" />
+    <Content Include="Passenger\Journeys.aspx" />
+    <Content Include="Passenger\JourneyDetails.aspx" />
+    <Content Include="Passenger\Tickets.aspx" />
+    <Content Include="Passenger\TicketDetails.aspx" />
+    <Content Include="Passenger\Wallet.aspx" />
+    <Content Include="Passenger\Account.aspx" />
+    <Content Include="Passenger\Web.config" />
     <Content Include="Errors\AccessDenied.aspx" />
     <Content Include="Errors\Unexpected.aspx" />
     <Content Include="Global.asax" />
@@ -104,6 +114,13 @@
     </Compile>
     <Compile Include="Account\ChangePassword.aspx.designer.cs">
       <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\RegisterPassenger.aspx.cs">
+      <DependentUpon>RegisterPassenger.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\RegisterPassenger.aspx.designer.cs">
+      <DependentUpon>RegisterPassenger.aspx</DependentUpon>
     </Compile>
     <Compile Include="Account\Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
@@ -299,6 +316,22 @@
     <Compile Include="Driver\ReportDefect.aspx.designer.cs"><DependentUpon>ReportDefect.aspx</DependentUpon></Compile>
     <Compile Include="Driver\CompleteTrip.aspx.cs"><DependentUpon>CompleteTrip.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
     <Compile Include="Driver\CompleteTrip.aspx.designer.cs"><DependentUpon>CompleteTrip.aspx</DependentUpon></Compile>
+    <Compile Include="Passenger\Passenger.Master.cs"><DependentUpon>Passenger.Master</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\Passenger.Master.designer.cs"><DependentUpon>Passenger.Master</DependentUpon></Compile>
+    <Compile Include="Passenger\Home.aspx.cs"><DependentUpon>Home.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\Home.aspx.designer.cs"><DependentUpon>Home.aspx</DependentUpon></Compile>
+    <Compile Include="Passenger\Journeys.aspx.cs"><DependentUpon>Journeys.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\Journeys.aspx.designer.cs"><DependentUpon>Journeys.aspx</DependentUpon></Compile>
+    <Compile Include="Passenger\JourneyDetails.aspx.cs"><DependentUpon>JourneyDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\JourneyDetails.aspx.designer.cs"><DependentUpon>JourneyDetails.aspx</DependentUpon></Compile>
+    <Compile Include="Passenger\Tickets.aspx.cs"><DependentUpon>Tickets.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\Tickets.aspx.designer.cs"><DependentUpon>Tickets.aspx</DependentUpon></Compile>
+    <Compile Include="Passenger\TicketDetails.aspx.cs"><DependentUpon>TicketDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\TicketDetails.aspx.designer.cs"><DependentUpon>TicketDetails.aspx</DependentUpon></Compile>
+    <Compile Include="Passenger\Wallet.aspx.cs"><DependentUpon>Wallet.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\Wallet.aspx.designer.cs"><DependentUpon>Wallet.aspx</DependentUpon></Compile>
+    <Compile Include="Passenger\Account.aspx.cs"><DependentUpon>Account.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Passenger\Account.aspx.designer.cs"><DependentUpon>Account.aspx</DependentUpon></Compile>
     <Compile Include="Errors\AccessDenied.aspx.cs">
       <DependentUpon>AccessDenied.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -321,6 +354,9 @@
     </Compile>
     <Compile Include="Infrastructure\ClientIpAddress.cs" />
     <Compile Include="Infrastructure\DriverPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Infrastructure\PassengerPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Infrastructure\FlashMessageStore.cs" />

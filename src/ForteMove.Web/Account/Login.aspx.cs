@@ -27,6 +27,12 @@ namespace ForteMove.Web.Account
                 return;
             }
 
+            if (string.Equals(Request.QueryString["registered"], "1", StringComparison.Ordinal))
+            {
+                litNotice.Text = "Your passenger account is ready. Sign in to continue.";
+                pnlNotice.Visible = true;
+            }
+
             ForteMovePrincipal principal = Context.User as ForteMovePrincipal;
             if (principal != null && principal.Identity.IsAuthenticated)
             {
@@ -89,6 +95,16 @@ namespace ForteMove.Web.Account
             if (principal.Role == RoleCode.Driver)
             {
                 Response.Redirect(ResolveUrl("~/Driver/Today.aspx"), true);
+                return;
+            }
+
+            if (principal.Role == RoleCode.Passenger)
+            {
+                string passengerReturnUrl = SafeRedirects.GetPassengerReturnUrl(
+                    Request.QueryString["returnUrl"]);
+                Response.Redirect(
+                    passengerReturnUrl ?? ResolveUrl("~/Passenger/Home.aspx"),
+                    true);
                 return;
             }
 

@@ -32,6 +32,8 @@
                 <h2>Welcome back</h2>
                 <p class="text-secondary mb-4">Sign in with your ForteMove account.</p>
 
+                <asp:Panel ID="pnlNotice" runat="server" CssClass="alert alert-success" Visible="false" role="status"><asp:Literal ID="litNotice" runat="server" /></asp:Panel>
+
                 <asp:Panel ID="pnlError" runat="server" CssClass="alert alert-danger app-alert" role="alert" Visible="false">
                     <span class="alert-icon" aria-hidden="true">!</span>
                     <asp:Label ID="lblError" runat="server" />
@@ -49,7 +51,7 @@
                 </div>
 
                 <asp:Button ID="btnSignIn" runat="server" CssClass="btn btn-primary btn-lg w-100" Text="Sign in" OnClick="btnSignIn_Click" />
-                <p class="auth-support-note">Access is limited to authorised ForteMove users.</p>
+                <p class="auth-support-note">New passenger? <a href="<%= ResolveUrl("~/Account/RegisterPassenger.aspx") %>">Create an account</a></p>
             </form>
         </section>
     </main>

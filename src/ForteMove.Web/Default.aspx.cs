@@ -35,6 +35,13 @@ namespace ForteMove.Web
                 return;
             }
 
+
+            if (principal.Context.Role == RoleCode.Passenger)
+            {
+                Response.Redirect(ResolveUrl("~/Passenger/Home.aspx"), true);
+                return;
+            }
+
             Response.Redirect(ResolveUrl("~/Errors/AccessDenied.aspx"), true);
         }
     }

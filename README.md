@@ -1,6 +1,6 @@
 # ForteMove
 
-ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. This repository currently contains the platform foundation and five vertical slices:
+ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. This repository contains the manually accepted system through Vertical Slice 6, including Driver Operations and Passenger Wallet/Ticketing. Slice 7 has not been implemented.
 
 1. secure Transport Administrator authentication and logout;
 2. role-protected administrator workspace and dashboard;
@@ -11,8 +11,9 @@ ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management app
 7. recurring Schedule creation, synchronous dated Trip generation, Schedule history, safe future changes, and operational Trip browsing.
 8. Transport Administrator Driver management with secure temporary passwords and mandatory first-login password change; and
 9. GVM-aware, explainable Driver-and-bus recommendations with atomic assignment confirmation and retained decision history.
-10. mobile-first assigned-Driver Trip readiness, start, delay, resume, Cannot Proceed, defect reporting, completion, and history; and
-11. administrator exception resolution, Trip cancellation, defect review, and live operational attention counts.
+10. mobile-first assigned-Driver Trip readiness, start, delay, resume, Cannot Proceed, defect reporting, completion, and history;
+11. administrator exception resolution, Trip cancellation, defect review, and live operational attention counts; and
+12. Passenger self-registration, simulated wallet top-ups, journey discovery, Ticket purchase, retained Ticket history, and automatic cancellation refunds.
 
 No demo identities, buses, routes, stops, schedules, trips, assignments, drivers, passengers, wallets, tickets, tracking records, maintenance work orders, or fuel/energy records are seeded.
 
@@ -35,7 +36,7 @@ Prerequisites:
 
 - Visual Studio 2022 with ASP.NET and .NET Framework development tools;
 - .NET Framework 4.8 targeting pack; and
-- SQL Server Express available as `.\SQLEXPRESS` (or an explicitly supplied SQL Server instance).
+- SQL Server Express 2017 or later available as `.\SQLEXPRESS` (or an explicitly supplied SQL Server instance).
 
 Initialize the schema and securely create the first Transport Administrator from a PowerShell prompt at the repository root:
 
@@ -67,6 +68,9 @@ Open `ForteMove.sln`, set `ForteMove.Web` as the startup project, and launch its
 16. Sign in as an assigned Driver and use Today to complete the safety checklist, start, report delays or blockers, resume, report defects, and complete the Trip with an ending odometer.
 17. Use the administrator Operations views to resolve Cannot Proceed reports and review or resolve vehicle defects.
 18. Use the POST-backed Logout action when finished.
+19. Create a Passenger account from the login page, sign in, and top up the simulated wallet.
+20. Find an assigned future journey, review its live fare and capacity, purchase a Ticket, and inspect it under Tickets.
+21. If an administrator cancels the Trip, verify that the Ticket is retained as Refunded and its exact fare returns to the Passenger wallet.
 
 Vehicle status is an explicit administrator choice. An `Operational` request is rejected when the licence, roadworthy certificate, or insurance is expired; the administrator must correct the compliance information or deliberately select `OutOfService`. Assignment eligibility independently checks compliance even when a stored vehicle status is Operational.
 
@@ -78,10 +82,13 @@ Schedule codes such as `FM-S01` remain stable across internal history. Generated
 
 Driver operations keep planned service times unchanged and store actual operational timestamps in UTC for South African local display. Readiness is tied to the exact assignment, a five-minute early-start window is enforced, and late Trips never auto-start or auto-cancel. Completion preserves immutable start/end readings and atomically advances the Bus odometer. Open Cannot Proceed reports block operational actions, while unresolved Critical defects independently block assignment and Trip start/resume.
 
+Passenger Ticket sales use the current assigned Bus capacity and operational eligibility rather than assignment recommendation rankings. Purchases debit the Passenger wallet, snapshot the Route fare, and protect the Trip as an operational dependency. Simulated top-ups do not use a payment gateway. Trip completion leaves a purchased Ticket as a past Ticket because boarding/redemption is intentionally outside this slice; administrator Trip cancellation performs the full atomic refund instead.
+
 ## Collaborator handoff
 
-- [Collaborator setup and Slice 1–4 walkthrough](COLLABORATOR_SETUP.md)
-- [Repository security, privacy and portability audit](REPOSITORY_AUDIT.md)
-- [Slice 4 checkpoint and branch workflow](BRANCH_WORKFLOW.md)
-- [Developer architecture and implementation map](DEVELOPER_HANDOFF.md)
-- [Slice 5 Driver Operations design](SLICE_5_PLAN.md)
+- [Collaborator setup and Slice 1–6 walkthrough](COLLABORATOR_SETUP.md)
+- [Slice 6 checkpoint audit, history and current implementation map](SLICE_6_CHECKPOINT.md)
+- [Earlier repository security, privacy and portability audit](REPOSITORY_AUDIT.md)
+- [Historical Slice 4 branch workflow](BRANCH_WORKFLOW.md)
+- [Slice 4 developer architecture and implementation map](DEVELOPER_HANDOFF.md)
+- [Historical Slice 5 Driver Operations design](SLICE_5_PLAN.md)

@@ -146,6 +146,7 @@ WHERE t.TripId=@TripId AND @DriverId IS NOT NULL
             ExecuteWrite(delegate(SqlConnection c,SqlTransaction tx)
             {
                 AcquireAssignmentLock(c,tx);
+                SqlPassengerCommerce.AcquireLock(c,tx);
                 const string sql=@"
 DECLARE @DriverId bigint,@AssignmentId bigint,@BusId bigint,@OldStatus nvarchar(30),@BusOdo decimal(12,1);
 SELECT @DriverId=dp.DriverProfileId,@AssignmentId=ta.TripAssignmentId,@BusId=b.BusId,@OldStatus=t.TripStatus,@BusOdo=b.OdometerKilometres
@@ -410,6 +411,8 @@ UPDATE dbo.TripCannotProceedReports SET ResolutionType=N'Cancelled',ResolutionNo
 UPDATE dbo.Trips SET TripStatus=N'Cancelled',OperationallyTouchedUtc=COALESCE(OperationallyTouchedUtc,@Utc),OperationallyTouchedByUserAccountId=COALESCE(OperationallyTouchedByUserAccountId,@Actor),UpdatedByUserAccountId=@Actor,UpdatedUtc=@Utc WHERE TripId=@TripId;
 INSERT dbo.TripStatusHistory(TripId,FromStatus,ToStatus,EventType,OccurredUtc,ActorUserAccountId,Note) VALUES(@TripId,@OldStatus,N'Cancelled',N'TripCancelled',@Utc,@Actor,@Reason);";
                 using(SqlCommand cmd=NewCommand(c,tx,sql)){cmd.Parameters.Add("@TripId",SqlDbType.BigInt).Value=request.TripId;AddTimestamp(cmd,"@TripRv",request.TripRowVersion);AddNullableTimestamp(cmd,"@PostedAssignmentRv",request.AssignmentRowVersion);AddString(cmd,"@Reason",500,request.Reason);cmd.Parameters.Add("@Actor",SqlDbType.BigInt).Value=actorUserAccountId;AddUtc(cmd,"@Utc",utcNow);cmd.ExecuteNonQuery();}
+                SqlPassengerCommerce.RefundPurchasedTickets(
+                    c, tx, request.TripId, actorUserAccountId, request.Reason, utcNow);
                 SqlAuditWriter.Write(c,tx,actorUserAccountId,"TripCancelled","Trip",request.TripId.ToString(CultureInfo.InvariantCulture),"Reason="+request.Reason,null,utcNow);
             },"The Trip could not be cancelled because it changed.");
         }
@@ -467,6 +470,7 @@ FROM dbo.BusDefectReports d JOIN dbo.Buses b ON b.BusId=d.BusId JOIN dbo.DriverP
         {
             try{using(SqlConnection c=new SqlConnection(connectionString)){c.Open();using(SqlTransaction tx=c.BeginTransaction(IsolationLevel.Serializable)){action(c,tx);tx.Commit();}}}
             catch(TripOperationsPersistenceException){throw;}
+            catch(PassengerPersistenceException ex){throw new TripOperationsPersistenceException(ex.Message,ex);}
             catch(SqlException ex){throw new TripOperationsPersistenceException(GetFriendly(ex,friendly),ex);}
         }
         private static string GetFriendly(SqlException ex,string fallback){return ex.Number>=51030&&ex.Number<=51099?ex.Message:fallback;}

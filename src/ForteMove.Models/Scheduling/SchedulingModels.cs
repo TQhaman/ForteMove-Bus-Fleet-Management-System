@@ -233,6 +233,10 @@ namespace ForteMove.Models.Scheduling
 
         public bool HasOperationalHistory { get; set; }
 
+        public bool HasTicketHistory { get; set; }
+
+        public int PurchasedTicketCount { get; set; }
+
         public bool IsUntouched
         {
             get
@@ -241,7 +245,8 @@ namespace ForteMove.Models.Scheduling
                     !RequiresReview &&
                     !OperationallyTouchedUtc.HasValue &&
                     !HasAssignmentHistory &&
-                    !HasOperationalHistory;
+                    !HasOperationalHistory &&
+                    !HasTicketHistory;
             }
         }
     }
@@ -305,6 +310,8 @@ namespace ForteMove.Models.Scheduling
         public int FutureTripsToReplace { get; set; }
         public int NewTripsToGenerate { get; set; }
         public int ProtectedTripsRequiringReview { get; set; }
+        public int TicketProtectedTripCount { get; set; }
+        public int PurchasedTicketCount { get; set; }
         public int HistoricalTripsAffected { get; set; }
         public string RequestFingerprint { get; set; }
         public string OccurrenceSignature { get; set; }
@@ -335,6 +342,8 @@ namespace ForteMove.Models.Scheduling
         public IList<ScheduleOccurrence> Occurrences { get; set; }
         public int ExpectedFutureTripsToReplace { get; set; }
         public int ExpectedProtectedTrips { get; set; }
+        public int ExpectedTicketProtectedTrips { get; set; }
+        public int ExpectedPurchasedTickets { get; set; }
     }
 
     public sealed class ScheduleChangeResult

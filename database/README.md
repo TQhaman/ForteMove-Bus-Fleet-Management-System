@@ -47,6 +47,7 @@ Use this switch for the second idempotency run after the administrator has been 
 - `0004_SchedulingAndTrips.sql` creates stable recurring Schedules, versioned operating patterns, generated Trips, and the constraints required for safe regeneration.
 - `0005_DriversAndAssignments.sql` adds bus gross vehicle mass, Driver assignment credentials, and append-only Trip assignment history.
 - `0006_DriverOperations.sql` adds pre-trip readiness, actual Trip execution, delay and Cannot Proceed histories, Driver defect reports, and auditable Trip status transitions.
+- `0007_PassengerWalletAndTicketing.sql` adds Passenger profiles, one wallet per Passenger, an append-only wallet ledger, and whole-Route journey Tickets.
 
 Migration `0003` preserves existing bus rows while renaming `Buses.VinChassisNumber` to `Buses.Vin` and its unique constraint/index to `UQ_Buses_Vin`. It refuses to run against an unexpected or partially changed VIN schema.
 
@@ -65,6 +66,10 @@ Assignment recommendations are advisory. The selected Driver, bus, Trip state, c
 Migration `0006` does not seed operational records. Readiness is bound to the exact current assignment and is invalidated on a safe pre-start reassignment, removal, or cancellation. Actual start/completion timestamps use UTC, while the application converts them to South African operational time for display. Starting and ending odometer readings remain immutable Trip evidence; completing a Trip atomically advances the Bus's authoritative odometer.
 
 Delay, Cannot Proceed, defect, and Trip status records preserve operational history. Open or reviewed Critical defects block new assignments and Trip start/resume without silently changing the Bus's persistent status. Transport Administrators resolve exceptions, review/resolve defects, and are the only actors able to cancel a Trip.
+
+Migration `0007` does not seed Passenger or commercial data. Passenger self-registration creates an active Passenger account, Passenger profile, and R0.00 wallet atomically. Wallet balances and immutable Ticket fare snapshots use `DECIMAL(12,2)`. Simulated top-ups, Ticket purchases, and Trip-cancellation refunds are recorded in the append-only wallet ledger with idempotency tokens.
+
+Ticket sales are available only for an assigned, future, operationally eligible Trip. Sellable capacity comes from the currently assigned Bus. A successful purchase protects the Trip from destructive Schedule regeneration. Administrator cancellation refunds every purchased Ticket to its owning Passenger wallet in the same transaction; Driver completion does not imply boarding and does not change Ticket state.
 
 ## Migration policy
 

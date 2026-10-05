@@ -239,7 +239,9 @@ namespace ForteMove.Business.Services
                 DepartureTimes = request.DepartureTimes.Distinct().OrderBy(item => item).ToList(),
                 Occurrences = generated.Value.Occurrences,
                 ExpectedFutureTripsToReplace = impact.FutureTripsToReplace,
-                ExpectedProtectedTrips = impact.ProtectedTripsRequiringReview
+                ExpectedProtectedTrips = impact.ProtectedTripsRequiringReview,
+                ExpectedTicketProtectedTrips = impact.TicketProtectedTripCount,
+                ExpectedPurchasedTickets = impact.PurchasedTicketCount
             };
 
             try
@@ -347,6 +349,8 @@ namespace ForteMove.Business.Services
                 FutureTripsToReplace = options.ExistingTripsFromCutover.Count(item => item.IsUntouched),
                 NewTripsToGenerate = generated.Value.TripCount - protectedCollisions,
                 ProtectedTripsRequiringReview = protectedTrips.Count,
+                TicketProtectedTripCount = protectedTrips.Count(item => item.HasTicketHistory),
+                PurchasedTicketCount = protectedTrips.Sum(item => item.PurchasedTicketCount),
                 HistoricalTripsAffected = 0,
                 RequestFingerprint = requestFingerprint,
                 OccurrenceSignature = occurrenceSignature
