@@ -60,6 +60,16 @@ namespace ForteMove.Business.Identifiers
             return "WTX-" + sequence.ToString("D6", CultureInfo.InvariantCulture);
         }
 
+        public static string FormatFuelRequestCode(long sequence) { return FuelCode(sequence,"FR-","D6"); }
+        public static string FormatFuelVoucherCode(long sequence) { return FuelCode(sequence,"FV-","D6"); }
+        public static string FormatFuelTransactionCode(long sequence) { return FuelCode(sequence,"FTX-","D6"); }
+        public static string FormatFuelStationCode(long sequence) { return FuelCode(sequence,"FS-","D3"); }
+        private static string FuelCode(long sequence,string prefix,string format)
+        {
+            if(sequence<=0) throw new ArgumentOutOfRangeException("sequence");
+            return prefix+sequence.ToString(format,CultureInfo.InvariantCulture);
+        }
+
         private static string Format(int sequence, string prefix, string format)
         {
             if (sequence <= 0)

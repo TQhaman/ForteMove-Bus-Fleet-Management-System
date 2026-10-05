@@ -18,6 +18,11 @@ namespace ForteMove.Web.Admin
         protected global::System.Web.UI.WebControls.HyperLink lnkExceptions;
         protected global::System.Web.UI.WebControls.HyperLink lnkDefects;
         protected global::System.Web.UI.WebControls.HyperLink lnkLiveTracking;
+        protected global::System.Web.UI.WebControls.HyperLink lnkFuelRequests;
+        protected global::System.Web.UI.WebControls.HyperLink lnkFuelVouchers;
+        protected global::System.Web.UI.WebControls.HyperLink lnkFuelTransactions;
+        protected global::System.Web.UI.WebControls.HyperLink lnkFuelStations;
+        protected global::System.Web.UI.WebControls.HyperLink lnkFuelPrototypeTerminal;
         protected global::System.Web.UI.WebControls.Literal litInitial;
         protected global::System.Web.UI.WebControls.Label lblDisplayName;
         protected global::System.Web.UI.WebControls.Label lblRole;

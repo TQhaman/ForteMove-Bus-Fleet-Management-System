@@ -38,6 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ServiceResult.cs" />
+    <Compile Include="Fuel\FuelEnums.cs" />
+    <Compile Include="Fuel\FuelModels.cs" />
+    <Compile Include="Fuel\FuelRequests.cs" />
     <Compile Include="Tracking\TrackingModels.cs" />
     <Compile Include="Routing\StopCoordinateModels.cs" />
     <Compile Include="Common\ValidationError.cs" />

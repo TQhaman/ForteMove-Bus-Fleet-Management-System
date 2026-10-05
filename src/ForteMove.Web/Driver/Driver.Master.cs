@@ -16,6 +16,7 @@ namespace ForteMove.Web.Driver
             Mark(lnkToday, path == "~/Driver/Today.aspx" || path == "~/Driver/TripDetails.aspx" || path == "~/Driver/PreTripCheck.aspx" || path == "~/Driver/ReportDelay.aspx" || path == "~/Driver/CannotProceed.aspx" || path == "~/Driver/ReportDefect.aspx" || path == "~/Driver/CompleteTrip.aspx");
             Mark(lnkUpcoming, path == "~/Driver/Upcoming.aspx");
             Mark(lnkHistory, path == "~/Driver/History.aspx");
+            Mark(lnkFuel, path.StartsWith("~/Driver/Fuel/", StringComparison.OrdinalIgnoreCase));
             Mark(lnkAccount, path == "~/Driver/Account.aspx");
         }
 

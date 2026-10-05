@@ -1,0 +1,7 @@
+<%@ Page Title="Fuel Voucher" Language="C#" MasterPageFile="~/Driver/Driver.Master" AutoEventWireup="true" CodeBehind="VoucherDetails.aspx.cs" Inherits="ForteMove.Web.Driver.Fuel.VoucherDetailsPage"  %>
+<asp:Content ID="Main" ContentPlaceHolderID="MainContent" runat="server">
+<header class="driver-heading"><div><p class="section-kicker">Fuel</p><h1>Fuel Voucher</h1></div></header>
+<nav class="fuel-subnavigation" aria-label="Fuel navigation"><a  href="<%= ResolveUrl("~/Driver/Fuel/Requests.aspx") %>">Requests</a><a  href="<%= ResolveUrl("~/Driver/Fuel/Vouchers.aspx") %>">Active Vouchers</a><a  href="<%= ResolveUrl("~/Driver/Fuel/History.aspx") %>">History</a></nav>
+<asp:Panel ID="pnlMessage" runat="server" CssClass="alert alert-danger" Visible="false" role="alert"><asp:Literal ID="litMessage" runat="server"/></asp:Panel>
+<section class="app-panel form-panel"><asp:Literal ID="litDetails" runat="server"/><asp:Panel ID="pnlWarnings" runat="server" CssClass="alert alert-warning" Visible="false"><asp:Literal ID="litWarnings" runat="server"/></asp:Panel><asp:Panel ID="pnlToken" runat="server"><h2>Present at the approved Station</h2><asp:Image ID="imgQr" runat="server" CssClass="fuel-qr" AlternateText="One-use Fuel Voucher QR code"/><p>Keep this token private. Copy it into the protected Prototype Terminal for demonstration.</p><asp:TextBox ID="txtToken" runat="server" CssClass="form-control fuel-token" ReadOnly="true" aria-label="Fuel Voucher redemption token"/></asp:Panel></section>
+</asp:Content>

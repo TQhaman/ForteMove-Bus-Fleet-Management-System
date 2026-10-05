@@ -1,0 +1,107 @@
+Slice 8 implementation worktree manifest (relative to the repository root)
+Branch: Slice-8; checkpoint HEAD: fd09a9b; no Slice 8 commit/push
+M = modified existing file; ?? = newly added/untracked file
+No files deleted. Build/package/test artifacts are ignored.
+
+ M README.md
+ M database/README.md
+ M src/ForteMove.Business/ForteMove.Business.csproj
+ M src/ForteMove.Business/Identifiers/IdentifierCodePolicy.cs
+ M src/ForteMove.Data/ForteMove.Data.csproj
+ M src/ForteMove.Data/Repositories/SqlAssignmentRepository.cs
+ M src/ForteMove.Data/Repositories/SqlSchedulingRepository.cs
+ M src/ForteMove.Data/Repositories/SqlTripOperationsRepository.cs
+ M src/ForteMove.Models/ForteMove.Models.csproj
+ M src/ForteMove.Models/Scheduling/SchedulingModels.cs
+ M src/ForteMove.Web/Admin/Admin.Master
+ M src/ForteMove.Web/Admin/Admin.Master.cs
+ M src/ForteMove.Web/Admin/Admin.Master.designer.cs
+ M src/ForteMove.Web/Content/fortemove.css
+ M src/ForteMove.Web/Driver/Driver.Master
+ M src/ForteMove.Web/Driver/Driver.Master.cs
+ M src/ForteMove.Web/Driver/Driver.Master.designer.cs
+ M src/ForteMove.Web/Driver/TripDetails.aspx
+ M src/ForteMove.Web/Driver/TripDetails.aspx.cs
+ M src/ForteMove.Web/Driver/TripDetails.aspx.designer.cs
+ M src/ForteMove.Web/ForteMove.Web.csproj
+ M src/ForteMove.Web/Infrastructure/ServiceFactory.cs
+ M tools/Verification/README.md
+?? SLICE_8_VERIFICATION.md
+?? database/migrations/0008_FuelVouchers.sql
+?? src/ForteMove.Business/Contracts/IFuelRepository.cs
+?? src/ForteMove.Business/Contracts/IFuelStationRepository.cs
+?? src/ForteMove.Business/Contracts/IFuelTokenProtector.cs
+?? src/ForteMove.Business/Exceptions/FuelPersistenceException.cs
+?? src/ForteMove.Business/Fuel/FuelPolicy.cs
+?? src/ForteMove.Business/Fuel/FuelRedemptionToken.cs
+?? src/ForteMove.Business/Services/AdminFuelService.cs
+?? src/ForteMove.Business/Services/DriverFuelService.cs
+?? src/ForteMove.Business/Services/FuelStationService.cs
+?? src/ForteMove.Data/Internal/SqlFuelLifecycle.cs
+?? src/ForteMove.Data/Repositories/SqlFuelRepository.cs
+?? src/ForteMove.Data/Repositories/SqlFuelStationRepository.cs
+?? src/ForteMove.Models/Fuel/FuelEnums.cs
+?? src/ForteMove.Models/Fuel/FuelModels.cs
+?? src/ForteMove.Models/Fuel/FuelRequests.cs
+?? src/ForteMove.Web/Admin/Fuel/CreateStation.aspx
+?? src/ForteMove.Web/Admin/Fuel/CreateStation.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/CreateStation.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/EditStation.aspx
+?? src/ForteMove.Web/Admin/Fuel/EditStation.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/EditStation.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/PrototypeTerminal.aspx
+?? src/ForteMove.Web/Admin/Fuel/PrototypeTerminal.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/PrototypeTerminal.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/RequestDetails.aspx
+?? src/ForteMove.Web/Admin/Fuel/RequestDetails.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/RequestDetails.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/Requests.aspx
+?? src/ForteMove.Web/Admin/Fuel/Requests.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/Requests.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/Stations.aspx
+?? src/ForteMove.Web/Admin/Fuel/Stations.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/Stations.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/TransactionDetails.aspx
+?? src/ForteMove.Web/Admin/Fuel/TransactionDetails.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/TransactionDetails.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/Transactions.aspx
+?? src/ForteMove.Web/Admin/Fuel/Transactions.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/Transactions.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/VoucherDetails.aspx
+?? src/ForteMove.Web/Admin/Fuel/VoucherDetails.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/VoucherDetails.aspx.designer.cs
+?? src/ForteMove.Web/Admin/Fuel/Vouchers.aspx
+?? src/ForteMove.Web/Admin/Fuel/Vouchers.aspx.cs
+?? src/ForteMove.Web/Admin/Fuel/Vouchers.aspx.designer.cs
+?? src/ForteMove.Web/Driver/Fuel/History.aspx
+?? src/ForteMove.Web/Driver/Fuel/History.aspx.cs
+?? src/ForteMove.Web/Driver/Fuel/History.aspx.designer.cs
+?? src/ForteMove.Web/Driver/Fuel/RequestDetails.aspx
+?? src/ForteMove.Web/Driver/Fuel/RequestDetails.aspx.cs
+?? src/ForteMove.Web/Driver/Fuel/RequestDetails.aspx.designer.cs
+?? src/ForteMove.Web/Driver/Fuel/RequestFuel.aspx
+?? src/ForteMove.Web/Driver/Fuel/RequestFuel.aspx.cs
+?? src/ForteMove.Web/Driver/Fuel/RequestFuel.aspx.designer.cs
+?? src/ForteMove.Web/Driver/Fuel/Requests.aspx
+?? src/ForteMove.Web/Driver/Fuel/Requests.aspx.cs
+?? src/ForteMove.Web/Driver/Fuel/Requests.aspx.designer.cs
+?? src/ForteMove.Web/Driver/Fuel/VoucherDetails.aspx
+?? src/ForteMove.Web/Driver/Fuel/VoucherDetails.aspx.cs
+?? src/ForteMove.Web/Driver/Fuel/VoucherDetails.aspx.designer.cs
+?? src/ForteMove.Web/Driver/Fuel/VoucherQr.ashx
+?? src/ForteMove.Web/Driver/Fuel/VoucherQr.ashx.cs
+?? src/ForteMove.Web/Driver/Fuel/Vouchers.aspx
+?? src/ForteMove.Web/Driver/Fuel/Vouchers.aspx.cs
+?? src/ForteMove.Web/Driver/Fuel/Vouchers.aspx.designer.cs
+?? src/ForteMove.Web/Infrastructure/FuelPresentation.cs
+?? src/ForteMove.Web/Infrastructure/FuelQrRenderer.cs
+?? src/ForteMove.Web/Infrastructure/MachineKeyFuelTokenProtector.cs
+?? src/ForteMove.Web/packages.config
+?? tools/Verification/Invoke-Slice8IntegrityVerification.ps1
+?? tools/Verification/Invoke-Slice8PageRenderVerification.ps1
+?? tools/Verification/Invoke-Slice8Verification.ps1
+?? tools/Verification/Slice8BusinessVerification.cs
+?? tools/Verification/Slice8ConcurrencyVerification.cs
+?? tools/Verification/Slice8PageRenderVerification.cs
+?? tools/Verification/Slice8RollbackVerification.cs
+?? SLICE_8_FILES_CHANGED.txt

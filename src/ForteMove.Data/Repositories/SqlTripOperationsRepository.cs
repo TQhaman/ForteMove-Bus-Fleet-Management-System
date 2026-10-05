@@ -339,6 +339,7 @@ UPDATE dbo.Trips SET OperationallyTouchedUtc=COALESCE(OperationallyTouchedUtc,@U
             ExecuteWrite(delegate(SqlConnection c,SqlTransaction tx)
             {
                 AcquireAssignmentLock(c,tx);
+                SqlFuelLifecycle.AcquireLock(c,tx);
                 const string sql=@"
 DECLARE @ExecutionId bigint,@StartOdo decimal(12,1),@BusOdo decimal(12,1),@OldStatus nvarchar(30),@BusId bigint;
 SELECT @ExecutionId=e.TripExecutionId,@StartOdo=p.StartOdometerKilometres,@BusOdo=b.OdometerKilometres,@OldStatus=t.TripStatus,@BusId=b.BusId
@@ -362,6 +363,7 @@ IF @@ROWCOUNT<>1 THROW 51041,'The Bus odometer changed. Reload the Trip before c
 UPDATE dbo.Trips SET TripStatus=N'Completed',UpdatedByUserAccountId=@UserId,UpdatedUtc=@Utc WHERE TripId=@TripId;
 INSERT dbo.TripStatusHistory(TripId,FromStatus,ToStatus,EventType,OccurredUtc,ActorUserAccountId,Note) VALUES(@TripId,@OldStatus,N'Completed',N'TripCompleted',@Utc,@UserId,@Note);";
                 using(SqlCommand cmd=NewCommand(c,tx,sql)){AddCoreActionParameters(cmd,request.TripId,userAccountId,request.TripRowVersion,request.AssignmentRowVersion,operationalNow,utcNow);AddTimestamp(cmd,"@ExecutionRv",request.RelatedRowVersion);AddTimestamp(cmd,"@BusRv",request.BusRowVersion);AddDecimal(cmd,"@EndOdo",request.EndOdometerKilometres.Value);AddNullableString(cmd,"@Note",1000,request.CompletionNote);cmd.ExecuteNonQuery();}
+                SqlFuelLifecycle.Invalidate(c,tx,request.TripId,null,userAccountId,"Trip completed",utcNow);
                 SqlAuditWriter.Write(c,tx,userAccountId,"TripCompleted","Trip",request.TripId.ToString(CultureInfo.InvariantCulture),"EndOdometerKm="+request.EndOdometerKilometres.Value.ToString("0.0",CultureInfo.InvariantCulture),null,utcNow);
             },"The Trip could not be completed because its operational data changed.");
         }
@@ -397,6 +399,8 @@ IF @@ROWCOUNT<>1 THROW 51042,'The exception cannot be cleared. Refresh it and re
             ExecuteWrite(delegate(SqlConnection c,SqlTransaction tx)
             {
                 AcquireAssignmentLock(c,tx);
+                SqlPassengerCommerce.AcquireLock(c,tx);
+                SqlFuelLifecycle.AcquireLock(c,tx);
                 const string sql=@"
 DECLARE @OldStatus nvarchar(30),@AssignmentId bigint,@AssignmentRv binary(8);
 SELECT @OldStatus=t.TripStatus,@AssignmentId=ta.TripAssignmentId,@AssignmentRv=ta.RowVersion
@@ -411,6 +415,7 @@ UPDATE dbo.TripCannotProceedReports SET ResolutionType=N'Cancelled',ResolutionNo
 UPDATE dbo.Trips SET TripStatus=N'Cancelled',OperationallyTouchedUtc=COALESCE(OperationallyTouchedUtc,@Utc),OperationallyTouchedByUserAccountId=COALESCE(OperationallyTouchedByUserAccountId,@Actor),UpdatedByUserAccountId=@Actor,UpdatedUtc=@Utc WHERE TripId=@TripId;
 INSERT dbo.TripStatusHistory(TripId,FromStatus,ToStatus,EventType,OccurredUtc,ActorUserAccountId,Note) VALUES(@TripId,@OldStatus,N'Cancelled',N'TripCancelled',@Utc,@Actor,@Reason);";
                 using(SqlCommand cmd=NewCommand(c,tx,sql)){cmd.Parameters.Add("@TripId",SqlDbType.BigInt).Value=request.TripId;AddTimestamp(cmd,"@TripRv",request.TripRowVersion);AddNullableTimestamp(cmd,"@PostedAssignmentRv",request.AssignmentRowVersion);AddString(cmd,"@Reason",500,request.Reason);cmd.Parameters.Add("@Actor",SqlDbType.BigInt).Value=actorUserAccountId;AddUtc(cmd,"@Utc",utcNow);cmd.ExecuteNonQuery();}
+                SqlFuelLifecycle.Invalidate(c,tx,request.TripId,null,actorUserAccountId,"Trip cancelled",utcNow);
                 SqlPassengerCommerce.RefundPurchasedTickets(
                     c, tx, request.TripId, actorUserAccountId, request.Reason, utcNow);
                 SqlAuditWriter.Write(c,tx,actorUserAccountId,"TripCancelled","Trip",request.TripId.ToString(CultureInfo.InvariantCulture),"Reason="+request.Reason,null,utcNow);

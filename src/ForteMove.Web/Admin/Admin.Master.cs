@@ -95,6 +95,16 @@ namespace ForteMove.Web.Admin
             lnkLiveTracking.CssClass = BuildNavigationClass(appRelativePath,
                 "~/Admin/Tracking/LiveTracking.aspx", "~/Admin/Tracking/TripTracking.aspx");
 
+            lnkFuelRequests.CssClass = BuildNavigationClass(appRelativePath, "~/Admin/Fuel/Requests.aspx", "~/Admin/Fuel/RequestDetails.aspx");
+            SetAriaCurrent(lnkFuelRequests);
+            lnkFuelVouchers.CssClass = BuildNavigationClass(appRelativePath, "~/Admin/Fuel/Vouchers.aspx", "~/Admin/Fuel/VoucherDetails.aspx");
+            SetAriaCurrent(lnkFuelVouchers);
+            lnkFuelTransactions.CssClass = BuildNavigationClass(appRelativePath, "~/Admin/Fuel/Transactions.aspx", "~/Admin/Fuel/TransactionDetails.aspx");
+            SetAriaCurrent(lnkFuelTransactions);
+            lnkFuelStations.CssClass = BuildNavigationClass(appRelativePath, "~/Admin/Fuel/Stations.aspx", "~/Admin/Fuel/CreateStation.aspx", "~/Admin/Fuel/EditStation.aspx");
+            SetAriaCurrent(lnkFuelStations);
+            lnkFuelPrototypeTerminal.CssClass = BuildNavigationClass(appRelativePath, "~/Admin/Fuel/PrototypeTerminal.aspx");
+            SetAriaCurrent(lnkFuelPrototypeTerminal);
             SetAriaCurrent(lnkDashboard);
             SetAriaCurrent(lnkRegisterBus);
             SetAriaCurrent(lnkFleetList);

@@ -1551,6 +1551,24 @@ a:focus-visible {
 .driver-navigation { background: #fff; border-bottom: 1px solid #dbe2ea; display: flex; gap: .25rem; overflow-x: auto; padding: .5rem clamp(1rem,4vw,2rem); }
 .driver-navigation a { border-radius: .5rem; color: #41516a; font-weight: 700; padding: .65rem .85rem; text-decoration: none; white-space: nowrap; }
 .driver-navigation a.active { background: #eaf2ff; color: #075bd8; }
+
+/* Fuel authorization and the protected prototype terminal. */
+.fuel-subnavigation { display:flex; gap:.5rem; flex-wrap:wrap; margin:0 0 1.5rem; }
+.fuel-subnavigation a { padding:.7rem .9rem; color:var(--navy,#18334d); text-decoration:none; border:1px solid #dbe2ea; border-radius:.5rem; background:#fff; }
+.fuel-subnavigation a.active { color:#075bd8; border-color:#075bd8; background:#eaf2ff; font-weight:700; }
+.fuel-detail-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.2rem; margin:1rem 0 2rem; }
+.fuel-detail-grid dt { color:#526278; font-size:.85rem; margin-bottom:.3rem; }
+.fuel-detail-grid dd { color:#162b46; font-weight:600; overflow-wrap:anywhere; margin:0; }
+.fuel-filter-row { display:flex; flex-wrap:wrap; gap:1rem; align-items:end; margin-bottom:1.5rem; }
+.fuel-filter-row .form-field { flex:1 1 180px; }
+.fuel-checks { display:flex; flex-wrap:wrap; gap:1.25rem; margin:1.5rem 0; }
+.fuel-checks legend { font-size:1rem; font-weight:600; }
+.fuel-checks label { margin-left:.45rem; }
+.fuel-qr { display:block; max-width:100%; width:280px; height:auto; background:white; margin:1rem 0; }
+.fuel-token { font-family:monospace; font-size:.85rem; }
+.driver-main .form-field { margin-bottom:1.25rem; }
+.driver-main .btn { min-height:44px; }
+@media(max-width:600px) { .fuel-detail-grid { grid-template-columns:1fr; } .fuel-filter-row .btn { width:100%; } }
 .driver-main { margin: 0 auto; max-width: 880px; padding: 1.25rem clamp(1rem,4vw,2rem) 3rem; }
 .driver-heading { margin-bottom: 1.25rem; }
 .driver-heading h1 { font-size: clamp(1.65rem,5vw,2.2rem); margin-bottom: .35rem; }

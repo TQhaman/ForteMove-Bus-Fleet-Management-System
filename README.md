@@ -1,6 +1,6 @@
 # ForteMove
 
-ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. This repository contains the manually accepted system through Vertical Slice 6, including Driver Operations and Passenger Wallet/Ticketing. Slice 7 has not been implemented.
+ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. The accepted baseline is Vertical Slices 1–7. Vertical Slice 8 adds Fuel Voucher Management, with its implementation checkpoint on `Slice-8-completed`. See the Slice 8 verification report for the manual acceptance workflow.
 
 1. secure Transport Administrator authentication and logout;
 2. role-protected administrator workspace and dashboard;
@@ -14,6 +14,8 @@ ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management app
 10. mobile-first assigned-Driver Trip readiness, start, delay, resume, Cannot Proceed, defect reporting, completion, and history;
 11. administrator exception resolution, Trip cancellation, defect review, and live operational attention counts; and
 12. Passenger self-registration, simulated wallet top-ups, journey discovery, Ticket purchase, retained Ticket history, and automatic cancellation refunds.
+13. audience-protected, simulated Trip tracking using ordered Stop coordinates and actual operational timestamps;
+14. Driver Fuel Requests, administrator authorization, one-use QR Fuel Vouchers, approved Station management, and protected prototype redemption with immutable transaction history.
 
 No demo identities, buses, routes, stops, schedules, trips, assignments, drivers, passengers, wallets, tickets, tracking records, maintenance work orders, or fuel/energy records are seeded.
 
@@ -48,6 +50,8 @@ The initializer asks locally for the administrator identity and final passphrase
 
 Open `ForteMove.sln`, set `ForteMove.Web` as the startup project, and launch its HTTPS IIS Express URL. The authentication cookie is intentionally marked Secure, so an HTTP-only URL cannot retain a login.
 
+Restore NuGet packages before building (Visual Studio: right-click the solution → Restore NuGet Packages, or `nuget restore ForteMove.sln`). Slice 8 pins QRCoder 1.8.0 in `ForteMove.Web/packages.config`; QR images are generated locally without an external QR service. The ignored `packages` directory is not committed.
+
 ## Implemented workflow
 
 1. Browse to an Admin page while signed out and return to the login page.
@@ -72,6 +76,8 @@ Open `ForteMove.sln`, set `ForteMove.Web` as the startup project, and launch its
 20. Find an assigned future journey, review its live fare and capacity, purchase a Ticket, and inspect it under Tickets.
 21. If an administrator cancels the Trip, verify that the Ticket is retained as Refunded and its exact fare returns to the Passenger wallet.
 22. Enter approved Stop coordinates from Route Details, then open Operations > Live tracking as Administrator, Trip Details as the assigned Driver, or Track trip from the Passenger's own Ticket Details.
+23. Create a fictional approved Fuel Station as Administrator. As the assigned Driver, submit a Fuel Request, then approve it as Administrator and view the one-use Voucher/QR as its Driver.
+24. Use the protected Prototype Fuel Station Terminal as Administrator to review the token at the approved Station and confirm one redemption. Inspect Fuel Transactions; no real payment or supply-provider integration occurs.
 
 Vehicle status is an explicit administrator choice. An `Operational` request is rejected when the licence, roadworthy certificate, or insurance is expired; the administrator must correct the compliance information or deliberately select `OutOfService`. Assignment eligibility independently checks compliance even when a stored vehicle status is Operational.
 
@@ -86,6 +92,8 @@ Driver operations keep planned service times unchanged and store actual operatio
 Passenger Ticket sales use the current assigned Bus capacity and operational eligibility rather than assignment recommendation rankings. Purchases debit the Passenger wallet, snapshot the Route fare, and protect the Trip as an operational dependency. Simulated top-ups do not use a payment gateway. Trip completion leaves a purchased Ticket as a past Ticket because boarding/redemption is intentionally outside this slice; administrator Trip cancellation performs the full atomic refund instead.
 
 ## Collaborator handoff
+
+- [Slice 8 Fuel Voucher rules, verification results, and manual workflow](SLICE_8_VERIFICATION.md)
 
 - [Slice 7 tracking implementation, verification results, and manual workflow](SLICE_7_VERIFICATION.md)
 

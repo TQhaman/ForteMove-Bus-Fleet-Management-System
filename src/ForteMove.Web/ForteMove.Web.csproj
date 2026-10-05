@@ -41,6 +41,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="QRCoder">
+      <HintPath>..\..\packages\QRCoder.1.8.0\lib\net40\QRCoder.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -63,6 +67,24 @@
     <Content Include="Content\vendor\leaflet\images\marker-icon-2x.png" />
     <Content Include="Content\vendor\leaflet\images\marker-shadow.png" />
     <Content Include="Account\Login.aspx" />
+    <Content Include="Admin\Fuel\Requests.aspx" />
+    <Content Include="Driver\Fuel\Requests.aspx" />
+    <Content Include="Driver\Fuel\History.aspx" />
+    <Content Include="Driver\Fuel\RequestFuel.aspx" />
+    <Content Include="Driver\Fuel\RequestDetails.aspx" />
+    <Content Include="Admin\Fuel\RequestDetails.aspx" />
+    <Content Include="Admin\Fuel\Vouchers.aspx" />
+    <Content Include="Admin\Fuel\VoucherDetails.aspx" />
+    <Content Include="Driver\Fuel\Vouchers.aspx" />
+    <Content Include="Driver\Fuel\VoucherDetails.aspx" />
+    <Content Include="Admin\Fuel\Stations.aspx" />
+    <Content Include="Admin\Fuel\CreateStation.aspx" />
+    <Content Include="Admin\Fuel\EditStation.aspx" />
+    <Content Include="Admin\Fuel\Transactions.aspx" />
+    <Content Include="Admin\Fuel\TransactionDetails.aspx" />
+    <Content Include="Admin\Fuel\PrototypeTerminal.aspx" />
+    <Content Include="Driver\Fuel\VoucherQr.ashx" />
+    <Content Include="packages.config" />
     <Content Include="Account\ChangePassword.aspx" />
     <Content Include="Account\RegisterPassenger.aspx" />
     <Content Include="Admin\Admin.Master" />
@@ -526,6 +548,42 @@
     <Compile Include="Infrastructure\RouteBuilderState.cs" />
     <Compile Include="Infrastructure\SafeRedirects.cs" />
     <Compile Include="Infrastructure\ServiceFactory.cs" />
+    <Compile Include="Admin\Fuel\Requests.aspx.cs" />
+    <Compile Include="Admin\Fuel\Requests.aspx.designer.cs" />
+    <Compile Include="Driver\Fuel\Requests.aspx.cs" />
+    <Compile Include="Driver\Fuel\Requests.aspx.designer.cs" />
+    <Compile Include="Driver\Fuel\History.aspx.cs" />
+    <Compile Include="Driver\Fuel\History.aspx.designer.cs" />
+    <Compile Include="Driver\Fuel\RequestFuel.aspx.cs" />
+    <Compile Include="Driver\Fuel\RequestFuel.aspx.designer.cs" />
+    <Compile Include="Driver\Fuel\RequestDetails.aspx.cs" />
+    <Compile Include="Driver\Fuel\RequestDetails.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\RequestDetails.aspx.cs" />
+    <Compile Include="Admin\Fuel\RequestDetails.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\Vouchers.aspx.cs" />
+    <Compile Include="Admin\Fuel\Vouchers.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\VoucherDetails.aspx.cs" />
+    <Compile Include="Admin\Fuel\VoucherDetails.aspx.designer.cs" />
+    <Compile Include="Driver\Fuel\Vouchers.aspx.cs" />
+    <Compile Include="Driver\Fuel\Vouchers.aspx.designer.cs" />
+    <Compile Include="Driver\Fuel\VoucherDetails.aspx.cs" />
+    <Compile Include="Driver\Fuel\VoucherDetails.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\Stations.aspx.cs" />
+    <Compile Include="Admin\Fuel\Stations.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\CreateStation.aspx.cs" />
+    <Compile Include="Admin\Fuel\CreateStation.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\EditStation.aspx.cs" />
+    <Compile Include="Admin\Fuel\EditStation.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\Transactions.aspx.cs" />
+    <Compile Include="Admin\Fuel\Transactions.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\TransactionDetails.aspx.cs" />
+    <Compile Include="Admin\Fuel\TransactionDetails.aspx.designer.cs" />
+    <Compile Include="Admin\Fuel\PrototypeTerminal.aspx.cs" />
+    <Compile Include="Admin\Fuel\PrototypeTerminal.aspx.designer.cs" />
+    <Compile Include="Infrastructure\MachineKeyFuelTokenProtector.cs" />
+    <Compile Include="Infrastructure\FuelQrRenderer.cs" />
+    <Compile Include="Infrastructure\FuelPresentation.cs" />
+    <Compile Include="Driver\Fuel\VoucherQr.ashx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

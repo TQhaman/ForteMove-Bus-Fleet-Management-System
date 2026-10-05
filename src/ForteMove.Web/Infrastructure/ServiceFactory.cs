@@ -78,6 +78,19 @@ namespace ForteMove.Web.Infrastructure
             return new TrackingService(new SqlTrackingRepository(GetConnectionString()));
         }
 
+        public static DriverFuelService CreateDriverFuelService()
+        {
+            return new DriverFuelService(new SqlFuelRepository(GetConnectionString()),new MachineKeyFuelTokenProtector());
+        }
+        public static AdminFuelService CreateAdminFuelService()
+        {
+            return new AdminFuelService(new SqlFuelRepository(GetConnectionString()),new SqlFuelStationRepository(GetConnectionString()),new MachineKeyFuelTokenProtector());
+        }
+        public static FuelStationService CreateFuelStationService()
+        {
+            return new FuelStationService(new SqlFuelStationRepository(GetConnectionString()));
+        }
+
         private static string GetConnectionString()
         {
             ConnectionStringSettings settings =

@@ -482,6 +482,7 @@ WHERE rs.RouteScheduleId=@RouteScheduleId AND rs.IsActive=1;";
                         AcquireReferenceCodeLock(connection, transaction);
                         AcquireAssignmentLock(connection, transaction);
                         SqlPassengerCommerce.AcquireLock(connection, transaction);
+                        SqlFuelLifecycle.AcquireLock(connection, transaction);
                         ValidateCurrentVersion(connection, transaction, aggregate);
                         ValidateCategory(connection, transaction, aggregate.PreferredBusCategoryId);
 
@@ -759,7 +760,8 @@ SELECT t.TripId, t.RouteScheduleVersionId, t.ServiceDate, t.ScheduledDepartureTi
            WHERE ticket_history.TripId=t.TripId
        ) THEN 1 ELSE 0 END) AS HasTicketHistory,
        (SELECT COUNT(*) FROM dbo.Tickets purchased_ticket
-        WHERE purchased_ticket.TripId=t.TripId AND purchased_ticket.TicketStatus=N'Purchased') AS PurchasedTicketCount
+        WHERE purchased_ticket.TripId=t.TripId AND purchased_ticket.TicketStatus=N'Purchased') AS PurchasedTicketCount,
+       CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM dbo.FuelRequests fuel_history WHERE fuel_history.TripId=t.TripId) THEN 1 ELSE 0 END) AS HasFuelHistory
 FROM dbo.Trips AS t" + hint + @"
 INNER JOIN dbo.RouteScheduleVersions AS rsv
     ON rsv.RouteScheduleVersionId=t.RouteScheduleVersionId
@@ -784,7 +786,8 @@ ORDER BY t.ServiceDate, t.ScheduledDepartureTime;"))
                             HasAssignmentHistory = reader.GetBoolean(7),
                             HasOperationalHistory = reader.GetBoolean(8),
                             HasTicketHistory = reader.GetBoolean(9),
-                            PurchasedTicketCount = reader.GetInt32(10)
+                            PurchasedTicketCount = reader.GetInt32(10),
+                            HasFuelHistory = reader.GetBoolean(11)
                         });
                     }
                 }
@@ -814,6 +817,7 @@ WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
       AND NOT EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
       AND NOT EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId)
       AND NOT EXISTS (SELECT 1 FROM dbo.Tickets ticket_history WHERE ticket_history.TripId=t.TripId)
+      AND NOT EXISTS (SELECT 1 FROM dbo.FuelRequests fuel_history WHERE fuel_history.TripId=t.TripId)
   );"))
             {
                 AddBigInt(command, "@ActorId", actorId);
@@ -839,7 +843,8 @@ WHERE rsv.RouteScheduleId=@ScheduleId AND t.ServiceDate>=@FromDate
   AND NOT EXISTS (SELECT 1 FROM dbo.TripCannotProceedReports x WHERE x.TripId=t.TripId)
   AND NOT EXISTS (SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.TripId=t.TripId)
   AND NOT EXISTS (SELECT 1 FROM dbo.TripStatusHistory h WHERE h.TripId=t.TripId)
-  AND NOT EXISTS (SELECT 1 FROM dbo.Tickets ticket_history WHERE ticket_history.TripId=t.TripId);"))
+  AND NOT EXISTS (SELECT 1 FROM dbo.Tickets ticket_history WHERE ticket_history.TripId=t.TripId)
+  AND NOT EXISTS (SELECT 1 FROM dbo.FuelRequests fuel_history WHERE fuel_history.TripId=t.TripId);"))
             {
                 AddBigInt(command, "@ScheduleId", scheduleId);
                 AddDate(command, "@FromDate", fromDate);

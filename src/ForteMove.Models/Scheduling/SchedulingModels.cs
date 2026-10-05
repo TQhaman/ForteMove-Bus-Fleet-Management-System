@@ -234,6 +234,7 @@ namespace ForteMove.Models.Scheduling
         public bool HasOperationalHistory { get; set; }
 
         public bool HasTicketHistory { get; set; }
+        public bool HasFuelHistory { get; set; }
 
         public int PurchasedTicketCount { get; set; }
 
@@ -246,7 +247,8 @@ namespace ForteMove.Models.Scheduling
                     !OperationallyTouchedUtc.HasValue &&
                     !HasAssignmentHistory &&
                     !HasOperationalHistory &&
-                    !HasTicketHistory;
+                    !HasTicketHistory &&
+                    !HasFuelHistory;
             }
         }
     }

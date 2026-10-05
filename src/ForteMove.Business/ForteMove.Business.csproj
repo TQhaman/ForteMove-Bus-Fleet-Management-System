@@ -40,6 +40,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\IAuthenticationRepository.cs" />
+    <Compile Include="Contracts\IFuelRepository.cs" />
+    <Compile Include="Contracts\IFuelStationRepository.cs" />
+    <Compile Include="Contracts\IFuelTokenProtector.cs" />
+    <Compile Include="Exceptions\FuelPersistenceException.cs" />
+    <Compile Include="Fuel\FuelPolicy.cs" />
+    <Compile Include="Fuel\FuelRedemptionToken.cs" />
+    <Compile Include="Services\DriverFuelService.cs" />
+    <Compile Include="Services\AdminFuelService.cs" />
+    <Compile Include="Services\FuelStationService.cs" />
     <Compile Include="Contracts\ITrackingRepository.cs" />
     <Compile Include="Services\TrackingService.cs" />
     <Compile Include="Tracking\TrackingCalculator.cs" />

@@ -48,6 +48,7 @@ Use this switch for the second idempotency run after the administrator has been 
 - `0005_DriversAndAssignments.sql` adds bus gross vehicle mass, Driver assignment credentials, and append-only Trip assignment history.
 - `0006_DriverOperations.sql` adds pre-trip readiness, actual Trip execution, delay and Cannot Proceed histories, Driver defect reports, and auditable Trip status transitions.
 - `0007_PassengerWalletAndTicketing.sql` adds Passenger profiles, one wallet per Passenger, an append-only wallet ledger, and whole-Route journey Tickets.
+- `0008_FuelVouchers.sql` adds approved Fuel Stations/capabilities, assignment-bound Fuel Requests, one-use Fuel Vouchers, and immutable Fuel Transactions. It seeds none of these records.
 
 Migration `0003` preserves existing bus rows while renaming `Buses.VinChassisNumber` to `Buses.Vin` and its unique constraint/index to `UQ_Buses_Vin`. It refuses to run against an unexpected or partially changed VIN schema.
 
@@ -73,9 +74,15 @@ Ticket sales are available only for an assigned, future, operationally eligible 
 
 ## Migration policy
 
-Slice 7 is schema-neutral: there is no migration `0008`. Simulated tracking reads existing ordered Stop coordinates and actual Trip execution, delay, and Cannot Proceed timestamps. It never persists positions or changes Trip state. The Stop coordinate editor updates the existing paired `DECIMAL(9,6)` fields with rowversion protection and a transactional `StopCoordinatesUpdated` audit containing old and new values. Corrections affecting started, unfinished Trips require an administrator warning/acknowledgement and are permitted.
+Slice 7 was schema-neutral and introduced no migration. Slice 8 introduces `0008` for Fuel Vouchers only. Simulated tracking still reads existing ordered Stop coordinates and actual Trip execution, delay, and Cannot Proceed timestamps. It never persists positions or changes Trip state. The Stop coordinate editor updates the existing paired `DECIMAL(9,6)` fields with rowversion protection and a transactional `StopCoordinatesUpdated` audit containing old and new values. Corrections affecting started, unfinished Trips require an administrator warning/acknowledgement and are permitted.
 
 There are no Route-geometry snapshots. Historical/Completed Trip rendering uses currently stored Stop coordinates, so later corrections also change those maps. Simulated tracking must not be treated as historical GPS evidence. Coordinates are not inferred or seeded.
+
+Slice 8 supports Diesel in litres and Electric charging in kWh; Petrol/Hybrid are not guessed. Quantities use `DECIMAL(10,2)`, Rand amounts `DECIMAL(12,2)` (including R0.00), and odometer snapshots `DECIMAL(12,1)`. Active Voucher expiry is derived from South African operational time strictly later than `ValidUntilLocal`. Approved quantities, value, Station description, supply/unit, and fleet number are snapshots. Redemption reads the locked Bus odometer but never changes it.
+
+Fuel writes serialize behind `ForteMove.Assignments` then `ForteMove.FuelVouchers`; Passenger-commerce integration preserves `Assignments → PassengerCommerce → FuelVouchers`. Schedule changes retain their reference-code lock prefix and directly protect all Fuel history. Reassignment/removal/completion/cancellation invalidates Pending Requests and Active Vouchers in the existing owning transaction, retaining histories and Passenger refunds.
+
+Voucher tokens contain 32 random bytes. SQL stores a unique SHA-256 lookup hash and an ASP.NET MachineKey-protected copy for the owning Driver's QR display. Tokens never appear in audit details or URLs. Preserve application protection keys between deployments; machine-key loss/rotation can make an existing Driver QR unrecoverable. A web-farm/production deployment needs consistent secure keys outside source control. Do not regenerate or transfer an existing authorization to another assignment to work around this.
 
 - Never edit an applied migration. Add a new, sequentially numbered migration instead.
 - Migration files do not contain `GO`; each file is executed and recorded in one SQL transaction.

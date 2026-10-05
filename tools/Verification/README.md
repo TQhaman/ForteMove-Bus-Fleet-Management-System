@@ -1,5 +1,11 @@
 # Slice 6 acceptance harnesses
 
+## Slice 8 Fuel Voucher verification
+
+The current Fuel Voucher checks and manual walkthrough are documented in [Slice 8 verification](../../SLICE_8_VERIFICATION.md). Build first, then run `Invoke-Slice8Verification.ps1 -AssembliesDirectory <built-dll-directory>` for non-persisting Business checks. `-IncludeDatabaseChecks` adds caller-owned rollback checks against the accepted local database; `-IncludeConcurrencyChecks` creates and removes its own uniquely named disposable database for real concurrent/lifecycle commits. Synthetic fixtures never enter the accepted database through the disposable runner.
+
+`Invoke-Slice8PageRenderVerification.ps1 -AssembliesDirectory <built-dll-directory> -Precompile` executes real Fuel and regression pages in an isolated application copy and precompiles the full application. `Invoke-Slice8IntegrityVerification.ps1` reads checksums/schema and verifies immutable old migration Git objects and architecture scans. These checks do not replace interactive cookie-login, populated-postback or scanner acceptance. Compiled outputs remain ignored.
+
 These optional source files preserve the checks used during Slice 6 acceptance. They are outside the solution and are not run by the database initializer or ordinary builds.
 
 - `Slice6BusinessVerification.cs` uses a fake repository and fixed clock. Its registration inputs are synthetic in-memory test fixtures, not login credentials or a default account. It checks balances, eligibility, idempotent operations and password-hashing output.
