@@ -49,6 +49,7 @@ Use this switch for the second idempotency run after the administrator has been 
 - `0006_DriverOperations.sql` adds pre-trip readiness, actual Trip execution, delay and Cannot Proceed histories, Driver defect reports, and auditable Trip status transitions.
 - `0007_PassengerWalletAndTicketing.sql` adds Passenger profiles, one wallet per Passenger, an append-only wallet ledger, and whole-Route journey Tickets.
 - `0008_FuelVouchers.sql` adds approved Fuel Stations/capabilities, assignment-bound Fuel Requests, one-use Fuel Vouchers, and immutable Fuel Transactions. It seeds none of these records.
+- `0009_MaintenanceManagement.sql` adds Repair Providers, preventive Maintenance Plans, Maintenance Work Orders, append-only progress and persistent vehicle-status history. No maintenance/reference data is seeded.
 
 Migration `0003` preserves existing bus rows while renaming `Buses.VinChassisNumber` to `Buses.Vin` and its unique constraint/index to `UQ_Buses_Vin`. It refuses to run against an unexpected or partially changed VIN schema.
 
@@ -71,6 +72,29 @@ Delay, Cannot Proceed, defect, and Trip status records preserve operational hist
 Migration `0007` does not seed Passenger or commercial data. Passenger self-registration creates an active Passenger account, Passenger profile, and R0.00 wallet atomically. Wallet balances and immutable Ticket fare snapshots use `DECIMAL(12,2)`. Simulated top-ups, Ticket purchases, and Trip-cancellation refunds are recorded in the append-only wallet ledger with idempotency tokens.
 
 Ticket sales are available only for an assigned, future, operationally eligible Trip. Sellable capacity comes from the currently assigned Bus. A successful purchase protects the Trip from destructive Schedule regeneration. Administrator cancellation refunds every purchased Ticket to its owning Passenger wallet in the same transaction; Driver completion does not imply boarding and does not change Ticket state.
+
+## Slice 9 maintenance persistence
+
+Migration `0009` adds `RepairProviders`, `MaintenancePlans`, `MaintenanceWorkOrders`, `MaintenanceProgressEntries` and `BusVehicleStatusHistory`. It refuses partially existing unrecorded maintenance tables. Mutable master records use rowversion; progress and status history are append-only through the application. Same-Bus composite relationships protect linked plans, defects, exceptions and Work Orders.
+
+Four filtered unique indexes prevent multiple InProgress orders for one Bus and multiple Open/InProgress orders for a linked plan, defect or exception. A unique creation token protects repeated submissions. Completed/Cancelled lifecycle checks require complete terminal evidence and reject misplaced completion/cancellation fields. Cost uses `DECIMAL(12,2)`; verified odometer and kilometre thresholds use `DECIMAL(12,1)`.
+
+Due state is derived from the authoritative Bus odometer and South African operational date, not persisted. Equality is Due; greater/past is Overdue. Explicit first-due initialization leaves previous-service fields empty. Verified previous-service initialization uses administrator evidence. Completion establishes the recorded baseline; later interval changes recalculate from it rather than replacing it.
+
+Canonical application-lock order is **Assignments -> PassengerCommerce -> FuelVouchers -> Maintenance**, skipping locks not needed. Maintenance eligibility writes acquire Assignments first; Start Maintenance additionally acquires FuelVouchers before Maintenance. Provider-only writes use Maintenance. Transactions are serializable, revalidate current records, capture authoritative time after locks and audit in the same transaction. No nested independent or distributed transaction is introduced.
+
+Starting maintenance changes the Bus to UnderMaintenance, retains assignments/Tickets, flags unstarted assigned Trips for review and cancels only pending/unused fuel authorizations for that Bus. Redeemed history is preserved. Completion advances only a verified nondecreasing odometer, resets an optional linked plan and optionally resolves a defect; it does not return the Bus to service. Return to Service is separate and never clears Trip review flags.
+
+Work Order open/start/completion timestamps describe recorded work. Vehicle-status history describes persistent-state transitions and can show a longer period before return. No historical downtime is invented. Provider name/code and preventive-threshold snapshots survive reference changes; contact details remain current reference information. Optional cost has no billing/payment semantics; photos/uploads are deferred.
+
+For existing installations:
+
+```powershell
+.\tools\Initialize-ForteMoveDatabase.ps1 -SkipAdministratorSeed
+.\tools\Initialize-ForteMoveDatabase.ps1 -SkipAdministratorSeed
+```
+
+The first applies `0009` if missing; the second checksum-skips it. Do not edit migrations `0000`–`0008` or alter checksums to adopt schema drift. [Slice 9 verification](../SLICE_9_VERIFICATION.md) records the local run results and the empty development-schema constraint repair performed before handoff.
 
 ## Migration policy
 

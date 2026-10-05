@@ -56,7 +56,9 @@ namespace ForteMove.Models.Assignments
 
     public sealed class AssignmentBusCandidate
     {
-        public AssignmentBusCandidate() { Windows = new List<AssignmentResourceWindow>(); }
+        public decimal CurrentOdometer { get; set; }
+        public IList<ForteMove.Models.Maintenance.MaintenancePlan> MaintenancePlans { get; set; }
+        public AssignmentBusCandidate() { Windows = new List<AssignmentResourceWindow>(); MaintenancePlans = new List<ForteMove.Models.Maintenance.MaintenancePlan>(); }
         public long BusId { get; set; }
         public string FleetNumber { get; set; }
         public int BusCategoryId { get; set; }

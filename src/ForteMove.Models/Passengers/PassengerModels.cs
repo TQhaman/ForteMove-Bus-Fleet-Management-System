@@ -136,6 +136,9 @@ namespace ForteMove.Models.Passengers
 
     public sealed class PassengerJourneyCandidate
     {
+        public PassengerJourneyCandidate(){ MaintenancePlans=new List<ForteMove.Models.Maintenance.MaintenancePlan>(); }
+        public decimal BusCurrentOdometer { get; set; }
+        public IList<ForteMove.Models.Maintenance.MaintenancePlan> MaintenancePlans { get; set; }
         public long TripId { get; set; }
         public string TripCode { get; set; }
         public long RouteId { get; set; }

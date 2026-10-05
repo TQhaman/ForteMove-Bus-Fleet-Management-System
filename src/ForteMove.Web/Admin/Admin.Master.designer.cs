@@ -2,6 +2,11 @@ namespace ForteMove.Web.Admin
 {
     public partial class AdminMaster
     {
+protected global::System.Web.UI.WebControls.HyperLink lnkMaintenanceOverview;
+protected global::System.Web.UI.WebControls.HyperLink lnkMaintenanceDue;
+protected global::System.Web.UI.WebControls.HyperLink lnkMaintenanceWorkOrders;
+protected global::System.Web.UI.WebControls.HyperLink lnkMaintenancePlans;
+protected global::System.Web.UI.WebControls.HyperLink lnkMaintenanceRepairProviders;
         protected global::System.Web.UI.WebControls.ContentPlaceHolder HeadContent;
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
         protected global::System.Web.UI.WebControls.HyperLink lnkDashboard;

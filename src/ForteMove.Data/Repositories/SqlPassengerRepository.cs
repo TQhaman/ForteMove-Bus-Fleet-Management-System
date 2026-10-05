@@ -17,6 +17,7 @@ namespace ForteMove.Data.Repositories
     public sealed class SqlPassengerRepository : IPassengerRepository
     {
         private readonly string connectionString;
+        private readonly ForteMove.Business.Time.IClock clock;
 
         private const string CandidateSelect = @"
 SELECT t.TripId,t.TripCode,t.RouteId,r.RouteCode,r.RouteName,
@@ -36,7 +37,7 @@ SELECT t.TripId,t.TripCode,t.RouteId,r.RouteCode,r.RouteName,
        CONVERT(bit,CASE WHEN current_assignment.TripAssignmentId IS NOT NULL AND
        (
            EXISTS(SELECT 1 FROM dbo.TripExecutions active_execution
-                  WHERE active_execution.TripId<>t.TripId AND active_execution.ActualCompletionUtc IS NULL
+                  WHERE active_execution.TripId<>t.TripId AND active_execution.ActualCompletionUtc IS NULL AND EXISTS(SELECT 1 FROM dbo.Trips active_trip WHERE active_trip.TripId=active_execution.TripId AND active_trip.TripStatus NOT IN(N'Completed',N'Cancelled'))
                     AND (active_execution.DriverProfileId=current_assignment.DriverProfileId OR active_execution.BusId=current_assignment.BusId))
            OR EXISTS
            (
@@ -66,8 +67,10 @@ LEFT JOIN dbo.Buses AS bus ON bus.BusId=current_assignment.BusId
 OUTER APPLY(SELECT TOP(1) delay.EstimatedDelayMinutes FROM dbo.TripDelayEvents delay WHERE delay.TripId=t.TripId AND delay.EndedUtc IS NULL ORDER BY delay.ReportedUtc DESC) AS open_delay
 OUTER APPLY(SELECT COUNT_BIG(*) PurchasedTicketCount FROM dbo.Tickets ticket WHERE ticket.TripId=t.TripId AND ticket.TicketStatus=N'Purchased') AS ticket_count";
 
-        public SqlPassengerRepository(string connectionString)
+        public SqlPassengerRepository(string connectionString) : this(connectionString, new ForteMove.Business.Time.SystemClock()) {}
+        public SqlPassengerRepository(string connectionString, ForteMove.Business.Time.IClock clock)
         {
+            if(clock==null)throw new ArgumentNullException("clock");this.clock=clock;
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("A SQL Server connection string is required.", "connectionString");
             this.connectionString = connectionString;
         }
@@ -236,6 +239,7 @@ ORDER BY t.ScheduledDepartureTime,r.RouteCode,t.TripCode;";
                 command.Parameters.Add("@RouteId", SqlDbType.BigInt).Value = (object)query.RouteId ?? DBNull.Value;
                 AddNullableString(command, "@Search", 220, query.Search == null ? null : "%" + EscapeLike(query.Search) + "%");
                 connection.Open(); using (SqlDataReader reader = command.ExecuteReader()) while (reader.Read()) rows.Add(ReadCandidate(reader));
+                foreach(var row in rows)FillMaintenance(connection,row);
             }
             return rows;
         }
@@ -247,7 +251,10 @@ ORDER BY t.ScheduledDepartureTime,r.RouteCode,t.TripCode;";
             using (SqlCommand command = new SqlCommand(sql, connection))
             {
                 command.Parameters.Add("@TripId", SqlDbType.BigInt).Value = tripId; connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow)) return reader.Read() ? ReadCandidate(reader) : null;
+                PassengerJourneyCandidate item;
+                using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SingleRow)) item=reader.Read()?ReadCandidate(reader):null;
+                if(item!=null)FillMaintenance(connection,item);
+                return item;
             }
         }
 
@@ -463,6 +470,13 @@ OUTER APPLY(SELECT TOP(1) assignment.BusId FROM dbo.TripAssignments assignment W
 LEFT JOIN dbo.Buses b ON b.BusId=current_assignment.BusId
 OUTER APPLY(SELECT TOP(1) delay.EstimatedDelayMinutes FROM dbo.TripDelayEvents delay WHERE delay.TripId=trip.TripId AND delay.EndedUtc IS NULL ORDER BY delay.ReportedUtc DESC) open_delay";
 
+        private static void FillMaintenance(SqlConnection c,PassengerJourneyCandidate item)
+        {
+            if(!item.BusId.HasValue)return;
+            var safety=SqlMaintenanceLifecycle.ReadSafety(c,null,item.BusId.Value);
+            if(safety!=null){item.MaintenancePlans=safety.Plans;item.BusCurrentOdometer=safety.Bus.OdometerKilometres;}
+        }
+
         private static PassengerJourneyCandidate ReadCandidate(SqlDataReader reader)
         {
             return new PassengerJourneyCandidate
@@ -553,8 +567,16 @@ WHERE p.UserAccountId=@UserId AND u.IsActive=1;"))
             { command.Parameters.Add("@UserId",SqlDbType.BigInt).Value=userId;using(SqlDataReader reader=command.ExecuteReader(CommandBehavior.SingleRow)){if(!reader.Read())throw new PassengerPersistenceException("The Passenger wallet is unavailable.",string.Empty,null);profileId=reader.GetInt64(0);walletId=reader.GetInt64(1);balance=reader.GetDecimal(2);rowVersion=(byte[])reader.GetValue(3);} }
         }
 
-        private static void ReadAndValidateLockedSale(SqlConnection connection, SqlTransaction transaction, PurchaseTicketRequest request, DateTime now, out decimal fare, out int capacity, out int sold)
+        private void ReadAndValidateLockedSale(SqlConnection connection, SqlTransaction transaction, PurchaseTicketRequest request, DateTime now, out decimal fare, out int capacity, out int sold)
         {
+            now=clock.ToOperationalTime(clock.UtcNow);
+            SqlMaintenanceLifecycle.LockTripContext(connection,transaction,request.TripId);
+            using(var cmd=new SqlCommand("SELECT BusId FROM dbo.TripAssignments WHERE TripId=@Trip AND IsCurrent=1;",connection,transaction))
+            {
+                cmd.Parameters.Add("@Trip",SqlDbType.BigInt).Value=request.TripId;var bus=cmd.ExecuteScalar();
+                if(bus!=null)try{SqlMaintenanceLifecycle.EnsureNewOperation(connection,transaction,(long)bus,now);}
+                catch(MaintenancePersistenceException e){throw new PassengerPersistenceException("This service is temporarily unavailable for ticket purchases.",string.Empty,e);}
+            }
             const string sql=@"
 SELECT r.DefaultFare,b.PassengerCapacity,CONVERT(int,(SELECT COUNT_BIG(*) FROM dbo.Tickets ticket WITH(UPDLOCK,HOLDLOCK) WHERE ticket.TripId=t.TripId AND ticket.TicketStatus=N'Purchased'))
 FROM dbo.Trips t WITH(UPDLOCK,HOLDLOCK)
@@ -579,7 +601,7 @@ WHERE t.TripId=@TripId AND t.RowVersion=@TripRv AND r.RowVersion=@RouteRv AND r.
   AND (rsv.ExpectedCapacity IS NULL OR b.PassengerCapacity>=rsv.ExpectedCapacity)
   AND NOT EXISTS(SELECT 1 FROM dbo.TripCannotProceedReports exception WHERE exception.TripId=t.TripId AND exception.ResolvedUtc IS NULL)
   AND NOT EXISTS(SELECT 1 FROM dbo.BusDefectReports defect WHERE defect.BusId=b.BusId AND defect.Severity=N'Critical' AND defect.DefectStatus<>N'Resolved')
-  AND NOT EXISTS(SELECT 1 FROM dbo.TripExecutions active_execution WHERE active_execution.TripId<>t.TripId AND active_execution.ActualCompletionUtc IS NULL AND (active_execution.DriverProfileId=dp.DriverProfileId OR active_execution.BusId=b.BusId))
+  AND NOT EXISTS(SELECT 1 FROM dbo.TripExecutions active_execution WHERE active_execution.TripId<>t.TripId AND active_execution.ActualCompletionUtc IS NULL AND EXISTS(SELECT 1 FROM dbo.Trips active_trip WHERE active_trip.TripId=active_execution.TripId AND active_trip.TripStatus NOT IN(N'Completed',N'Cancelled')) AND (active_execution.DriverProfileId=dp.DriverProfileId OR active_execution.BusId=b.BusId))
   AND NOT EXISTS(SELECT 1 FROM dbo.TripAssignments other_assignment INNER JOIN dbo.Trips other_trip ON other_trip.TripId=other_assignment.TripId
       WHERE other_assignment.IsCurrent=1 AND other_assignment.TripId<>t.TripId AND other_trip.TripStatus NOT IN(N'Completed',N'Cancelled')
         AND (other_assignment.DriverProfileId=dp.DriverProfileId OR other_assignment.BusId=b.BusId)

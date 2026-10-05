@@ -94,4 +94,13 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Services\RepairProviderService.cs" />
+    <Compile Include="Services\MaintenanceService.cs" />
+    <Compile Include="Maintenance\MaintenancePolicy.cs" />
+    <Compile Include="Exceptions\MaintenancePersistenceException.cs" />
+    <Compile Include="Fleet\BusSafetyPolicy.cs" />
+    <Compile Include="Contracts\IRepairProviderRepository.cs" />
+    <Compile Include="Contracts\IMaintenanceRepository.cs" />
+  </ItemGroup>
 </Project>

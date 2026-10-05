@@ -4,6 +4,7 @@ namespace ForteMove.Models.Fleet
 {
     public sealed class BusDetails
     {
+        public BusSafetyContext Safety { get; set; }
         public long BusId { get; set; }
         public int BusCategoryId { get; set; }
         public string CategoryName { get; set; }

@@ -48,7 +48,9 @@ SELECT
     (SELECT COUNT_BIG(*) FROM dbo.Trips WHERE TripStatus=N'InProgress') AS InProgressTrips,
     (SELECT COUNT_BIG(*) FROM dbo.Trips WHERE TripStatus=N'Delayed') AS DelayedTrips,
     (SELECT COUNT_BIG(*) FROM dbo.TripCannotProceedReports WHERE ResolvedUtc IS NULL) AS OpenCannotProceed,
-    (SELECT COUNT_BIG(*) FROM dbo.BusDefectReports WHERE Severity=N'Critical' AND DefectStatus<>N'Resolved') AS UnresolvedCriticalDefects
+    (SELECT COUNT_BIG(*) FROM dbo.BusDefectReports WHERE Severity=N'Critical' AND DefectStatus<>N'Resolved') AS UnresolvedCriticalDefects,
+    (SELECT COUNT_BIG(DISTINCT p.BusId) FROM dbo.MaintenancePlans p JOIN dbo.Buses b ON b.BusId=p.BusId WHERE p.IsActive=1 AND ((p.NextDueDate IS NOT NULL AND p.NextDueDate<@OperationalDate) OR (p.NextDueOdometer IS NOT NULL AND p.NextDueOdometer<b.OdometerKilometres))) AS OverdueMaintenanceBuses,
+    (SELECT COUNT_BIG(*) FROM dbo.MaintenanceWorkOrders WHERE OrderStatus=N'Open') AS OpenMaintenanceWorkOrders
 FROM dbo.Buses;";
 
         private readonly string connectionString;
@@ -101,7 +103,9 @@ FROM dbo.Buses;";
                         InProgressTrips = reader.GetInt64(12),
                         DelayedTrips = reader.GetInt64(13),
                         OpenCannotProceed = reader.GetInt64(14),
-                        UnresolvedCriticalDefects = reader.GetInt64(15)
+                        UnresolvedCriticalDefects = reader.GetInt64(15),
+                        OverdueMaintenanceBuses = reader.GetInt64(16),
+                        OpenMaintenanceWorkOrders = reader.GetInt64(17)
                     };
                 }
             }

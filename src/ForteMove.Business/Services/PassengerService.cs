@@ -229,6 +229,7 @@ namespace ForteMove.Business.Services
             if (item.ScheduleExpectedCapacity.HasValue && item.BusPassengerCapacity < item.ScheduleExpectedCapacity.Value) return "This service is not currently available for ticket purchases.";
             if (!item.BusLicenceExpiryDate.HasValue || item.BusLicenceExpiryDate.Value.Date < finishDate || !item.BusRoadworthyExpiryDate.HasValue || item.BusRoadworthyExpiryDate.Value.Date < finishDate || !item.BusInsuranceExpiryDate.HasValue || item.BusInsuranceExpiryDate.Value.Date < finishDate) return "This service is not currently available for ticket purchases.";
             if (!LicenceCompatible(item.DriverLicenceCode, item.BusGrossVehicleMassKg)) return "This service is not currently available for ticket purchases.";
+            if (ForteMove.Business.Fleet.BusSafetyPolicy.MaintenanceBlocks(item.MaintenancePlans,now.Date,item.BusCurrentOdometer).Count>0) return "This service is temporarily unavailable for ticket purchases.";
             if (item.HasOpenCannotProceed) return "Ticket sales are temporarily unavailable for this service.";
             if (item.HasUnresolvedCriticalDefect) return "Ticket sales are temporarily unavailable for this service.";
             if (item.HasOperationalConflict) return "This service is not currently available for ticket purchases.";

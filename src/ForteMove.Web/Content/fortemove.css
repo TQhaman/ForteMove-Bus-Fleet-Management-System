@@ -1645,3 +1645,6 @@ a:focus-visible {
     .tracking-map { height: 260px; }
     .tracking-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* Maintenance uses the established operational workspace. */
+.surface-card{background:#fff;border:1px solid #dde4ed;border-radius:12px;padding:1.5rem;margin:1.25rem 0;box-shadow:0 2px 5px rgba(17,34,59,.03)}
+.maintenance-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1rem 0}.maintenance-form-grid .form-group{margin:0}.surface-card .form-group{margin-bottom:1rem}.surface-card label{display:block;font-weight:600;margin-bottom:.4rem}.surface-card input[type=checkbox]+label{display:inline;margin-left:.4rem}.maintenance-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin:1rem 0}.maintenance-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem}.maintenance-metrics .surface-card{margin:0}.maintenance-metrics strong{display:block;font-size:1.75rem;color:#122740}.surface-card td{vertical-align:top}.surface-card th{white-space:nowrap}.surface-card table{min-width:600px}.surface-card .empty-state{padding:1.5rem;color:#637085}

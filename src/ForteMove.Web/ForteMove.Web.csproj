@@ -633,4 +633,38 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <ItemGroup>
+    <Compile Include="Infrastructure\MaintenancePresentation.cs" />
+    <Compile Include="Infrastructure\MaintenanceAdminPage.cs" />
+    <Compile Include="Admin\Maintenance\WorkOrders.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\WorkOrders.aspx.cs" />
+    <Content Include="Admin\Maintenance\WorkOrders.aspx" />
+    <Compile Include="Admin\Maintenance\WorkOrderDetails.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\WorkOrderDetails.aspx.cs" />
+    <Content Include="Admin\Maintenance\WorkOrderDetails.aspx" />
+    <Compile Include="Admin\Maintenance\ServiceHistory.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\ServiceHistory.aspx.cs" />
+    <Content Include="Admin\Maintenance\ServiceHistory.aspx" />
+    <Compile Include="Admin\Maintenance\ReturnToService.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\ReturnToService.aspx.cs" />
+    <Content Include="Admin\Maintenance\ReturnToService.aspx" />
+    <Compile Include="Admin\Maintenance\RepairProviders.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\RepairProviders.aspx.cs" />
+    <Content Include="Admin\Maintenance\RepairProviders.aspx" />
+    <Compile Include="Admin\Maintenance\Plans.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\Plans.aspx.cs" />
+    <Content Include="Admin\Maintenance\Plans.aspx" />
+    <Compile Include="Admin\Maintenance\Overview.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\Overview.aspx.cs" />
+    <Content Include="Admin\Maintenance\Overview.aspx" />
+    <Compile Include="Admin\Maintenance\Due.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\Due.aspx.cs" />
+    <Content Include="Admin\Maintenance\Due.aspx" />
+    <Compile Include="Admin\Maintenance\CreateWorkOrder.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\CreateWorkOrder.aspx.cs" />
+    <Content Include="Admin\Maintenance\CreateWorkOrder.aspx" />
+    <Compile Include="Admin\Maintenance\CompleteWorkOrder.aspx.designer.cs" />
+    <Compile Include="Admin\Maintenance\CompleteWorkOrder.aspx.cs" />
+    <Content Include="Admin\Maintenance\CompleteWorkOrder.aspx" />
+  </ItemGroup>
 </Project>

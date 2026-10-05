@@ -1,6 +1,6 @@
 # ForteMove
 
-ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. The accepted baseline is Vertical Slices 1–7. Vertical Slice 8 adds Fuel Voucher Management, with its implementation checkpoint on `Slice-8-completed`. See the Slice 8 verification report for the manual acceptance workflow.
+ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management application. The accepted checkpoint is Vertical Slices 1–8 on `Slice-8-completed`. Vertical Slice 9 adds Maintenance Management, with its implementation checkpoint on `Slice-9-completed`; automated verification is complete and browser acceptance is documented separately. See [Slice 9 verification](SLICE_9_VERIFICATION.md) and [manual tests](SLICE_9_MANUAL_TESTS.md).
 
 1. secure Transport Administrator authentication and logout;
 2. role-protected administrator workspace and dashboard;
@@ -16,6 +16,7 @@ ForteMove is an ASP.NET Web Forms bus-depot and scheduled-transit management app
 12. Passenger self-registration, simulated wallet top-ups, journey discovery, Ticket purchase, retained Ticket history, and automatic cancellation refunds.
 13. audience-protected, simulated Trip tracking using ordered Stop coordinates and actual operational timestamps;
 14. Driver Fuel Requests, administrator authorization, one-use QR Fuel Vouchers, approved Station management, and protected prototype redemption with immutable transaction history.
+15. preventive service plans, external repair-provider references, maintenance Work Orders, progress/completion evidence, explicit Return to Service, and preserved vehicle-status history.
 
 No demo identities, buses, routes, stops, schedules, trips, assignments, drivers, passengers, wallets, tickets, tracking records, maintenance work orders, or fuel/energy records are seeded.
 
@@ -91,8 +92,27 @@ Driver operations keep planned service times unchanged and store actual operatio
 
 Passenger Ticket sales use the current assigned Bus capacity and operational eligibility rather than assignment recommendation rankings. Purchases debit the Passenger wallet, snapshot the Route fare, and protect the Trip as an operational dependency. Simulated top-ups do not use a payment gateway. Trip completion leaves a purchased Ticket as a past Ticket because boarding/redemption is intentionally outside this slice; administrator Trip cancellation performs the full atomic refund instead.
 
+## Maintenance workflow (Slice 9)
+
+Open **Maintenance > Overview** as Transport Administrator. Create approved Repair Providers and Preventive Plans, then create a Work Order from a defect, service threshold, operational exception, compliance need or manual request. Review the affected Trips, purchased Tickets and unused fuel authorizations before starting maintenance. Record progress, complete with verified service evidence, and use the separate **Return to Service** action after resolving safety blockers.
+
+A plan becomes **Due** at its exact date/odometer threshold and **Overdue** only after it. Only active plans marked to block operation when overdue prevent new assignments, readiness/start, new Ticket sales and Return to Service. They do not stop an already-started Trip, prevent completion or independently block in-trip Resume.
+
+Starting maintenance preserves assignments and purchased Tickets, flags unstarted assigned Trips for review, and cancels pending Fuel Requests/unused Active Vouchers. Completion resets a linked plan and can explicitly resolve a linked defect, but leaves the Bus UnderMaintenance. Fleet Edit cannot bypass Return to Service. Maintenance does not automatically cancel/refund Trips, renew compliance, infer distance, create Fuel Transactions or affect simulated movement.
+
+Provider code/name and preventive thresholds are Work Order snapshots. Recorded workshop time and later vehicle-status transitions are distinct; pre-Slice-9 downtime is unknown and is not backfilled. Optional completed cost is a record, not a procurement/payment workflow. No Maintenance Officer, provider login, photos, uploads or external notifications are added.
+
+For an existing installation, apply/check migrations without reseeding an administrator:
+
+```powershell
+.\tools\Initialize-ForteMoveDatabase.ps1 -SkipAdministratorSeed
+```
+
 ## Collaborator handoff
 
+- [Slice 9 verification and safety/transaction rules](SLICE_9_VERIFICATION.md)
+- [Slice 9 manual browser acceptance](SLICE_9_MANUAL_TESTS.md)
+- [Slice 9 changed-file inventory](SLICE_9_CHANGED_FILES.md)
 - [Slice 8 Fuel Voucher rules, verification results, and manual workflow](SLICE_8_VERIFICATION.md)
 
 - [Slice 7 tracking implementation, verification results, and manual workflow](SLICE_7_VERIFICATION.md)

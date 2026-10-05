@@ -23,7 +23,7 @@ namespace ForteMove.Business.Fuel
         public static string SupplyLabel(FuelSupplyType supply) { return supply==FuelSupplyType.Diesel?"Diesel":"Electric charging"; }
         public static bool Eligible(FuelTripContext context)
         {
-            return context!=null && context.AssignmentIsCurrent && context.DriverAccountActive &&
+            return context!=null && context.VehicleStatus!="UnderMaintenance" && context.AssignmentIsCurrent && context.DriverAccountActive &&
                 (context.TripStatus==TripStatus.Scheduled || context.TripStatus==TripStatus.Ready ||
                  context.TripStatus==TripStatus.InProgress || context.TripStatus==TripStatus.Delayed) &&
                 Supply(context.PropulsionCode).HasValue;

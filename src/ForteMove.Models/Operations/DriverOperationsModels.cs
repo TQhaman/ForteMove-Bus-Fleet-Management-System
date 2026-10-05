@@ -125,6 +125,7 @@ namespace ForteMove.Models.Operations
     {
         public DriverTripDetails()
         {
+            MaintenancePlans=new List<ForteMove.Models.Maintenance.MaintenancePlan>();
             StopNames = new List<string>();
             DelayHistory = new List<TripDelayDetails>();
             DefectHistory = new List<DefectReportDetails>();
@@ -148,6 +149,9 @@ namespace ForteMove.Models.Operations
         public long BusId { get; set; }
         public string FleetNumber { get; set; }
         public decimal BusOdometerKilometres { get; set; }
+        public string VehicleStatus { get; set; }
+        public IList<ForteMove.Models.Maintenance.MaintenancePlan> MaintenancePlans { get; set; }
+        public string DepartureAvailabilityMessage { get; set; }
         public PreTripInspectionDetails CurrentInspection { get; set; }
         public TripExecutionDetails Execution { get; set; }
         public TripDelayDetails OpenDelay { get; set; }

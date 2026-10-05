@@ -1,0 +1,7 @@
+<%@ Page Title="Work orders" Language="C#" MasterPageFile="~/Admin/Admin.Master" AutoEventWireup="true" CodeBehind="WorkOrders.aspx.cs" Inherits="ForteMove.Web.Admin.Maintenance.WorkOrdersPage" %>
+<asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+<header class="page-heading"><div><p class="eyebrow">Maintenance</p><h1>Work orders</h1></div><a class="btn btn-outline-primary" href="Overview.aspx">Maintenance overview</a></header>
+<asp:Panel ID="pnlMessage" runat="server" Visible="false" CssClass="alert alert-danger" role="alert"><asp:Literal ID="litMessage" runat="server" /></asp:Panel>
+<a class="btn btn-primary" href="CreateWorkOrder.aspx">Create work order</a><section class="surface-card"><div class="maintenance-form-grid"><div class="form-group"><asp:Label runat="server" AssociatedControlID="ddlBus" Text="Bus" /><asp:DropDownList ID="ddlBus" runat="server" CssClass="form-control"  /></div><div class="form-group"><asp:Label runat="server" AssociatedControlID="txtSearch" Text="Search" /><asp:TextBox ID="txtSearch" runat="server" CssClass="form-control" MaxLength="100" /></div><div class="form-group"><asp:Label runat="server" AssociatedControlID="ddlStatus" Text="Status" /><asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-control"  /></div></div><asp:Button ID="btnFilter" runat="server" Text="Apply filters" CssClass="btn btn-primary" OnClick="Filter_Click" /><asp:Literal ID="litOrders" runat="server" /></section>
+</asp:Content>
+

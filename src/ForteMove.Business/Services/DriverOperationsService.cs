@@ -41,7 +41,7 @@ namespace ForteMove.Business.Services
 
         public DriverTripDetails GetTripDetails(long userAccountId, long tripId)
         {
-            return tripId <= 0 ? null : repository.GetDriverTripDetails(userAccountId, tripId, clock.OperationalNow);
+            var value=tripId<=0?null:repository.GetDriverTripDetails(userAccountId,tripId,clock.OperationalNow);if(value!=null){var blocks=ForteMove.Business.Fleet.BusSafetyPolicy.MaintenanceBlocks(value.MaintenancePlans,clock.Today,value.BusOdometerKilometres);if(value.VehicleStatus!=null&&value.VehicleStatus!="Operational")blocks.Add("The assigned bus is "+value.VehicleStatus.Replace("UnderMaintenance","Under maintenance").Replace("OutOfService","Out of service")+".");value.DepartureAvailabilityMessage=string.Join(" ",blocks);}return value;
         }
 
         public ServiceResult<bool> ConfirmReadiness(ConfirmReadinessRequest request, long userAccountId)
@@ -59,12 +59,14 @@ namespace ForteMove.Business.Services
                 else if (request.StartOdometerKilometres.Value < 0)
                     errors.Add(new ValidationError("StartOdometerKilometres", "The starting odometer cannot be negative."));
             }
+            if(request!=null)AddDepartureErrors(errors,request.TripId,userAccountId);
             return Execute(errors, delegate { repository.ConfirmReadiness(request, userAccountId, clock.OperationalNow, clock.UtcNow); });
         }
 
         public ServiceResult<bool> StartTrip(TripOperationRequest request, long userAccountId)
         {
-            return Execute(ValidateAction(request), delegate { repository.StartTrip(request, userAccountId, clock.OperationalNow, clock.UtcNow); });
+            var errors=ValidateAction(request);if(request!=null)AddDepartureErrors(errors,request.TripId,userAccountId);
+            return Execute(errors, delegate { repository.StartTrip(request, userAccountId, clock.OperationalNow, clock.UtcNow); });
         }
 
         public ServiceResult<bool> ReportDelay(ReportDelayRequest request, long userAccountId)
@@ -130,6 +132,7 @@ namespace ForteMove.Business.Services
 
         public DateTime ToOperationalTime(DateTime utc) { return clock.ToOperationalTime(utc); }
 
+        private void AddDepartureErrors(IList<ValidationError> errors,long tripId,long user){var value=GetTripDetails(user,tripId);if(value!=null&&!string.IsNullOrEmpty(value.DepartureAvailabilityMessage))errors.Add(new ValidationError("",value.DepartureAvailabilityMessage));}
         private static IList<ValidationError> ValidateAction(TripOperationRequest request)
         {
             IList<ValidationError> errors = new List<ValidationError>();

@@ -31,22 +31,28 @@ WHERE u.UserAccountId=@User AND u.IsActive=1 AND u.MustChangePassword=0 AND r.Is
             }
         }
         internal static void Invalidate(SqlConnection connection,SqlTransaction transaction,long tripId,long? assignmentId,long actor,string reason,DateTime utc)
+        { InvalidateCore(connection,transaction,tripId,assignmentId,null,actor,reason,utc); }
+        internal static void InvalidateForBus(SqlConnection connection,SqlTransaction transaction,long tripId,long busId,long actor,string reason,DateTime utc)
+        { InvalidateCore(connection,transaction,tripId,null,busId,actor,reason,utc); }
+        private static void InvalidateCore(SqlConnection connection,SqlTransaction transaction,long tripId,long? assignmentId,long? busId,long actor,string reason,DateTime utc)
         {
             AcquireLock(connection,transaction);
             var events=new List<Tuple<long,string>>();
             using(var command=Command(connection,transaction,@"SELECT FuelRequestId,N'FuelRequestCancelled' FROM dbo.FuelRequests WITH(UPDLOCK,HOLDLOCK)
-WHERE TripId=@Trip AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND RequestStatus=N'Pending';
+WHERE TripId=@Trip AND (@Bus IS NULL OR BusId=@Bus) AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND RequestStatus=N'Pending';
 SELECT FuelVoucherId,N'FuelVoucherCancelled' FROM dbo.FuelVouchers WITH(UPDLOCK,HOLDLOCK)
-WHERE TripId=@Trip AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND VoucherStatus=N'Active';"))
+WHERE TripId=@Trip AND (@Bus IS NULL OR BusId=@Bus) AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND VoucherStatus=N'Active';"))
             {
+                command.Parameters.Add("@Bus",SqlDbType.BigInt).Value=(object)busId??DBNull.Value;
                 Id(command,"@Trip",tripId);command.Parameters.Add("@Assignment",SqlDbType.BigInt).Value=(object)assignmentId??DBNull.Value;
                 using(var reader=command.ExecuteReader()) do { while(reader.Read()) events.Add(Tuple.Create(reader.GetInt64(0),reader.GetString(1))); } while(reader.NextResult());
             }
             using(var command=Command(connection,transaction,@"UPDATE dbo.FuelRequests SET RequestStatus=N'Cancelled',CancelledByUserAccountId=@Actor,CancelledUtc=@Utc,CancellationReason=@Reason,UpdatedUtc=@Utc
-WHERE TripId=@Trip AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND RequestStatus=N'Pending';
+WHERE TripId=@Trip AND (@Bus IS NULL OR BusId=@Bus) AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND RequestStatus=N'Pending';
 UPDATE dbo.FuelVouchers SET VoucherStatus=N'Cancelled',CancelledByUserAccountId=@Actor,CancelledUtc=@Utc,CancellationReason=@Reason,UpdatedUtc=@Utc
-WHERE TripId=@Trip AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND VoucherStatus=N'Active';"))
+WHERE TripId=@Trip AND (@Bus IS NULL OR BusId=@Bus) AND (@Assignment IS NULL OR TripAssignmentId=@Assignment) AND VoucherStatus=N'Active';"))
             {
+                command.Parameters.Add("@Bus",SqlDbType.BigInt).Value=(object)busId??DBNull.Value;
                 Id(command,"@Trip",tripId);Id(command,"@Actor",actor);command.Parameters.Add("@Assignment",SqlDbType.BigInt).Value=(object)assignmentId??DBNull.Value;
                 Text(command,"@Reason",500,reason);Utc(command,"@Utc",utc);command.ExecuteNonQuery();
             }

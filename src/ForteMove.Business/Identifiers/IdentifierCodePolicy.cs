@@ -60,6 +60,9 @@ namespace ForteMove.Business.Identifiers
             return "WTX-" + sequence.ToString("D6", CultureInfo.InvariantCulture);
         }
 
+        public static string FormatMaintenancePlanCode(long sequence) { return FuelCode(sequence,"MP-","D6"); }
+        public static string FormatMaintenanceWorkOrderCode(long sequence) { return FuelCode(sequence,"MWO-","D6"); }
+        public static string FormatRepairProviderCode(long sequence) { return FuelCode(sequence,"RP-","D3"); }
         public static string FormatFuelRequestCode(long sequence) { return FuelCode(sequence,"FR-","D6"); }
         public static string FormatFuelVoucherCode(long sequence) { return FuelCode(sequence,"FV-","D6"); }
         public static string FormatFuelTransactionCode(long sequence) { return FuelCode(sequence,"FTX-","D6"); }

@@ -275,12 +275,22 @@ namespace ForteMove.Business.Services
             if (errors.Count > 0) return ServiceResult<bool>.Failure(errors);
             BusDetails existing=repository.GetBusDetails(request.BusId);
             if(existing==null)return ServiceResult<bool>.Failure(string.Empty,"The bus no longer exists.");
+            if(existing.BaseOperationalState==BusOperationalState.Retired && request.BaseOperationalState!=BusOperationalState.Retired)return ServiceResult<bool>.Failure("BaseOperationalState","A retired bus cannot be reactivated.");
+            if(request.BaseOperationalState==BusOperationalState.Operational && existing.BaseOperationalState!=BusOperationalState.Operational)return ServiceResult<bool>.Failure("BaseOperationalState","Use Return to Service to restore this bus to Operational.");
+            if(existing.Safety!=null&&existing.Safety.HasInProgressMaintenance&&request.BaseOperationalState!=BusOperationalState.UnderMaintenance)return ServiceResult<bool>.Failure("BaseOperationalState","Complete or cancel the work order before changing vehicle status.");
+            if(existing.Safety!=null)existing.Safety.CategoryActive=true;
             existing.BusCategoryId=request.BusCategoryId.Value;existing.PassengerCapacity=request.PassengerCapacity.Value;
             existing.GrossVehicleMassKg=request.GrossVehicleMassKg;existing.LicenceExpiryDate=request.LicenceExpiryDate.Value.Date;
             existing.RoadworthyExpiryDate=request.RoadworthyExpiryDate.Value.Date;existing.InsuranceExpiryDate=request.InsuranceExpiryDate.Value.Date;
             existing.BaseOperationalState=request.BaseOperationalState.Value;existing.RowVersion=request.RowVersion;
+            if(existing.BaseOperationalState==BusOperationalState.Operational && existing.Safety!=null)
+            {
+                existing.Safety.Bus=existing;var blocks=ForteMove.Business.Fleet.BusSafetyPolicy.OperationalBlocks(existing.Safety,clock.Today);
+                if(blocks.Count>0)return ServiceResult<bool>.Failure("BaseOperationalState",string.Join(" ",blocks));
+            }
             try{repository.UpdateBusEligibility(existing,actorUserAccountId);return ServiceResult<bool>.Success(true);}
             catch(InvalidOperationException ex){return ServiceResult<bool>.Failure(string.Empty,ex.Message);}
+            catch(MaintenancePersistenceException ex){return ServiceResult<bool>.Failure(string.Empty,ex.Message);}
         }
 
         public static string GetRequiredLicenceCode(int? grossVehicleMassKg)
@@ -292,9 +302,11 @@ namespace ForteMove.Business.Services
 
         private static void AddOperationalComplianceErrors(IList<ValidationError> errors, DateTime licence, DateTime roadworthy, DateTime insurance, DateTime today)
         {
-            if (licence.Date < today.Date) errors.Add(new ValidationError("LicenceExpiryDate", "An expired vehicle licence prevents Operational status."));
-            if (roadworthy.Date < today.Date) errors.Add(new ValidationError("RoadworthyExpiryDate", "An expired roadworthy certificate prevents Operational status."));
-            if (insurance.Date < today.Date) errors.Add(new ValidationError("InsuranceExpiryDate", "Expired insurance prevents Operational status."));
+            foreach(var message in ForteMove.Business.Fleet.BusSafetyPolicy.Compliance(licence,roadworthy,insurance,today))
+            {
+                var field=message.StartsWith("Vehicle licence",StringComparison.Ordinal)?"LicenceExpiryDate":message.StartsWith("Roadworthy",StringComparison.Ordinal)?"RoadworthyExpiryDate":"InsuranceExpiryDate";
+                errors.Add(new ValidationError(field,message+" Operational status is not permitted."));
+            }
         }
 
         private static void ValidateRequiredText(

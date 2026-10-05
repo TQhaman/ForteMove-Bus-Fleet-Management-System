@@ -1,0 +1,7 @@
+<%@ Page Title="Bus service history" Language="C#" MasterPageFile="~/Admin/Admin.Master" AutoEventWireup="true" CodeBehind="ServiceHistory.aspx.cs" Inherits="ForteMove.Web.Admin.Maintenance.ServiceHistoryPage" %>
+<asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+<header class="page-heading"><div><p class="eyebrow">Maintenance</p><h1>Bus service history</h1></div><a class="btn btn-outline-primary" href="Overview.aspx">Maintenance overview</a></header>
+<asp:Panel ID="pnlMessage" runat="server" Visible="false" CssClass="alert alert-danger" role="alert"><asp:Literal ID="litMessage" runat="server" /></asp:Panel>
+<section class="surface-card"><div class="form-group"><asp:Label runat="server" AssociatedControlID="ddlBus" Text="Bus" /><asp:DropDownList ID="ddlBus" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="Bus_Changed" /></div><asp:Literal ID="litBus" runat="server" /><asp:HyperLink ID="lnkReturn" runat="server" Text="Return to service" CssClass="btn btn-primary" /><asp:HyperLink ID="lnkPlan" runat="server" Text="Add preventive plan" CssClass="btn btn-outline-primary" /></section><section class="surface-card"><h2>Work orders</h2><asp:Literal ID="litOrders" runat="server" /></section><section class="surface-card"><h2>Recorded progress and vehicle status</h2><p>Times shown are when actions were recorded. Earlier downtime is unknown if no status change was recorded.</p><asp:Literal ID="litHistory" runat="server" /></section>
+</asp:Content>
+

@@ -88,4 +88,10 @@
     <Compile Include="Scheduling\SchedulingModels.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Maintenance\MaintenanceRequests.cs" />
+    <Compile Include="Maintenance\MaintenanceModels.cs" />
+    <Compile Include="Maintenance\MaintenanceEnums.cs" />
+    <Compile Include="Fleet\BusSafetyModels.cs" />
+  </ItemGroup>
 </Project>

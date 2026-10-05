@@ -105,6 +105,11 @@ namespace ForteMove.Web.Admin
             SetAriaCurrent(lnkFuelStations);
             lnkFuelPrototypeTerminal.CssClass = BuildNavigationClass(appRelativePath, "~/Admin/Fuel/PrototypeTerminal.aspx");
             SetAriaCurrent(lnkFuelPrototypeTerminal);
+            lnkMaintenanceOverview.CssClass=BuildNavigationClass(appRelativePath,"~/Admin/Maintenance/Overview.aspx","~/Admin/Maintenance/ServiceHistory.aspx");SetAriaCurrent(lnkMaintenanceOverview);
+lnkMaintenanceDue.CssClass=BuildNavigationClass(appRelativePath,"~/Admin/Maintenance/Due.aspx");SetAriaCurrent(lnkMaintenanceDue);
+lnkMaintenanceWorkOrders.CssClass=BuildNavigationClass(appRelativePath,"~/Admin/Maintenance/WorkOrders.aspx","~/Admin/Maintenance/CreateWorkOrder.aspx","~/Admin/Maintenance/WorkOrderDetails.aspx","~/Admin/Maintenance/CompleteWorkOrder.aspx","~/Admin/Maintenance/ReturnToService.aspx");SetAriaCurrent(lnkMaintenanceWorkOrders);
+lnkMaintenancePlans.CssClass=BuildNavigationClass(appRelativePath,"~/Admin/Maintenance/Plans.aspx");SetAriaCurrent(lnkMaintenancePlans);
+lnkMaintenanceRepairProviders.CssClass=BuildNavigationClass(appRelativePath,"~/Admin/Maintenance/RepairProviders.aspx");SetAriaCurrent(lnkMaintenanceRepairProviders);
             SetAriaCurrent(lnkDashboard);
             SetAriaCurrent(lnkRegisterBus);
             SetAriaCurrent(lnkFleetList);

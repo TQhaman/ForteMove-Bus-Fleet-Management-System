@@ -34,6 +34,8 @@ namespace ForteMove.Web.Admin
             litDelayedTrips.Text = summary.DelayedTrips.ToString("N0", CultureInfo.CurrentCulture);
             litOpenCannotProceed.Text = summary.OpenCannotProceed.ToString("N0", CultureInfo.CurrentCulture);
             litCriticalDefects.Text = summary.UnresolvedCriticalDefects.ToString("N0", CultureInfo.CurrentCulture);
+            litOverdueMaintenance.Text=summary.OverdueMaintenanceBuses.ToString("N0",CultureInfo.CurrentCulture);
+            litOpenMaintenance.Text=summary.OpenMaintenanceWorkOrders.ToString("N0",CultureInfo.CurrentCulture);
             pnlRetired.Visible = summary.RetiredFleet > 0;
             SetBar(barOperational, summary.OperationalFleet, summary.TotalFleet, "Operational");
             SetBar(barOutOfService, summary.OutOfServiceFleet, summary.TotalFleet, "Out of service");

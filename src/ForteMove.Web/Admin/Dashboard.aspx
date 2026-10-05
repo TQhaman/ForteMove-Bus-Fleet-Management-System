@@ -30,7 +30,8 @@
             <article><span>Critical defects</span><strong><asp:Literal ID="litCriticalDefects" runat="server" /></strong></article>
         </div>
     </section>
-    <section aria-labelledby="quick-actions-title" class="mt-4"><div class="section-heading-row"><div><p class="section-kicker">Quick actions</p><h2 id="quick-actions-title">Manage operations</h2></div></div><div class="action-grid action-grid-three">
+    <section class="app-panel mt-4"><div class="panel-heading"><h2>Maintenance attention</h2><a class="btn btn-outline-primary btn-sm" href="Maintenance/Overview.aspx">View maintenance</a></div><div class="compact-metric-grid"><article><span>Buses with overdue service</span><strong><asp:Literal ID="litOverdueMaintenance" runat="server" /></strong></article><article><span>Open work orders</span><strong><asp:Literal ID="litOpenMaintenance" runat="server" /></strong></article></div></section>
+<section aria-labelledby="quick-actions-title" class="mt-4"><div class="section-heading-row"><div><p class="section-kicker">Quick actions</p><h2 id="quick-actions-title">Manage operations</h2></div></div><div class="action-grid action-grid-three">
         <a class="action-card" href="<%= ResolveUrl("~/Admin/RegisterBus.aspx") %>"><span class="action-card-copy"><strong>Register a bus</strong><span>Add a vehicle to the fleet register.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Routes/CreateRoute.aspx") %>"><span class="action-card-copy"><strong>Create a Route</strong><span>Build an ordered service path.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>
         <a class="action-card" href="<%= ResolveUrl("~/Admin/Scheduling/CreateSchedule.aspx") %>"><span class="action-card-copy"><strong>Create a Schedule</strong><span>Generate recurring future Trips.</span></span><span class="action-arrow" aria-hidden="true">&gt;</span></a>

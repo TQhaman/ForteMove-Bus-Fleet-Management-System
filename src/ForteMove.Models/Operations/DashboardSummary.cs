@@ -2,6 +2,8 @@ namespace ForteMove.Models.Operations
 {
     public sealed class DashboardSummary
     {
+        public long OverdueMaintenanceBuses { get; set; }
+        public long OpenMaintenanceWorkOrders { get; set; }
         public long TotalFleet { get; set; }
 
         public long OperationalFleet { get; set; }

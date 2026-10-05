@@ -120,7 +120,13 @@
                     <asp:HyperLink ID="lnkDefects" runat="server" NavigateUrl="~/Admin/Operations/Defects.aspx" CssClass="app-nav-link">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0-5.7 5.7L3 18l3 3 5.8-5.8a4 4 0 0 0 5.7-5.7l-2.8 2.8-3-3 2.8-2.8Z"/></svg><span>Defect reports</span>
                     </asp:HyperLink>
-                </nav>
+                <span class="nav-section-label">Maintenance</span>
+<asp:HyperLink ID="lnkMaintenanceOverview" runat="server" NavigateUrl="~/Admin/Maintenance/Overview.aspx" CssClass="app-nav-link"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a5 5 0 0 0-6 6l-5 7 4 4 7-5a5 5 0 0 0 6-6l-4 3-5-5 3-4Z"/></svg><span>Overview</span></asp:HyperLink>
+<asp:HyperLink ID="lnkMaintenanceDue" runat="server" NavigateUrl="~/Admin/Maintenance/Due.aspx" CssClass="app-nav-link"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a5 5 0 0 0-6 6l-5 7 4 4 7-5a5 5 0 0 0 6-6l-4 3-5-5 3-4Z"/></svg><span>Due / overdue</span></asp:HyperLink>
+<asp:HyperLink ID="lnkMaintenanceWorkOrders" runat="server" NavigateUrl="~/Admin/Maintenance/WorkOrders.aspx" CssClass="app-nav-link"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a5 5 0 0 0-6 6l-5 7 4 4 7-5a5 5 0 0 0 6-6l-4 3-5-5 3-4Z"/></svg><span>Work orders</span></asp:HyperLink>
+<asp:HyperLink ID="lnkMaintenancePlans" runat="server" NavigateUrl="~/Admin/Maintenance/Plans.aspx" CssClass="app-nav-link"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a5 5 0 0 0-6 6l-5 7 4 4 7-5a5 5 0 0 0 6-6l-4 3-5-5 3-4Z"/></svg><span>Preventive plans</span></asp:HyperLink>
+<asp:HyperLink ID="lnkMaintenanceRepairProviders" runat="server" NavigateUrl="~/Admin/Maintenance/RepairProviders.aspx" CssClass="app-nav-link"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a5 5 0 0 0-6 6l-5 7 4 4 7-5a5 5 0 0 0 6-6l-4 3-5-5 3-4Z"/></svg><span>Repair providers</span></asp:HyperLink>
+</nav>
 
                 <div class="sidebar-footnote" aria-label="Authenticated session status: Signed in">
                     <span class="status-dot" aria-hidden="true"></span>

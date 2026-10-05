@@ -15,9 +15,12 @@ namespace ForteMove.Data.Repositories
     public sealed class SqlTripOperationsRepository : ITripOperationsRepository
     {
         private readonly string connectionString;
+        private readonly ForteMove.Business.Time.IClock clock;
 
-        public SqlTripOperationsRepository(string connectionString)
+        public SqlTripOperationsRepository(string connectionString) : this(connectionString, new ForteMove.Business.Time.SystemClock()) {}
+        public SqlTripOperationsRepository(string connectionString, ForteMove.Business.Time.IClock clock)
         {
+            if(clock==null)throw new ArgumentNullException("clock");this.clock=clock;
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("A connection string is required.", "connectionString");
             this.connectionString = connectionString;
         }
@@ -50,7 +53,7 @@ WHERE @DriverId IS NOT NULL
       OR (te.DriverProfileId=@DriverId AND t.TripStatus=N'Completed')
       OR (ta.DriverProfileId=@DriverId AND ta.EndType=N'Cancelled' AND t.TripStatus=N'Cancelled'))
  AND (
-   (@Bucket=N'Today' AND ((t.ServiceDate=@Today AND ta.IsCurrent=1) OR (te.DriverProfileId=@DriverId AND te.ActualStartUtc IS NOT NULL AND te.ActualCompletionUtc IS NULL)))
+   (@Bucket=N'Today' AND ((t.ServiceDate=@Today AND ta.IsCurrent=1) OR (te.DriverProfileId=@DriverId AND te.ActualStartUtc IS NOT NULL AND te.ActualCompletionUtc IS NULL AND t.TripStatus NOT IN(N'Completed',N'Cancelled'))))
    OR (@Bucket=N'Upcoming' AND t.ServiceDate>@Today AND ta.IsCurrent=1 AND t.TripStatus NOT IN(N'Completed',N'Cancelled'))
    OR (@Bucket=N'History' AND (t.TripStatus IN(N'Completed',N'Cancelled') OR t.ServiceDate<@Today))
  )
@@ -130,6 +133,7 @@ WHERE t.TripId=@TripId AND @DriverId IS NOT NULL
                         };
                     }
                 }
+                var safety=SqlMaintenanceLifecycle.ReadSafety(connection,null,details.BusId);details.MaintenancePlans=safety.Plans;details.VehicleStatus=safety.Bus.BaseOperationalState.ToString();
                 LoadStops(connection, details);
                 LoadInspection(connection, details);
                 LoadExecution(connection, details);
@@ -147,6 +151,9 @@ WHERE t.TripId=@TripId AND @DriverId IS NOT NULL
             {
                 AcquireAssignmentLock(c,tx);
                 SqlPassengerCommerce.AcquireLock(c,tx);
+                utcNow=clock.UtcNow;operationalNow=clock.ToOperationalTime(utcNow);
+                try{SqlMaintenanceLifecycle.EnsureDriverDeparture(c,tx,request.TripId,userAccountId,operationalNow);}
+                catch(MaintenancePersistenceException e){throw new TripOperationsPersistenceException(e.Message,e);}
                 const string sql=@"
 DECLARE @DriverId bigint,@AssignmentId bigint,@BusId bigint,@OldStatus nvarchar(30),@BusOdo decimal(12,1);
 SELECT @DriverId=dp.DriverProfileId,@AssignmentId=ta.TripAssignmentId,@BusId=b.BusId,@OldStatus=t.TripStatus,@BusOdo=b.OdometerKilometres
@@ -189,6 +196,9 @@ IF @OldStatus=N'Scheduled' INSERT dbo.TripStatusHistory(TripId,FromStatus,ToStat
             ExecuteWrite(delegate(SqlConnection c,SqlTransaction tx)
             {
                 AcquireAssignmentLock(c,tx);
+                utcNow=clock.UtcNow;operationalNow=clock.ToOperationalTime(utcNow);
+                try{SqlMaintenanceLifecycle.EnsureDriverDeparture(c,tx,request.TripId,userAccountId,operationalNow);}
+                catch(MaintenancePersistenceException e){throw new TripOperationsPersistenceException(e.Message,e);}
                 const string sql=@"
 DECLARE @AssignmentId bigint,@DriverId bigint,@BusId bigint,@InspectionId bigint,@OldStatus nvarchar(30),@Departure datetime2(0);
 SELECT @AssignmentId=ta.TripAssignmentId,@DriverId=dp.DriverProfileId,@BusId=b.BusId,@InspectionId=p.PreTripInspectionId,@OldStatus=t.TripStatus,
@@ -216,7 +226,7 @@ WHERE t.TripId=@TripId AND t.RowVersion=@TripRv AND ta.RowVersion=@AssignmentRv 
  AND ((b.GrossVehicleMassKg<=3500) OR (b.GrossVehicleMassKg<=16000 AND dp.LicenceCode IN(N'C1',N'C',N'EC1',N'EC')) OR (b.GrossVehicleMassKg>16000 AND dp.LicenceCode IN(N'C',N'EC')))
  AND dp.LicenceExpiryDate>=CONVERT(date,t.ExpectedFinishLocal) AND dp.PrdpExpiryDate>=CONVERT(date,t.ExpectedFinishLocal);
 IF @AssignmentId IS NULL THROW 51032,'The Trip cannot be started. Confirm current readiness, service date, assignment, compliance, and safety conditions.',1;
-IF EXISTS(SELECT 1 FROM dbo.TripExecutions e JOIN dbo.Trips x ON x.TripId=e.TripId WHERE e.ActualCompletionUtc IS NULL AND e.TripId<>@TripId AND (e.DriverProfileId=@DriverId OR e.BusId=@BusId))
+IF EXISTS(SELECT 1 FROM dbo.TripExecutions e JOIN dbo.Trips x ON x.TripId=e.TripId WHERE e.ActualCompletionUtc IS NULL AND x.TripStatus NOT IN(N'Completed',N'Cancelled') AND e.TripId<>@TripId AND (e.DriverProfileId=@DriverId OR e.BusId=@BusId))
  THROW 51033,'The assigned Driver or Bus is still operating another Trip.',1;
 INSERT dbo.TripExecutions(TripId,PreTripInspectionId,TripAssignmentId,DriverProfileId,BusId,ActualStartUtc) VALUES(@TripId,@InspectionId,@AssignmentId,@DriverId,@BusId,@Utc);
 UPDATE dbo.TripDelayEvents SET EndedUtc=@Utc,EndType=N'Started',EndedByUserAccountId=@UserId WHERE TripId=@TripId AND EndedUtc IS NULL AND DelayPhase=N'PreStart';
@@ -450,7 +460,7 @@ FROM dbo.BusDefectReports d JOIN dbo.Buses b ON b.BusId=d.BusId JOIN dbo.DriverP
 
         private void UpdateDefect(UpdateDefectRequest request,long actor,DateTime utcNow,bool resolve)
         {
-            ExecuteWrite(delegate(SqlConnection c,SqlTransaction tx){AcquireAssignmentLock(c,tx);string sql=resolve?@"UPDATE dbo.BusDefectReports SET DefectStatus=N'Resolved',ResolvedByUserAccountId=@Actor,ResolvedUtc=@Utc,ResolutionNote=@Note,UpdatedUtc=@Utc WHERE BusDefectReportId=@Id AND RowVersion=@Rv AND DefectStatus IN(N'Open',N'Reviewed');":@"UPDATE dbo.BusDefectReports SET DefectStatus=N'Reviewed',ReviewedByUserAccountId=@Actor,ReviewedUtc=@Utc,ReviewNote=@Note,UpdatedUtc=@Utc WHERE BusDefectReportId=@Id AND RowVersion=@Rv AND DefectStatus=N'Open';";using(SqlCommand cmd=NewCommand(c,tx,sql)){cmd.Parameters.Add("@Id",SqlDbType.BigInt).Value=request.BusDefectReportId;AddTimestamp(cmd,"@Rv",request.RowVersion);cmd.Parameters.Add("@Actor",SqlDbType.BigInt).Value=actor;AddUtc(cmd,"@Utc",utcNow);AddString(cmd,"@Note",1000,request.Note);if(cmd.ExecuteNonQuery()!=1)throw new TripOperationsPersistenceException("The defect report changed. Refresh it and try again.",null);}SqlAuditWriter.Write(c,tx,actor,resolve?"DefectResolved":"DefectReviewed","BusDefectReport",request.BusDefectReportId.ToString(CultureInfo.InvariantCulture),"Note="+request.Note,null,utcNow);},"The defect report could not be updated because it changed.");
+            ExecuteWrite((c,tx)=>{AcquireAssignmentLock(c,tx);SqlDefectLifecycle.Update(c,tx,request,actor,utcNow,resolve);},"The defect report could not be updated because it changed.");
         }
 
         private static CannotProceedDetails ReadCannotProceed(SqlDataReader r)

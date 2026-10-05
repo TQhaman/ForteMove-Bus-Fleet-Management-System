@@ -65,4 +65,14 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Repositories\SqlRepairProviderRepository.cs" />
+    <Compile Include="Repositories\SqlMaintenanceRepository.WorkOrders.cs" />
+    <Compile Include="Repositories\SqlMaintenanceRepository.Queries.cs" />
+    <Compile Include="Repositories\SqlMaintenanceRepository.Plans.cs" />
+    <Compile Include="Repositories\SqlMaintenanceRepository.cs" />
+    <Compile Include="Internal\SqlMaintenanceLifecycle.cs" />
+    <Compile Include="Internal\SqlDefectLifecycle.cs" />
+    <Compile Include="Internal\SqlBusStatusHistory.cs" />
+  </ItemGroup>
 </Project>

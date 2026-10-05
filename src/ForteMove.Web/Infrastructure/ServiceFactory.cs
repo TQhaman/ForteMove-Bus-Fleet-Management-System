@@ -91,6 +91,12 @@ namespace ForteMove.Web.Infrastructure
             return new FuelStationService(new SqlFuelStationRepository(GetConnectionString()));
         }
 
+        public static MaintenanceService CreateMaintenanceService()
+        { return new MaintenanceService(new SqlMaintenanceRepository(GetConnectionString())); }
+
+        public static RepairProviderService CreateRepairProviderService()
+        { return new RepairProviderService(new SqlRepairProviderRepository(GetConnectionString())); }
+
         private static string GetConnectionString()
         {
             ConnectionStringSettings settings =
