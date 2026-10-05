@@ -1,4 +1,5 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TripTrackingPanel.ascx.cs" Inherits="ForteMove.Web.Controls.TripTrackingPanel" %>
+<link runat="server" href="~/Content/vendor/leaflet/leaflet.css" rel="stylesheet" />
 <section id="trackingPanel" runat="server" class="app-panel tracking-panel" aria-label="Simulated tracking">
     <div class="panel-heading"><div><p class="section-kicker">Simulated tracking</p><h2>Service progress</h2><p>Position is estimated between route stops using the recorded Trip timeline.</p></div></div>
     <p data-tracking="status" role="status">Loading service information...</p>

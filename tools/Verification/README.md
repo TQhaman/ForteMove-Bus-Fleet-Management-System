@@ -33,3 +33,13 @@ The process-only execution-policy option does not alter Windows policy. The harn
 - `Slice7BrowserPreview.html` and `Start-Slice7BrowserPreview.ps1`: isolated renderer fixture at `http://localhost:55359/`. Uses synthetic snapshots, not authentication or operational actions, and is outside the production Web project. Start the existing HTTPS IIS Express site first because the fixture loads the actual local CSS, Leaflet, and tracking script from it. `?tiles=failure` deliberately requests nonexistent loopback tiles to verify graceful map-background failure. Stop the helper process when done. It serves only this fixture, never arbitrary repository files.
 
 See [Slice 7 verification and manual workflow](../../SLICE_7_VERIFICATION.md) for observed results and the remaining authenticated operational acceptance walkthrough.
+
+### Real Web Forms page-rendering regression
+
+`Slice7PageRenderVerification.cs` executes the actual `Admin/Tracking/TripTracking.aspx` page and master through the ASP.NET lifecycle in an isolated application copy. It verifies that a read-only master head containing inline code blocks does not prevent the shared tracking control from rendering its declarative stylesheet and registered scripts. This catches runtime errors that a successful build or precompile does not detect.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\Verification\Invoke-Slice7PageRenderVerification.ps1 -AssembliesDirectory "$PWD\src\ForteMove.Web\bin"
+```
+
+Build first, or point `-AssembliesDirectory` at an isolated MSBuild `OutDir` containing all four new ForteMove assemblies. The runner copies application files into an ignored, uniquely named `tools/Verification/bin/PageRender-*` directory and leaves the running site's DLLs untouched. It uses read-only Windows-authenticated SQL queries and an existing active Administrator principal for the render check; it does not test sign-in/cookies, create a login bypass/test page, or change any account. Its dataset assertions deliberately target the reported manual-test case: `TR-000006`, five missing-coordinate Stops, no marker, polling enabled, and a server refresh time.

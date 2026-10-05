@@ -92,3 +92,18 @@ Review test dataset assumptions before running database harnesses elsewhere. No 
 No existing production files were removed. Migration files, authentication architecture, operational services, existing assignment/schedule/payment rules, and logo assets were preserved.
 
 Final Git status: 23 modified tracked files and 45 new untracked files, all left unstaged. Branch/HEAD are unchanged. Temporary verification browser/loopback-host/IIS Express processes were closed; launch the application normally from Visual Studio for manual acceptance.
+
+## Manual-test follow-up — tracking stylesheet runtime error
+
+The manual `TR-000006` test exposed a runtime `HttpException`: the master page's head contains inline code blocks, so its Controls collection is read-only. `TripTrackingPanel.OnPreRender` had tried to append a Leaflet stylesheet to that collection. Successful compilation/precompilation and the earlier standalone renderer fixture did not exercise this real page/master lifecycle; the earlier tests therefore missed the defect.
+
+The shared control now declares its local stylesheet directly in `TripTrackingPanel.ascx`, with a server-resolved application-relative URL. It no longer modifies `Page.Header.Controls`. Script registration, authentication, polling, calculations, and database behavior are unchanged. The same control supplies Administrator, Driver, and Passenger tracking.
+
+Verified against clean follow-up baseline `Slice-7` commit `43fe196f6a3f6712884fb899b059b7ef9ee6e95d`:
+
+- Debug and Release isolated builds: zero warnings/errors.
+- New real-page render regression: the actual `Admin/Tracking/TripTracking.aspx` page rendered successfully while its master head remained read-only; local CSS and both scripts were present.
+- `TR-000006` read-only snapshot: exactly five missing-coordinate Stops, complete itinerary, no position coordinates/marker, polling enabled, and server refresh time present.
+- No database writes, account changes, migration changes, or replacement of the DLLs used by the paused Visual Studio session.
+
+Stop the paused debugging session, use **Build > Rebuild Solution**, then start the app again and retry **Track Trip** for `TR-000006`. Do not continue the old paused request or run a stale last-successful build. See the verification README for the repeatable runtime render command.
