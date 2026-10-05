@@ -11,7 +11,7 @@ using ForteMove.Models.Routing;
 
 namespace ForteMove.Data.Repositories
 {
-    public sealed class SqlRouteRepository : IRouteRepository
+    public sealed partial class SqlRouteRepository : IRouteRepository
     {
         private const int MaximumSearchLength = 100;
         private const string ReferenceCodeLockResource = "ForteMove.NetworkReferenceCodes";
@@ -210,7 +210,9 @@ SELECT
     s.StopName,
     s.Area,
     rs.StopOrder,
-    rs.EstimatedMinutesFromOrigin
+    rs.EstimatedMinutesFromOrigin,
+    s.Latitude,
+    s.Longitude
 FROM dbo.RouteStops AS rs
 INNER JOIN dbo.Stops AS s ON s.StopId = rs.StopId
 WHERE rs.RouteId = @RouteId
@@ -563,7 +565,9 @@ ORDER BY rs.StopOrder, rs.RouteStopId;";
                                 StopOrder = reader.GetInt32(4),
                                 EstimatedMinutesFromOrigin = reader.IsDBNull(5)
                                     ? (int?)null
-                                    : reader.GetInt32(5)
+                                    : reader.GetInt32(5),
+                                Latitude = reader.IsDBNull(6) ? (decimal?)null : reader.GetDecimal(6),
+                                Longitude = reader.IsDBNull(7) ? (decimal?)null : reader.GetDecimal(7)
                             });
                         }
                     }

@@ -18,5 +18,9 @@ namespace ForteMove.Business.Contracts
         IList<RouteListItem> GetRouteList(RouteQuery query);
 
         RouteDetails GetRouteDetails(long routeId);
+
+        StopCoordinateDetails GetStopCoordinates(long stopId, long actorUserAccountId);
+
+        StopCoordinateSaveResult UpdateStopCoordinates(UpdateStopCoordinatesRequest request, long actorUserAccountId);
     }
 }

@@ -73,6 +73,10 @@ Ticket sales are available only for an assigned, future, operationally eligible 
 
 ## Migration policy
 
+Slice 7 is schema-neutral: there is no migration `0008`. Simulated tracking reads existing ordered Stop coordinates and actual Trip execution, delay, and Cannot Proceed timestamps. It never persists positions or changes Trip state. The Stop coordinate editor updates the existing paired `DECIMAL(9,6)` fields with rowversion protection and a transactional `StopCoordinatesUpdated` audit containing old and new values. Corrections affecting started, unfinished Trips require an administrator warning/acknowledgement and are permitted.
+
+There are no Route-geometry snapshots. Historical/Completed Trip rendering uses currently stored Stop coordinates, so later corrections also change those maps. Simulated tracking must not be treated as historical GPS evidence. Coordinates are not inferred or seeded.
+
 - Never edit an applied migration. Add a new, sequentially numbered migration instead.
 - Migration files do not contain `GO`; each file is executed and recorded in one SQL transaction.
 - Checksums use UTF-8 text with line endings normalized to LF, so Windows checkout line-ending changes do not create false drift.

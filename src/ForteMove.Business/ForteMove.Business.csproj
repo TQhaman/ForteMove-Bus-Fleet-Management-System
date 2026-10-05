@@ -40,6 +40,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\IAuthenticationRepository.cs" />
+    <Compile Include="Contracts\ITrackingRepository.cs" />
+    <Compile Include="Services\TrackingService.cs" />
+    <Compile Include="Tracking\TrackingCalculator.cs" />
+    <Compile Include="Routing\CoordinatePolicy.cs" />
+    <Compile Include="Services\RouteService.Coordinates.cs" />
+    <Compile Include="Exceptions\StopCoordinatePersistenceException.cs" />
     <Compile Include="Contracts\IBusRepository.cs" />
     <Compile Include="Contracts\IDashboardRepository.cs" />
     <Compile Include="Contracts\IDriverRepository.cs" />

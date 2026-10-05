@@ -13,5 +13,9 @@ namespace ForteMove.Models.Routing
         public int StopOrder { get; set; }
 
         public int? EstimatedMinutesFromOrigin { get; set; }
+
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public bool HasCoordinates { get { return Latitude.HasValue && Longitude.HasValue; } }
     }
 }

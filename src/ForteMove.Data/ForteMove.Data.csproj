@@ -37,6 +37,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Internal\SqlAuditWriter.cs" />
+    <Compile Include="Repositories\SqlTrackingRepository.cs" />
+    <Compile Include="Repositories\SqlRouteRepository.Coordinates.cs" />
     <Compile Include="Internal\SqlPassengerCommerce.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\SqlAuthenticationRepository.cs" />

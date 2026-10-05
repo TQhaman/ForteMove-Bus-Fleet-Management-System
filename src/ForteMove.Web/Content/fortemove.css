@@ -1609,3 +1609,21 @@ a:focus-visible {
 .wallet-entry span { color: #607089; display: block; font-size: .82rem; }
 .passenger-registration-card { max-width: 620px; }
 @media (max-width: 520px) { .passenger-action-grid,.wallet-review { grid-template-columns: 1fr; } .passenger-topbar .account-name { display:none; } .passenger-navigation a { font-size:.85rem; padding:.6rem .7rem; } }
+/* Shared, informational simulated tracking panel. Operational actions stay separate. */
+.tracking-panel { margin-top: 1.5rem; padding: 1.5rem; }
+.tracking-panel h2 { font-size: 1.25rem; }
+.tracking-map { height: 360px; width: 100%; background: #eef2f6; border: 1px solid #dce4ec; border-radius: .65rem; margin: 1rem 0; z-index: 0; }
+.tracking-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.tracking-summary dt { font-size: .8rem; color: #586b7e; font-weight: 500; }
+.tracking-summary dd { font-weight: 650; margin: .3rem 0 0; }
+.tracking-itinerary { padding-left: 1.4rem; display: grid; gap: .45rem; }
+.tracking-next { color: #0968bc; font-weight: 650; }
+.tracking-disclaimer { color: #586b7e; font-size: .85rem; line-height: 1.5; }
+.tracking-bus { border: 2px solid #fff; border-radius: .4rem; background: #10243b; color: #fff; box-shadow: 0 2px 6px #10243b55; text-align: center; font: 700 11px/24px system-ui, sans-serif; }
+.tracking-panel button { min-height: 44px; }
+.tracking-panel [hidden] { display: none !important; }
+@media (max-width: 640px) {
+    .tracking-panel { padding: 1rem; }
+    .tracking-map { height: 260px; }
+    .tracking-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

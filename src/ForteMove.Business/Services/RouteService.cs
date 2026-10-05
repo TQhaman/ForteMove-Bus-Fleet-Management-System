@@ -11,7 +11,7 @@ using ForteMove.Models.Routing;
 
 namespace ForteMove.Business.Services
 {
-    public sealed class RouteService
+    public sealed partial class RouteService
     {
         private const int MaximumRouteNameLength = 150;
         private const int MaximumStopNameLength = 150;
@@ -349,55 +349,8 @@ namespace ForteMove.Business.Services
 
             decimal? latitude = request == null ? null : request.Latitude;
             decimal? longitude = request == null ? null : request.Longitude;
-            if (latitude.HasValue != longitude.HasValue)
-            {
-                errors.Add(new ValidationError(
-                    "Stops",
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Stop {0} must include both latitude and longitude, or leave both empty.",
-                        stopOrder)));
-            }
-
-            if (latitude.HasValue &&
-                (latitude.Value < -90m || latitude.Value > 90m))
-            {
-                errors.Add(new ValidationError(
-                    "Stops",
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Stop {0} latitude must be between -90 and 90.",
-                        stopOrder)));
-            }
-            else if (latitude.HasValue && HasMoreThanDecimalPlaces(latitude.Value, 6))
-            {
-                errors.Add(new ValidationError(
-                    "Stops",
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Stop {0} latitude may use no more than six decimal places.",
-                        stopOrder)));
-            }
-
-            if (longitude.HasValue &&
-                (longitude.Value < -180m || longitude.Value > 180m))
-            {
-                errors.Add(new ValidationError(
-                    "Stops",
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Stop {0} longitude must be between -180 and 180.",
-                        stopOrder)));
-            }
-            else if (longitude.HasValue && HasMoreThanDecimalPlaces(longitude.Value, 6))
-            {
-                errors.Add(new ValidationError(
-                    "Stops",
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Stop {0} longitude may use no more than six decimal places.",
-                        stopOrder)));
-            }
+            foreach (ValidationError error in Routing.CoordinatePolicy.Validate(latitude, longitude, "Stops"))
+                errors.Add(error);
 
             if (errors.Count > errorCountBeforeValidation)
             {

@@ -38,6 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ServiceResult.cs" />
+    <Compile Include="Tracking\TrackingModels.cs" />
+    <Compile Include="Routing\StopCoordinateModels.cs" />
     <Compile Include="Common\ValidationError.cs" />
     <Compile Include="Fleet\Bus.cs" />
     <Compile Include="Fleet\BusDetails.cs" />

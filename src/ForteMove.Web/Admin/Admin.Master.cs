@@ -68,7 +68,7 @@ namespace ForteMove.Web.Admin
             lnkRouteList.CssClass = BuildNavigationClass(
                 appRelativePath,
                 "~/Admin/Routes/RouteList.aspx",
-                "~/Admin/Routes/RouteDetails.aspx");
+                "~/Admin/Routes/RouteDetails.aspx", "~/Admin/Routes/StopCoordinates.aspx");
             lnkCreateRoute.CssClass = BuildNavigationClass(
                 appRelativePath,
                 "~/Admin/Routes/CreateRoute.aspx");
@@ -92,6 +92,8 @@ namespace ForteMove.Web.Admin
                 "~/Admin/Operations/Exceptions.aspx", "~/Admin/Operations/ExceptionDetails.aspx");
             lnkDefects.CssClass = BuildNavigationClass(appRelativePath,
                 "~/Admin/Operations/Defects.aspx", "~/Admin/Operations/DefectDetails.aspx");
+            lnkLiveTracking.CssClass = BuildNavigationClass(appRelativePath,
+                "~/Admin/Tracking/LiveTracking.aspx", "~/Admin/Tracking/TripTracking.aspx");
 
             SetAriaCurrent(lnkDashboard);
             SetAriaCurrent(lnkRegisterBus);
@@ -106,6 +108,7 @@ namespace ForteMove.Web.Admin
             SetAriaCurrent(lnkAssignmentQueue);
             SetAriaCurrent(lnkExceptions);
             SetAriaCurrent(lnkDefects);
+            SetAriaCurrent(lnkLiveTracking);
         }
 
         private static string BuildNavigationClass(string currentPath, params string[] targetPaths)

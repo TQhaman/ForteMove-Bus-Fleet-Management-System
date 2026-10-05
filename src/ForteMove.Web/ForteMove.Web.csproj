@@ -47,6 +47,21 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Admin\Routes\StopCoordinates.aspx" />
+    <Content Include="Admin\Tracking\LiveTracking.aspx" />
+    <Content Include="Admin\Tracking\TripTracking.aspx" />
+    <Content Include="Passenger\TrackTrip.aspx" />
+    <Content Include="Controls\TripTrackingPanel.ascx" />
+    <Content Include="Tracking\Snapshot.ashx" />
+    <Content Include="Scripts\fortemove-tracking.js" />
+    <Content Include="Scripts\vendor\leaflet\leaflet.js" />
+    <Content Include="Content\vendor\leaflet\leaflet.css" />
+    <Content Include="Content\vendor\leaflet\LICENSE" />
+    <Content Include="Content\vendor\leaflet\images\layers.png" />
+    <Content Include="Content\vendor\leaflet\images\layers-2x.png" />
+    <Content Include="Content\vendor\leaflet\images\marker-icon.png" />
+    <Content Include="Content\vendor\leaflet\images\marker-icon-2x.png" />
+    <Content Include="Content\vendor\leaflet\images\marker-shadow.png" />
     <Content Include="Account\Login.aspx" />
     <Content Include="Account\ChangePassword.aspx" />
     <Content Include="Account\RegisterPassenger.aspx" />
@@ -108,6 +123,48 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Admin\Routes\StopCoordinates.aspx.cs">
+      <DependentUpon>StopCoordinates.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Routes\StopCoordinates.aspx.designer.cs">
+      <DependentUpon>StopCoordinates.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Tracking\LiveTracking.aspx.cs">
+      <DependentUpon>LiveTracking.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Tracking\LiveTracking.aspx.designer.cs">
+      <DependentUpon>LiveTracking.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Tracking\TripTracking.aspx.cs">
+      <DependentUpon>TripTracking.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Tracking\TripTracking.aspx.designer.cs">
+      <DependentUpon>TripTracking.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\TrackTrip.aspx.cs">
+      <DependentUpon>TrackTrip.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\TrackTrip.aspx.designer.cs">
+      <DependentUpon>TrackTrip.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TripTrackingPanel.ascx.cs">
+      <DependentUpon>TripTrackingPanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\TripTrackingPanel.ascx.designer.cs">
+      <DependentUpon>TripTrackingPanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Tracking\Snapshot.ashx.cs">
+      <DependentUpon>Snapshot.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\TripDetails.Tracking.cs">
+      <DependentUpon>TripDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Account\ChangePassword.aspx.cs">
       <DependentUpon>ChangePassword.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -269,14 +326,34 @@
     <Compile Include="Admin\Assignments\AssignmentDetails.aspx.designer.cs">
       <DependentUpon>AssignmentDetails.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Admin\Operations\Exceptions.aspx.cs"><DependentUpon>Exceptions.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Admin\Operations\Exceptions.aspx.designer.cs"><DependentUpon>Exceptions.aspx</DependentUpon></Compile>
-    <Compile Include="Admin\Operations\ExceptionDetails.aspx.cs"><DependentUpon>ExceptionDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Admin\Operations\ExceptionDetails.aspx.designer.cs"><DependentUpon>ExceptionDetails.aspx</DependentUpon></Compile>
-    <Compile Include="Admin\Operations\Defects.aspx.cs"><DependentUpon>Defects.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Admin\Operations\Defects.aspx.designer.cs"><DependentUpon>Defects.aspx</DependentUpon></Compile>
-    <Compile Include="Admin\Operations\DefectDetails.aspx.cs"><DependentUpon>DefectDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Admin\Operations\DefectDetails.aspx.designer.cs"><DependentUpon>DefectDetails.aspx</DependentUpon></Compile>
+    <Compile Include="Admin\Operations\Exceptions.aspx.cs">
+      <DependentUpon>Exceptions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Operations\Exceptions.aspx.designer.cs">
+      <DependentUpon>Exceptions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Operations\ExceptionDetails.aspx.cs">
+      <DependentUpon>ExceptionDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Operations\ExceptionDetails.aspx.designer.cs">
+      <DependentUpon>ExceptionDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Operations\Defects.aspx.cs">
+      <DependentUpon>Defects.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Operations\Defects.aspx.designer.cs">
+      <DependentUpon>Defects.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Operations\DefectDetails.aspx.cs">
+      <DependentUpon>DefectDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Operations\DefectDetails.aspx.designer.cs">
+      <DependentUpon>DefectDetails.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -298,40 +375,125 @@
     <Compile Include="Driver\Account.aspx.designer.cs">
       <DependentUpon>Account.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Driver\Today.aspx.cs"><DependentUpon>Today.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\Today.aspx.designer.cs"><DependentUpon>Today.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\Upcoming.aspx.cs"><DependentUpon>Upcoming.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\Upcoming.aspx.designer.cs"><DependentUpon>Upcoming.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\History.aspx.cs"><DependentUpon>History.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\History.aspx.designer.cs"><DependentUpon>History.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\TripDetails.aspx.cs"><DependentUpon>TripDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\TripDetails.aspx.designer.cs"><DependentUpon>TripDetails.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\PreTripCheck.aspx.cs"><DependentUpon>PreTripCheck.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\PreTripCheck.aspx.designer.cs"><DependentUpon>PreTripCheck.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\ReportDelay.aspx.cs"><DependentUpon>ReportDelay.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\ReportDelay.aspx.designer.cs"><DependentUpon>ReportDelay.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\CannotProceed.aspx.cs"><DependentUpon>CannotProceed.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\CannotProceed.aspx.designer.cs"><DependentUpon>CannotProceed.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\ReportDefect.aspx.cs"><DependentUpon>ReportDefect.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\ReportDefect.aspx.designer.cs"><DependentUpon>ReportDefect.aspx</DependentUpon></Compile>
-    <Compile Include="Driver\CompleteTrip.aspx.cs"><DependentUpon>CompleteTrip.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Driver\CompleteTrip.aspx.designer.cs"><DependentUpon>CompleteTrip.aspx</DependentUpon></Compile>
-    <Compile Include="Passenger\Passenger.Master.cs"><DependentUpon>Passenger.Master</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\Passenger.Master.designer.cs"><DependentUpon>Passenger.Master</DependentUpon></Compile>
-    <Compile Include="Passenger\Home.aspx.cs"><DependentUpon>Home.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\Home.aspx.designer.cs"><DependentUpon>Home.aspx</DependentUpon></Compile>
-    <Compile Include="Passenger\Journeys.aspx.cs"><DependentUpon>Journeys.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\Journeys.aspx.designer.cs"><DependentUpon>Journeys.aspx</DependentUpon></Compile>
-    <Compile Include="Passenger\JourneyDetails.aspx.cs"><DependentUpon>JourneyDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\JourneyDetails.aspx.designer.cs"><DependentUpon>JourneyDetails.aspx</DependentUpon></Compile>
-    <Compile Include="Passenger\Tickets.aspx.cs"><DependentUpon>Tickets.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\Tickets.aspx.designer.cs"><DependentUpon>Tickets.aspx</DependentUpon></Compile>
-    <Compile Include="Passenger\TicketDetails.aspx.cs"><DependentUpon>TicketDetails.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\TicketDetails.aspx.designer.cs"><DependentUpon>TicketDetails.aspx</DependentUpon></Compile>
-    <Compile Include="Passenger\Wallet.aspx.cs"><DependentUpon>Wallet.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\Wallet.aspx.designer.cs"><DependentUpon>Wallet.aspx</DependentUpon></Compile>
-    <Compile Include="Passenger\Account.aspx.cs"><DependentUpon>Account.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Passenger\Account.aspx.designer.cs"><DependentUpon>Account.aspx</DependentUpon></Compile>
+    <Compile Include="Driver\Today.aspx.cs">
+      <DependentUpon>Today.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\Today.aspx.designer.cs">
+      <DependentUpon>Today.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\Upcoming.aspx.cs">
+      <DependentUpon>Upcoming.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\Upcoming.aspx.designer.cs">
+      <DependentUpon>Upcoming.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\History.aspx.cs">
+      <DependentUpon>History.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\History.aspx.designer.cs">
+      <DependentUpon>History.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\TripDetails.aspx.cs">
+      <DependentUpon>TripDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\TripDetails.aspx.designer.cs">
+      <DependentUpon>TripDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\PreTripCheck.aspx.cs">
+      <DependentUpon>PreTripCheck.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\PreTripCheck.aspx.designer.cs">
+      <DependentUpon>PreTripCheck.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\ReportDelay.aspx.cs">
+      <DependentUpon>ReportDelay.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\ReportDelay.aspx.designer.cs">
+      <DependentUpon>ReportDelay.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\CannotProceed.aspx.cs">
+      <DependentUpon>CannotProceed.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\CannotProceed.aspx.designer.cs">
+      <DependentUpon>CannotProceed.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\ReportDefect.aspx.cs">
+      <DependentUpon>ReportDefect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\ReportDefect.aspx.designer.cs">
+      <DependentUpon>ReportDefect.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Driver\CompleteTrip.aspx.cs">
+      <DependentUpon>CompleteTrip.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Driver\CompleteTrip.aspx.designer.cs">
+      <DependentUpon>CompleteTrip.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\Passenger.Master.cs">
+      <DependentUpon>Passenger.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\Passenger.Master.designer.cs">
+      <DependentUpon>Passenger.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\Home.aspx.cs">
+      <DependentUpon>Home.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\Home.aspx.designer.cs">
+      <DependentUpon>Home.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\Journeys.aspx.cs">
+      <DependentUpon>Journeys.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\Journeys.aspx.designer.cs">
+      <DependentUpon>Journeys.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\JourneyDetails.aspx.cs">
+      <DependentUpon>JourneyDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\JourneyDetails.aspx.designer.cs">
+      <DependentUpon>JourneyDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\Tickets.aspx.cs">
+      <DependentUpon>Tickets.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\Tickets.aspx.designer.cs">
+      <DependentUpon>Tickets.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\TicketDetails.aspx.cs">
+      <DependentUpon>TicketDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\TicketDetails.aspx.designer.cs">
+      <DependentUpon>TicketDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\Wallet.aspx.cs">
+      <DependentUpon>Wallet.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\Wallet.aspx.designer.cs">
+      <DependentUpon>Wallet.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Passenger\Account.aspx.cs">
+      <DependentUpon>Account.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Passenger\Account.aspx.designer.cs">
+      <DependentUpon>Account.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Errors\AccessDenied.aspx.cs">
       <DependentUpon>AccessDenied.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

@@ -50,6 +50,9 @@
                             <asp:PlaceHolder runat="server" Visible='<%# Eval("EstimatedMinutesFromOrigin") != null %>'>
                                 <span class="itinerary-time"><%#: FormatMinutesFromOrigin(Eval("EstimatedMinutesFromOrigin")) %></span>
                             </asp:PlaceHolder>
+                            <span class="route-stop-meta"><%#: (bool)Eval("HasCoordinates") ? "Coordinates available" : "Coordinates missing" %>
+                                <a href='<%# ResolveUrl("~/Admin/Routes/StopCoordinates.aspx?id=" + Eval("StopId")) %>'>Update coordinates</a>
+                            </span>
                         </li>
                     </ItemTemplate>
                 </asp:Repeater>

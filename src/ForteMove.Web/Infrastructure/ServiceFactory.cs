@@ -73,6 +73,11 @@ namespace ForteMove.Web.Infrastructure
                 new SqlPassengerRepository(GetConnectionString()));
         }
 
+        public static TrackingService CreateTrackingService()
+        {
+            return new TrackingService(new SqlTrackingRepository(GetConnectionString()));
+        }
+
         private static string GetConnectionString()
         {
             ConnectionStringSettings settings =

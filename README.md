@@ -71,6 +71,7 @@ Open `ForteMove.sln`, set `ForteMove.Web` as the startup project, and launch its
 19. Create a Passenger account from the login page, sign in, and top up the simulated wallet.
 20. Find an assigned future journey, review its live fare and capacity, purchase a Ticket, and inspect it under Tickets.
 21. If an administrator cancels the Trip, verify that the Ticket is retained as Refunded and its exact fare returns to the Passenger wallet.
+22. Enter approved Stop coordinates from Route Details, then open Operations > Live tracking as Administrator, Trip Details as the assigned Driver, or Track trip from the Passenger's own Ticket Details.
 
 Vehicle status is an explicit administrator choice. An `Operational` request is rejected when the licence, roadworthy certificate, or insurance is expired; the administrator must correct the compliance information or deliberately select `OutOfService`. Assignment eligibility independently checks compliance even when a stored vehicle status is Operational.
 
@@ -85,6 +86,8 @@ Driver operations keep planned service times unchanged and store actual operatio
 Passenger Ticket sales use the current assigned Bus capacity and operational eligibility rather than assignment recommendation rankings. Purchases debit the Passenger wallet, snapshot the Route fare, and protect the Trip as an operational dependency. Simulated top-ups do not use a payment gateway. Trip completion leaves a purchased Ticket as a past Ticket because boarding/redemption is intentionally outside this slice; administrator Trip cancellation performs the full atomic refund instead.
 
 ## Collaborator handoff
+
+- [Slice 7 tracking implementation, verification results, and manual workflow](SLICE_7_VERIFICATION.md)
 
 - [Collaborator setup and Slice 1–6 walkthrough](COLLABORATOR_SETUP.md)
 - [Slice 6 checkpoint audit, history and current implementation map](SLICE_6_CHECKPOINT.md)
